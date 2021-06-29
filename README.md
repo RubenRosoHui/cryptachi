@@ -6,6 +6,3 @@ This is the repository for www.cryptachi.com
 | ---- | ------ | ----- | ---- |
 | Foster Hangdaan | Developer |  https://github.com/FosterHangdaan | www.fosterhangdaan.com |
 | Matthew Percy | Developer | https://github.com/mrbru3 | www.percy.tech |
-
-## Build
-To build this run `build.py` in the scripts folder. 
