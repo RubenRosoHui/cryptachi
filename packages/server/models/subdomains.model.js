@@ -4,7 +4,7 @@ const SubdomainSchema = mongoose.Schema({
 	//_id: abcd,
 	name: {type: String, unique: true},
 	paid: { type: Boolean, default: false},
-	//user: Mongoose.schema.ref,
+	user: {type: mongoose.Schema.Types.ObjectID, ref: 'User'},
 	expiration: Date,
 	createdAt: { type: Date, default: Date.now },
 	updatedAt: Date,
