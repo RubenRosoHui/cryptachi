@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
-const dotenv = require('dotenv');
-dotenv.config({path:'.env.development.local'});
 
 // Routes
 const aliasRoutes = require('./routes/alias.js');
