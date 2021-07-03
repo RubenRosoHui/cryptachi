@@ -7,16 +7,12 @@ const UserSchema = mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     resetToken: String,
     resetExpiration: Date,
-    
-    domains: [
+    aliases: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Subdomain"
+            ref: "Alias"
         }
     ]
-
-
-
 });
 
 module.exports = mongoose.model('User',UserSchema);

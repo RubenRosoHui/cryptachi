@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
-const SubdomainSchema = mongoose.Schema({
-	//_id: abcd,
+const AliasSchema = mongoose.Schema({
 	name: {type: String, unique: true},
 	paid: { type: Boolean, default: false},
 	user: {type: mongoose.Schema.Types.ObjectID, ref: 'User'},
@@ -16,7 +15,6 @@ const SubdomainSchema = mongoose.Schema({
 			description: String
 		}
 	],
-
 });
 
-module.exports = mongoose.model('Subdomain',SubdomainSchema);
+module.exports = mongoose.model('Alias',AliasSchema);
