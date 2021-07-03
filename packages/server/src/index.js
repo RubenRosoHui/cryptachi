@@ -10,19 +10,28 @@ const app = express();
 
 // MongoDB Configuration
 const mongoUrl = `mongodb://${process.env.MONGODB_HOSTNAME}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DBNAME}`;
-const mongoOptions = {
-	auth: {
-		user: process.env.MONGODB_USER,
-		password: process.env.MONGODB_PASS,
-	},
-	useNewUrlParser: true,
-	useUnifiedTopology: true
-};
+
+var mongoOptions;
+if(process.env.MONGODB_USER){
+	mongoOptions = {
+		auth: {
+			user: process.env.MONGODB_USER,
+			password: process.env.MONGODB_PASS,
+		},
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	};
+}
+else {
+	mongoOptions = {
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	};
+}
 
 // Middlewares
 app.use(bodyParser.json());
 
-// /api/alias/foster
 app.use('/api/alias', aliasRoutes);
 app.use('/api/auth', authRoutes);
 
