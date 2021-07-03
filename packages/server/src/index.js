@@ -34,7 +34,6 @@ else {
 // Middlewares
 app.use(bodyParser.json());
 
-// /api/alias/foster
 app.use('/api/alias', aliasRoutes);
 app.use('/api/auth', authRoutes);
 
