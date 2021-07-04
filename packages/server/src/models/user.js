@@ -4,7 +4,6 @@ const UserSchema = mongoose.Schema({
 	email: {type:String, unique:true, required:true},
 	password: {type:String, required:true},
 	roles: Array,
-    createdAt: { type: Date, default: Date.now },
     resetToken: String,
     resetExpiration: Date,
     aliases: [
@@ -12,7 +11,13 @@ const UserSchema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Alias"
         }
-    ]
-});
+    ],
+	orders: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+            ref: "Order"
+		}
+	]
+},{timestamps:true});
 
 module.exports = mongoose.model('User',UserSchema);
