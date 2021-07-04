@@ -12,10 +12,10 @@ const UserSchema = mongoose.Schema({
             ref: "Alias"
         }
     ],
-	purchases: [
+	orders: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-            ref: "Purchase"
+            ref: "Order"
 		}
 	]
 },{timestamps:true});

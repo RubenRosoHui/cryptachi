@@ -11,18 +11,6 @@ exports.register = async (req, res, next) => {
 	try {
 		let user = await User.findOne({ email });
 		
-		///if (user) {
-
-		//	throw ErrorLib.authenticationError();
-			//const error = new Error('User Already exists');
-			//error.statusCode = 400;
-			//error.name = 'AuthenticationError';
-			//throw error;
-			/*
-			return res.status(400).json({
-				msg: "User Already Exists"
-			});*/
-		//}
 		//Create user
 		user = new User({
 			email,
