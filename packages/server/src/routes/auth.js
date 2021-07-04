@@ -10,7 +10,7 @@ router.post('/register',validators.validateUser,validators.validateAlias,control
 //body('email').isEmail(),body('password').isLength({ min: 5 })
 
 //USER LOGIN
-router.post('/login');
+router.post('/login',controller.login);
 
 //RESET LINK
 router.get('/reset-password');

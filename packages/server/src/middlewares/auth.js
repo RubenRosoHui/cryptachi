@@ -1,4 +1,6 @@
 const User = require('../models/user.js');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 exports.validateWebToken = (req, res, next) => {
     const token = req.header("token");
