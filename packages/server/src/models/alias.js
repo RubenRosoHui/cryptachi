@@ -5,8 +5,6 @@ const AliasSchema = mongoose.Schema({
 	paid: { type: Boolean, default: false},
 	user: {type: mongoose.Schema.Types.ObjectID, ref: 'User'},
 	expiration: Date,
-	createdAt: { type: Date, default: Date.now },
-	updatedAt: Date,
 	records: [
 		{
 			currency: {type: String, required: true},
@@ -15,6 +13,6 @@ const AliasSchema = mongoose.Schema({
 			description: String
 		}
 	],
-});
+},{timestamps:true});
 
 module.exports = mongoose.model('Alias',AliasSchema);
