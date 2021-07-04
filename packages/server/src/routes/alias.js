@@ -11,7 +11,7 @@ router.get('/');
 router.post('/',authMiddleWare.validateWebToken,controller.addAlias);
 
 //REMOVE ALIAS
-router.delete('/',authMiddleWare.validateWebToken,);
+router.delete('/',authMiddleWare.validateWebToken,controller.deleteAlias);
 
 // ADD ALIAS RECORD
 router.post('/:name');
