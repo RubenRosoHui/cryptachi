@@ -1,5 +1,6 @@
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
+const ErrorLib = require('../lib/error.js')
 
 exports.addAlias = async (req,res,next) => { 
 
@@ -10,7 +11,8 @@ exports.addAlias = async (req,res,next) => {
 
 		//Prevent user from owning multiple domains
 		if(user.aliases.length >= 1){
-		 	return res.status(200).json("You can only own one alias!");
+		 	throw ErrorLib.unauthorizedAccessError("Only one alias per user");
+			//return res.status(200).json("You can only own one alias!");
 		}
 
 		//double check if domain is available
@@ -18,7 +20,8 @@ exports.addAlias = async (req,res,next) => {
 		if(alias){
 			//alias exists, does it have a user?
 			if(alias.user){
-				return res.status(400).json("ALIAS ALREADY TAKEN");
+				throw ErrorLib.unauthorizedAccessError("Alias already exists");
+				//return res.status(400).json("ALIAS ALREADY TAKEN");
 			}
 			else{
 				alias.user = user;
@@ -40,6 +43,6 @@ exports.addAlias = async (req,res,next) => {
 		return res.status(200).json("Alias created successfully");
 	}
 	catch(err){
-        return res.status(500).send(err);
+		next(err);
 	}
 }
