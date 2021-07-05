@@ -1,0 +1,110 @@
+:root {
+	--green-light: #c2fdc9;
+	--green: #50fa7b;
+	--green-dark: #009400;
+	--red-dark: #c8191f;
+	--red: #ff5555;
+	--red-light: #f99d9e;
+	--cyan-light: #19707b;
+	--cyan: #8be9fd;
+	--cyan-dark: #b9f1fe;
+	--yellow-light: #f8fbcc;
+	--yellow: #f1fa8c;
+	--yellow-dark: #9a8c35;
+	--purple-light: #d8bffb;
+	--purple: #bd93f9;
+	--purple-dark: #5806c8;
+	--pink-light: #feb1dd;
+	--pink: #ff79c6;
+	--pink-dark: #8d0063;
+	--blue-light: #c5cce1;
+	--blue: #5f72a8;
+	--blue-dark: #232e62;
+	--black-light: #7e808f;
+	--black: #4a4c59;
+	--black-dark: #282a36;
+	--black-darkest: #21232d;
+	--white: #f8f8f2;
+	--text: #f8f8f2;
+	--text-dark: #e4e4de;
+	--text-darker: #aeaea8;
+	--text-darkest: #666661;
+	--error-dark: #c8191f;
+	--error: #ff5555;
+	--error-light: #f99d9e;
+	--background: #21232d;
+	--primary-light: #7e808f;
+	--primary: #4a4c59;
+	--primary-dark: #282a36;
+	--secondary-light: #c2fdc9;
+	--secondary: #50fa7b;
+	--secondary-dark: #009400;
+	--surface-light: #c5cce1;
+	--surface: #5f72a8;
+	--surface-dark: #232e62;
+}
+
+.green-light {
+	color: var(--green-light);
+}
+.green {
+	color: var(--green);
+}
+.green-dark {
+	background-color: var(--green-dark);
+}
+.green-filter {
+	filter: invert(61%) sepia(41%) saturate(650%) hue-rotate(82deg) brightness(124%) contrast(96%);
+}
+
+.white {
+	color: #f8f8f2;
+}
+.white-dark {
+	color: #f8f8f2;
+}
+.white-darker {
+	color: #aeaea8;
+}
+.white-darkest {
+	color: #666661;
+}
+
+.red-light {
+	color: var(--red-light);
+}
+.red {
+	color: var(--red);
+}
+.red-dark {
+	color: var(--red-dark);
+}
+.red-filter {
+	filter: invert(53%) sepia(85%) saturate(3936%) hue-rotate(330deg) brightness(105%) contrast(99%);
+}
+
+.yellow-light {
+	color: var(--yellow-light);
+}
+.yellow {
+	color: var(--yellow);
+}
+.yellow-dark {
+	color: var(--yellow-dark);
+}
+.yellow-filter {
+	filter: invert(84%) sepia(38%) saturate(411%) hue-rotate(17deg) brightness(103%) contrast(105%);
+}
+
+.cyan-light {
+	color: var(--cyan-light);
+}
+.cyan {
+	color: var(--cyan);
+}
+.cyan-dark {
+	background-color: var(--cyan-dark);
+}
+.cyan-filter {
+	filter: invert(77%) sepia(32%) saturate(839%) hue-rotate(169deg) brightness(110%) contrast(98%);
+}

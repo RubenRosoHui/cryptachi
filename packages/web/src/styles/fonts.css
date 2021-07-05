@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+/*
+		To use the fonts:
+		font-family: 'Encode Sans SC', sans-serif;
+		font-family: 'JetBrains Mono', monospace;
+*/
+
+:root {
+	--font-xs: 0.75rem;
+	--font-sm: 0.875rem;
+	--font-reg: 1rem;
+	--font-md: 1.25rem;
+	--font-lg: 1.5rem;
+	--font-xl: 1.75rem;
+	--font-2xl: 2rem;
+	--font-3xl: 3rem;
+	--font-4xl: 4rem;
+}
+
+.font-xs {
+	font-size: var(--font-xs);
+}
+.font-sm {
+	font-size: var(--font-sm);
+}
+.font-lg {
+	font-size: var(--font-lg);
+}
+.font-reg {
+	font-size: var(--font-reg);
+}
+.font-2xl {
+	font-size: var(--font-2xl);
+}
+.font-3xl {
+	font-size: var(--font-3xl);
+}
+.font-4xl {
+	font-size: var(--font-4xl);
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Encode Sans SC', sans-serif;
+	font-weight: 800;
+	color: var(--green);
+}
