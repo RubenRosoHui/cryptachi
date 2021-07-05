@@ -8,15 +8,16 @@ router.get('/');
 
 //ADD ALIAS
 // router.post('/',authMiddleWare.validateWebToken,controller.addAlias);
-router.post('/',authMiddleWare.validateWebToken,controller.addAlias);
+//router.post('/',authMiddleWare.validateWebToken,controller.addAlias);
+router.post('/:name',authMiddleWare.validateWebToken,controller.addAlias);
 
 //REMOVE ALIAS
-router.delete('/',authMiddleWare.validateWebToken,controller.deleteAlias);
+router.delete('/:name',authMiddleWare.validateWebToken,controller.deleteAlias);
 
 // ADD ALIAS RECORD
-router.post('/:name');
+router.post('/:name/records',authMiddleWare.validateWebToken,controller.addRecord);
 
 //REMOVE ALIAS RECORD
-router.delete('/:name');
+router.delete('/:name/records',authMiddleWare.validateWebToken,controller.deleteRecord);
 
 module.exports = router;

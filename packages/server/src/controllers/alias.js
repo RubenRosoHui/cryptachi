@@ -4,7 +4,9 @@ const ErrorLib = require('../lib/error.js')
 
 exports.addAlias = async (req, res, next) => {
 
-	const { name } = req.body;
+	//const { name } = req.body;
+	const { name } = req.params;
+
 	try {
 		//retrieve user from validateWebToken middleware
 		const user = await User.findById(req.user.id);
@@ -49,7 +51,8 @@ exports.addAlias = async (req, res, next) => {
 
 exports.deleteAlias = async (req, res, next) => {
 
-	const { name } = req.body;
+	//const { name } = req.body;
+	const {name} = req.params;
 	try {
 
 		const user = await User.findById(req.user.id).populate("aliases");
@@ -72,7 +75,61 @@ exports.deleteAlias = async (req, res, next) => {
 }
 
 exports.addRecord = async (req, res, next) => {
+	const {currency,address} = req.body;
+	const {name} = req.params;
+	console.log(name);
+	try {
+		const user = await User.findById(req.user.id);//.populate("aliases");
+		const alias = await Alias.findOne({ name: name, user: user });
 
+		//if user owns alias
+		if (alias) {
 
+			//Is domain on the free plan and already has 1 record?
 
+			//Is Currency valid?
+			//does a record for this currency already exist?
+
+			//DNSimple API code
+
+			//Add record
+			alias.records.push({currency:currency,recipientAddress:address});
+			alias.save();
+			return res.status(200).json("Alias record created successfully");
+		}
+		else throw ErrorLib.unauthorizedAccessError("You do not own this alias")
+	}
+	catch (err) {
+		next(err);
+	}
+
+}
+
+exports.deleteRecord = async (req, res, next) => {
+
+	const {currency} = req.body;
+	const {name} = req.params;
+	try {
+
+		const user = await User.findById(req.user.id).populate("aliases");
+		const alias = await Alias.findOne({ name: name, user: user });
+
+		//if user owns alias
+		if (alias) {
+			
+			//Is Currency Valid?
+			//Does a record with this currency exist?
+
+			//DNSimple API code
+
+			//Delete record
+			alias.records = alias.records.filter(e => e.currency != currency);//.push({currency:currency,recipientAddress:address});
+			alias.save();
+			return res.status(200).json("Alias record deleted successfully");
+		}
+		else throw ErrorLib.unauthorizedAccessError("You do not own this alias")
+	}
+	catch (err) {
+		next(err);
+	}
 }

@@ -39,7 +39,14 @@ exports.validateUser = [
 exports.validateAlias = [
 	oneOf([
 		body('alias').isEmpty(),
-		body('alias').isFQDN().contains('cryptachi.com')
+		//body('alias').isFQDN().contains('cryptachi.com')
+		body('alias').custom( async (value, { req }) => {
+			if(req.body.alias + "cryptachi.com")
+			if (alias) {
+				throw new Error('Alias already exists');
+			}
+			return true;
+		})
 	],"Alias is invalid"),
 
 	//Does it already exist?
