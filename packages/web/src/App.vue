@@ -1,7 +1,7 @@
 <template>
   <the-navigation />
   <div id="main-content">
-    <h2>This is the content.</h2>
+    <router-view />
   </div>
   <the-footer />
 </template>
