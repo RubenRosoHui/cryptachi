@@ -1,20 +1,47 @@
 <template>
-	<h1>Cryptachi</h1>
+  <the-navigation />
+  <div id="main-content">
+    <h2>This is the content.</h2>
+  </div>
+  <the-footer />
 </template>
 
+<script>
+  import TheNavigation from './components/layout/TheNavigation.vue';
+  import TheFooter from './components/layout/TheFooter.vue';
+
+  export default {
+    components: { TheNavigation, TheFooter }
+  };
+</script>>
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap');
-  /*
-      To use the fonts:
-      font-family: 'Encode Sans SC', sans-serif;
-      font-family: 'JetBrains Mono', monospace;
-  */
+  @import url('./styles/colors.css');
+  @import url('./styles/spacing.css');
+  @import url('./styles/fonts.css');
+
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html, body, #app {
+    height: 100%;
+  }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+    background-color: var(--background);
+  }
 
   #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #main-content {
+    flex: 1;
   }
 </style>
