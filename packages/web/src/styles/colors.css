@@ -25,10 +25,10 @@
 	--black-dark: #282a36;
 	--black-darkest: #21232d;
 	--white: #f8f8f2;
-	--text: #f8f8f2;
-	--text-dark: #e4e4de;
-	--text-darker: #aeaea8;
-	--text-darkest: #666661;
+	--text-light: #f8f8f2;
+	--text: #e4e4de;
+	--text-dark: #aeaea8;
+	--text-darker: #666661;
 	--error-dark: #c8191f;
 	--error: #ff5555;
 	--error-light: #f99d9e;
@@ -42,6 +42,11 @@
 	--surface-light: #c5cce1;
 	--surface: #5f72a8;
 	--surface-dark: #232e62;
+
+	--green-filter: invert(61%) sepia(41%) saturate(650%) hue-rotate(82deg) brightness(124%) contrast(96%);
+	--red-filter: invert(53%) sepia(85%) saturate(3936%) hue-rotate(330deg) brightness(105%) contrast(99%);
+	--yellow-filter: invert(84%) sepia(38%) saturate(411%) hue-rotate(17deg) brightness(103%) contrast(105%);
+	--cyan-filter: invert(77%) sepia(32%) saturate(839%) hue-rotate(169deg) brightness(110%) contrast(98%);
 }
 
 .green-light {

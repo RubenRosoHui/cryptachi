@@ -18,3 +18,23 @@
 	--spacing-36: 9rem;
 	--spacing-40: 10rem;
 }
+
+.padding-2 {
+	padding: var(--spacing-2);
+}
+.padding-4 {
+	padding: var(--spacing-4);
+}
+.padding-8 {
+	padding: var(--spacing-8);
+}
+
+.margin-2 {
+	margin: var(--spacing-2);
+}
+.margin-4 {
+	margin: var(--spacing-4);
+}
+.margin-8 {
+	margin: var(--spacing-8);
+}

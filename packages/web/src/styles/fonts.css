@@ -17,6 +17,17 @@
 	--font-4xl: 4rem;
 }
 
+.font-family-sans-serif {
+	font-family: 'Encode Sans SC', sans-serif;
+}
+.font-family-mono {
+	font-family: 'JetBrains Mono', monospace;
+}
+
+.bold {
+	font-weight: bold;
+}
+
 .font-xs {
 	font-size: var(--font-xs);
 }
