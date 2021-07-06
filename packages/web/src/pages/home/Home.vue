@@ -1,11 +1,13 @@
 <template>
 	<header-section />
+	<supported-cryptos-section />
 </template>
 
 <script>
 	import HeaderSection from './HeaderSection.vue';
+	import SupportedCryptosSection from './SupportedCryptosSection.vue';
 	export default {
-		components: { HeaderSection },
+		components: { HeaderSection, SupportedCryptosSection },
 		name: 'HomePage'
 	};
 </script>>
