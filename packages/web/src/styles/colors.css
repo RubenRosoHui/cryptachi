@@ -62,16 +62,16 @@
 	filter: invert(61%) sepia(41%) saturate(650%) hue-rotate(82deg) brightness(124%) contrast(96%);
 }
 
-.white {
+.white-light {
 	color: #f8f8f2;
+}
+.white {
+	color: #e4e4de;
 }
 .white-dark {
-	color: #f8f8f2;
-}
-.white-darker {
 	color: #aeaea8;
 }
-.white-darkest {
+.white-darker {
 	color: #666661;
 }
 
