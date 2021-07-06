@@ -15,6 +15,8 @@
 	--font-2xl: 2rem;
 	--font-3xl: 3rem;
 	--font-4xl: 4rem;
+	--font-family-sans-serif: 'Encode Sans SC', sans-serif;
+	--font-family-mono: 'JetBrains Mono', monospace;
 }
 
 .font-family-sans-serif {
