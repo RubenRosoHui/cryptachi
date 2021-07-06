@@ -19,6 +19,9 @@
   @import url('./styles/colors.css');
   @import url('./styles/spacing.css');
   @import url('./styles/fonts.css');
+  @import url('./styles/layout.css');
+  @import url('./styles/sizings.css');
+  @import url('./styles/animations.css');
 
   * {
     box-sizing: border-box;
@@ -37,11 +40,30 @@
   }
 
   #app {
+    position: relative;
     display: flex;
     flex-direction: column;
   }
 
   #main-content {
     flex: 1;
+  }
+
+  a, a:visited {
+    color: var(--cyan);
+  }
+
+  ul {
+    list-style: none;
+  }
+
+  .backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9;
   }
 </style>
