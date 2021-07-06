@@ -34,7 +34,7 @@
   }
 
   body {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-family-mono);
     color: var(--text);
     background-color: var(--background);
   }
@@ -65,5 +65,45 @@
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 9;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* Inputs */
+	select {
+		border: none;
+		outline: none;
+		background-color: var(--black);
+		color: var(--cyan);
+	}
+	input[type="text"] {
+		border: 3px solid var(--black);
+		outline: none;
+		width: 100%;
+		background-color: var(--black-darkest);
+		padding-left: var(--spacing-2);
+		padding-right: var(--spacing-2);
+		color: var(--text);
+	}
+	input[type="text"], select {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-md);
+    font-weight: bold;
+	}
+
+  .base-button {
+    cursor: pointer;
+    font-weight: bold;
+    font-family: var(--font-family-sans-serif);
+    font-size: var(--font-reg);
+    background-color: var(--cyan);
+    border: none;
+    padding: var(--spacing-2);
+    transition: background-color 0.3s linear;
+  }
+  .base-button:hover {
+    background-color: var(--cyan-light);
   }
 </style>

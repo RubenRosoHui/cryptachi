@@ -57,3 +57,30 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: 800;
 	color: var(--green);
 }
+
+.title-1, .title-2, .title-3, .title-4 {
+	font-family: var(--font-family-sans-serif);
+	font-weight: bold;
+}
+.title-1 {
+	font-size: var(--font-3xl);
+}
+.title-2 {
+	font-size: var(--font-2xl);
+}
+.title-3 {
+	font-size: var(--font-xl);
+}
+.title-4 {
+	font-size: var(--font-lg);
+}
+
+.success, .error {
+	font-weight: bold;
+}
+.success {
+	color: var(--green-light);
+}
+.error {
+	color: var(--red-light);
+}
