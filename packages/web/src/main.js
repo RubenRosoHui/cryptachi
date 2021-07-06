@@ -5,7 +5,11 @@ import store from './store/index.js';
 
 import App from './App.vue';
 
+import Dropdown from './components/Dropdown.vue';
+
 const app = createApp(App);
+
+app.component('Dropdown', Dropdown);
 
 app.use(store);
 app.use(router);
