@@ -2,12 +2,13 @@
 	<div class="search-bar textbox">
 		<div class="form-control ti-container">
 			<label class="hidden" for="check-alias">Check Alias</label>
-			<input id="check-alias" type="text" name="alias" />
+			<input id="check-alias" type="text" name="alias" @input="$emit('aliasChange', $event.target.value)"/>
 		</div>
 		<div class="form-control sel-container">
 			<label class="hidden" for="domains-dropdown">Select Domain</label>
-			<select id="domains-dropdown" name="domain">
+			<select id="domains-dropdown" name="domain" ref="domainsDropdown" @change="$emit('domainChange', $event.target.value)">
 				<option value="cryptachi.com" label=".cryptachi.com" selected />
+				<option value="test.com" label=".test.com" />
 			</select>
 		</div>
 	</div>
@@ -15,7 +16,11 @@
 
 <script>
 	export default {
-		name: 'SearchAliasForm'
+		name: 'SearchAliasField',
+		emits: ['aliasChange', 'domainChange'],
+		mounted() {
+			this.$emit('domainChange', this.$refs.domainsDropdown.value);
+		}
 	}
 </script>
 
