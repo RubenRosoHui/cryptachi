@@ -29,3 +29,25 @@
 		transform: translateX(-2rem);
 	}
 }
+
+.levitate {
+	animation: levitate-keyframes;
+	animation-duration: 5s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+	animation-timing-function: ease-in-out;
+}
+@keyframes levitate-keyframes {
+	0% {
+		transform: translateY(-2rem);
+	}
+	70% {
+		transform: translateY(0);
+	}
+	85% {
+		transform: translateY(-0.15rem);
+	}
+	100% {
+		transform: translateY(0)
+	}
+}
