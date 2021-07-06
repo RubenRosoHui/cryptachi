@@ -54,7 +54,6 @@
 		display: flex;
 		position: relative;
 		align-items: center;
-		padding: var(--spacing-4);
 	}
 
 	.backdrop {
