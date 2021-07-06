@@ -5,11 +5,11 @@
 		</div>
 		<div class="text-container">
 			<h1>tired of using long and hard-to-remember crypto addresses?</h1>
-			<p class="font-family-sans-serif font-lg bold">sign up now and get your <span class="yellow">free</span> crypto alias</p>
+			<p class="title-4">sign up now and get your <span class="yellow">free</span> crypto alias</p>
 		</div>
-		<form @submit.prevent="" class="form-container">
-			<search-alias-field />
-			<button type="submit">Submit</button>
+		<form @submit.prevent="submitForm">
+			<search-alias-field class="search-box" @aliasChange="onAliasChange" @domainChange="onDomainChange" />
+			<button class="base-button signup-button" type="submit">SIGN UP</button>
 		</form>
 	</header>
 </template>
@@ -19,7 +19,24 @@
 
 	export default {
 		components: { SearchAliasField },
-		name: 'HeaderSection'
+		name: 'HeaderSection',
+		data: () => ({
+			form: {
+				aliasField: { value: '' },
+				domainField: { value: '' }
+			}
+		}),
+		methods: {
+			onAliasChange(alias) {
+				this.form.aliasField.value = alias;
+			},
+			onDomainChange(domain) {
+				this.form.domainField.value = domain;
+			},
+			submitForm() {
+				console.log('Submitting form.');
+			}
+		}
 	}
 </script>
 
@@ -40,7 +57,27 @@
 	}
 
 	form {
-		max-width: 500px;
+		max-width: 800px;
 		margin: var(--spacing-8) auto 0 auto;
+	}
+
+	.signup-button {
+		width: 100%;
+		margin-top: var(--spacing-8);
+	}
+
+	@media (min-width: 600px) {
+		form {
+			display: flex;
+			justify-content: center;
+		}
+		.signup-button {
+			width: 200px;
+			margin-top: 0;
+			margin-left: var(--spacing-4);
+		}
+		.search-box {
+			width: 100%;
+		}
 	}
 </style>
