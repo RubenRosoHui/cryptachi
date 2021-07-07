@@ -1,0 +1,40 @@
+:root {
+	--spacing-1: 0.25rem;
+	--spacing-2: 0.5rem;
+	--spacing-3: 0.75rem;
+	--spacing-4: 1rem;
+	--spacing-5: 1.25rem;
+	--spacing-6: 1.50rem;
+	--spacing-7: 1.75rem;
+	--spacing-8: 2rem;
+	--spacing-10: 2.5rem;
+	--spacing-12: 3rem;
+	--spacing-14: 3.5rem;
+	--spacing-16: 4rem;
+	--spacing-20: 5rem;
+	--spacing-24: 6rem;
+	--spacing-28: 7rem;
+	--spacing-32: 8rem;
+	--spacing-36: 9rem;
+	--spacing-40: 10rem;
+}
+
+.padding-2 {
+	padding: var(--spacing-2);
+}
+.padding-4 {
+	padding: var(--spacing-4);
+}
+.padding-8 {
+	padding: var(--spacing-8);
+}
+
+.margin-2 {
+	margin: var(--spacing-2);
+}
+.margin-4 {
+	margin: var(--spacing-4);
+}
+.margin-8 {
+	margin: var(--spacing-8);
+}

@@ -1,4 +1,4 @@
-# frontend
+# Cryptachi - Web
 
 ## Project setup
 ```
