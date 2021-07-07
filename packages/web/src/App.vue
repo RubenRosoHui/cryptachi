@@ -37,6 +37,7 @@
     font-family: var(--font-family-mono);
     color: var(--text);
     background-color: var(--background);
+    overflow-x: hidden;
   }
 
   #app {
