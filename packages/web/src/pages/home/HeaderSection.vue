@@ -4,8 +4,8 @@
 			<img class="logo levitate" src="../../assets/logos/png/cryptachi-logo.png" />
 		</div>
 		<div class="text-container">
-			<h1>tired of using long and hard-to-remember crypto addresses?</h1>
-			<p class="title-4">sign up now and get your <span class="yellow">free</span> crypto alias</p>
+			<h1>Tired of using long and hard-to-remember crypto addresses?</h1>
+			<p class="title-4">Sign up now and get your <span class="yellow">free</span> crypto alias</p>
 		</div>
 		<form @submit.prevent="submitForm">
 			<search-alias-field class="search-box" @aliasChange="onAliasChange" @domainChange="onDomainChange" />
