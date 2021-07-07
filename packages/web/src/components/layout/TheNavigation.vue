@@ -127,7 +127,7 @@
 		padding-right: var(--spacing-1);
 	}
 
-	@media (min-width: 500px) {
+	@media (min-width: 700px) {
 		.link-label {
 			display: none;
 		}
