@@ -22,6 +22,7 @@
   @import url('./styles/layout.css');
   @import url('./styles/sizings.css');
   @import url('./styles/animations.css');
+  @import url('./styles/forms.css');
 
   * {
     box-sizing: border-box;
@@ -71,28 +72,6 @@
   .hidden {
     display: none;
   }
-
-  /* Inputs */
-	select {
-		border: none;
-		outline: none;
-		background-color: var(--black);
-		color: var(--cyan);
-	}
-	input[type="text"] {
-		border: 3px solid var(--black);
-		outline: none;
-		width: 100%;
-		background-color: var(--black-darkest);
-		padding-left: var(--spacing-2);
-		padding-right: var(--spacing-2);
-		color: var(--text);
-	}
-	input[type="text"], select {
-    font-family: var(--font-family-mono);
-    font-size: var(--font-md);
-    font-weight: bold;
-	}
 
   .base-button {
     cursor: pointer;
