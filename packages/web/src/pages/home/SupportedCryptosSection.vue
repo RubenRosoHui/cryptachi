@@ -1,5 +1,5 @@
 <template>
-	<section>
+	<div class="section-container">
 		<h1>Get aliases for several cryptocurrencies</h1>
 		<div class="crypto-list-container">
 			<img src="../../assets/logos/png/bitcoin-200.png" />
@@ -7,7 +7,7 @@
 			<img src="../../assets/logos/png/ethereum-200.png" />
 		</div>
 		<p class="title-4">And much more...</p>
-	</section>
+	</div>
 </template>
 
 <script>
@@ -17,7 +17,7 @@
 </script>
 
 <style scoped>
-	section {
+	.section-container {
 		padding: var(--spacing-16) var(--spacing-4);
 		text-align: center;
 	}
