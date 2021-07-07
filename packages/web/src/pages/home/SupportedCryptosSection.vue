@@ -33,4 +33,4 @@
 	.crypto-list-container img {
 		max-width: 100px;
 	}
-</style>>
+</style>
