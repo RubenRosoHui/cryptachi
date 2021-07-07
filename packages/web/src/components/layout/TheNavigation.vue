@@ -22,7 +22,7 @@
 				<li>
 					<router-link to="/">
 						<span class="link-label">Login</span>
-						<img title="Login" src="../../assets/icons/svg/fi-rr-form.svg" />
+						<img title="Login" src="../../assets/icons/svg/fi-rr-sign-in.svg" />
 					</router-link>
 				</li>
 			</ul>
