@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 // Routes
 const aliasRoutes = require('./routes/alias.js');
 const authRoutes = require('./routes/auth.js');
+const userRoutes = require('./routes/user.js')
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use(bodyParser.json());
 
 app.use('/api/alias', aliasRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 app.use( (error,req,res,next)=> {
 	const status = error.statusCode || 500;

@@ -4,7 +4,11 @@ const controller = require('../controllers/alias.js')
 const authMiddleWare = require('../middlewares/auth.js')
 
 //QUERY ALIAS
-router.get('/');
+router.get('/',controller.queryAliases);
+
+//GET ALIASES OF A USER
+//NEED TO MOVE THE LOCATION OF THIS
+//router.get('/',authMiddleWare.validateWebToken,controller.getAliases)
 
 //ADD ALIAS
 // router.post('/',authMiddleWare.validateWebToken,controller.addAlias);
