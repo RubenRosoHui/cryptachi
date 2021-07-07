@@ -75,6 +75,22 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: var(--font-lg);
 }
 
+.subtitle-1, .subtitle-2, .subtitle-3, subtitle-4 {
+	font-family: var(--font-family-sans-serif);
+}
+.subtitle-1 {
+	font-size: var(--font-lg);
+}
+.subtitle-2 {
+	font-size: var(--font-md);
+}
+.subtitle-3 {
+	font-size: var(--font-reg);
+}
+.subtitle-4 {
+	font-size: var(--font-sm);
+}
+
 .success, .error {
 	font-weight: bold;
 }
