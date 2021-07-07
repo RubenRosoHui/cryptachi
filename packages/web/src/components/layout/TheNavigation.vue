@@ -1,12 +1,12 @@
 <template>
 	<div class="navigation-container">
 		<teleport to="body">
-			<div class="backdrop" v-if="isMenuDisplayed" @click="toggleMenu" />
+			<div class="backdrop" v-if="isMenuDisplayed" @click="sideMenu('close')" />
 		</teleport>
 		<h1 class="font-lg">Cryptachi</h1>
 		<nav class="font-family-mono font-sm bold">
-			<img id="dropdown-menu" title="Menu" src="../../assets/icons/svg/fi-rr-menu-burger.svg" @click="toggleMenu" />
-			<ul :class="dropdownStyles" @click="toggleMenu">
+			<img id="dropdown-menu" title="Menu" src="../../assets/icons/svg/fi-rr-menu-burger.svg" @click="sideMenu('toggle')" />
+			<ul :class="dropdownStyles" @click="sideMenu('close')">
 				<li>
 					<router-link to="/">
 						<span class="link-label">Home</span>
@@ -35,8 +35,21 @@
 		name: 'TheNavigation',
 		data: () => ({ isMenuDisplayed: false }),
 		methods: {
-			toggleMenu() {
-				this.isMenuDisplayed = !this.isMenuDisplayed;
+			sideMenu(action) {
+				switch(action) {
+					case 'open':
+						this.isMenuDisplayed = true;
+						break;
+					case 'close':
+						this.isMenuDisplayed = false;
+						break;
+					case 'toggle':
+						this.isMenuDisplayed = !this.isMenuDisplayed;
+						break;
+					default:
+						this.isMenuDisplayed = false;
+						break;
+				}
 			}
 		},
 		computed: {
