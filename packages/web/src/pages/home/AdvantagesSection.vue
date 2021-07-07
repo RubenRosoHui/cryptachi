@@ -63,6 +63,9 @@
 		text-align: center;
 		background-color: var(--black-dark);
 	}
+	.section-container > header {
+		margin-bottom: var(--spacing-10);
+	}
 
 	.advantages-list {
 		text-align: left;
