@@ -20,6 +20,12 @@
 					</router-link>
 				</li>
 				<li>
+					<router-link to="/register">
+						<span class="link-label">Sign Up</span>
+						<img title="Sign Up" src="../../assets/icons/svg/fi-rr-form.svg" />
+					</router-link>
+				</li>
+				<li>
 					<router-link to="/">
 						<span class="link-label">Login</span>
 						<img title="Login" src="../../assets/icons/svg/fi-rr-sign-in.svg" />
