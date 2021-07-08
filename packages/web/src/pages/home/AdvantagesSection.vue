@@ -83,7 +83,7 @@
 		align-items: center;
 	}
 	.advantages-list li header img {
-		width: 22px;
+		width: var(--icon-md);
 		filter: var(--yellow-filter);
 		margin-right: var(--spacing-2);
 	}
