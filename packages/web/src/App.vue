@@ -18,9 +18,9 @@
 <style>
   @import url('./styles/colors.css');
   @import url('./styles/spacing.css');
+  @import url('./styles/sizings.css');
   @import url('./styles/fonts.css');
   @import url('./styles/layout.css');
-  @import url('./styles/sizings.css');
   @import url('./styles/animations.css');
   @import url('./styles/forms.css');
   @import url('./styles/buttons.css');
