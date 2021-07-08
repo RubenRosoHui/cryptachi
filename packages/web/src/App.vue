@@ -80,7 +80,7 @@
     font-size: var(--font-reg);
     background-color: var(--cyan);
     border: none;
-    padding: var(--spacing-2);
+    padding: var(--spacing-4);
     transition: background-color 0.3s linear;
   }
   .base-button:hover {

@@ -73,6 +73,7 @@
 		}
 		.signup-button {
 			width: 200px;
+			padding: var(--spacing-2);
 			margin-top: 0;
 			margin-left: var(--spacing-4);
 		}
