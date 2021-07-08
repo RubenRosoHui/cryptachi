@@ -25,8 +25,6 @@ exports.register = async (req, res, next) => {
 		//Create domain if any
 		let aliasObject;
 		if (alias) {
-
-			console.log("creating new domain");
 			aliasObject = new Alias({
 				name: alias,
 				user: user,
@@ -44,7 +42,7 @@ exports.register = async (req, res, next) => {
 
 		jwt.sign(
 			payload,
-			"randomString",
+			process.env.SECRET,
 			{
 				expiresIn: 10000
 			},
@@ -57,7 +55,6 @@ exports.register = async (req, res, next) => {
 		);
 	}
 	catch (err) {
-		//res.status(500).send("Error in Saving");
 		next(err); //takes it to the next error middleware
 	}
 }
@@ -81,7 +78,7 @@ exports.login = async (req, res, next) => {
 
 		jwt.sign(
 			payload,
-			"randomString",
+			process.env.SECRET,
 			{
 				expiresIn: 3600
 			},
@@ -94,10 +91,6 @@ exports.login = async (req, res, next) => {
 		);
 	} catch (err) {
 		next(err);
-		//onsole.error(e);
-		//es.status(500).json({
-		//	message: "Server Error"
-		//});
 	}
 }
 

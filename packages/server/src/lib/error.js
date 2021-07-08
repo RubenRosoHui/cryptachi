@@ -19,7 +19,6 @@ exports.badRequestError = function(err) {
 }
 
 exports.authenticationError = function(err) {
-	//console.log("test");
 	const error = module.exports.errorWrapper(err);
 	error.name = 'AuthenticationError';
 	error.statusCode = 401;

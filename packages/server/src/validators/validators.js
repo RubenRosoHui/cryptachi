@@ -10,7 +10,6 @@ exports.validateUser = [
 	body('email').custom(async (value, { req }) => {
 		let user = await User.findOne({ email: value });
 		if (user) {
-			console.log('User already exists');
 			throw new Error('User already exists');
 		}
 		return true;
@@ -37,6 +36,7 @@ exports.validateUser = [
 ]
 
 exports.validateAlias = [
+	/* Needs work
 	oneOf([
 		body('alias').isEmpty(),
 		body('alias').toLowerCase().isFQDN().contains('cryptachi.com'),
@@ -48,7 +48,7 @@ exports.validateAlias = [
 			return true;
 		})
 	],"Alias is invalid"),
-
+	*/
 	//Does it already exist?
 	body('alias').custom(async (value, { req }) => {
 		let alias = await Alias.findOne({ name: req.body.alias });
