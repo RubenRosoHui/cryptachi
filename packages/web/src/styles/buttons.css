@@ -13,9 +13,13 @@
 .base-button {
 	border: none;
 	background-color: var(--cyan);
+	color: var(--black-darkest);
 }
 .base-button:hover {
 	background-color: var(--yellow);
+}
+.base-button[disabled] {
+	background-color: var(--black);
 }
 
 .hollow-button {
@@ -26,4 +30,12 @@
 .hollow-button:hover {
 	border-color: var(--yellow);
 	color: var(--yellow);
+}
+.hollow-button[disabled] {
+	border-color: var(--black);
+	color: var(--black);
+}
+
+button[disabled] {
+	cursor: not-allowed;
 }

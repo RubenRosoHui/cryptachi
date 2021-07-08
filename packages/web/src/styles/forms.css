@@ -4,17 +4,56 @@ select {
 	background-color: var(--black);
 	color: var(--cyan);
 }
-input[type="text"] {
-	border: 3px solid var(--black);
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+	border: 3px solid var(--black-light);
 	outline: none;
 	width: 100%;
 	background-color: var(--black-darkest);
-	padding-left: var(--spacing-2);
-	padding-right: var(--spacing-2);
+	padding: var(--spacing-2);
 	color: var(--text);
 }
-input[type="text"], select {
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+	border-color: var(--cyan);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
 	font-family: var(--font-family-mono);
-	font-size: var(--font-md);
+	font-size: var(--font-reg);
 	font-weight: bold;
+}
+
+input[disabled] {
+	color: var(--black-light);
+	border-color: var(--black);
+	cursor: not-allowed;
+}
+
+/* Custom Checkboxes */
+.checkbox {
+	display: inline-flex;
+	align-items: center;
+}
+label.checkbox-container > input[type="checkbox"] {
+	display: none;
+}
+label.checkbox-container > input[type="checkbox"] + *::before {
+	content: "";
+	display: inline-block;
+	vertical-align: bottom;
+	background-image: url("../assets/icons/svg/fi-rr-square.svg");
+	height: 25px;
+	width: 25px;
+	margin-right: var(--spacing-2);
+	filter: var(--cyan-filter);
+}
+label.checkbox-container > input[type="checkbox"]:checked + *::before {
+	background-image: url("../assets/icons/svg/fi-rr-checkbox.svg");
 }
