@@ -52,6 +52,17 @@
 	.textbox {
 		display: flex;
 		flex-wrap: wrap;
+		background-color: var(--black-darkest);
+		border: 3px solid var(--black);
+		padding: var(--spacing-1);
+		font-size: var(--font-md);
+	}
+	.textbox:focus-within {
+		border-color: var(--cyan);
+	}
+
+	select {
+		font-size: inherit;
 	}
 	.ti-container {
 		flex: 1;
@@ -64,10 +75,6 @@
 	input[type="text"] {
 		border: none;
 		text-align: right;
+		padding: 0 var(--spacing-2);
 	}
-  .textbox {
-		background-color: var(--black-darkest);
-		border: 3px solid var(--black);
-		padding: var(--spacing-1);
-  }
 </style>
