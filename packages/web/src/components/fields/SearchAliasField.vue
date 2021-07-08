@@ -53,7 +53,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		background-color: var(--black-darkest);
-		border: 3px solid var(--black);
+		border: 3px solid var(--black-light);
 		padding: var(--spacing-1);
 		font-size: var(--font-md);
 	}
