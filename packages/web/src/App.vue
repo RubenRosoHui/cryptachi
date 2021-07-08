@@ -23,6 +23,7 @@
   @import url('./styles/sizings.css');
   @import url('./styles/animations.css');
   @import url('./styles/forms.css');
+  @import url('./styles/buttons.css');
 
   * {
     box-sizing: border-box;
@@ -71,19 +72,5 @@
 
   .hidden {
     display: none;
-  }
-
-  .base-button {
-    cursor: pointer;
-    font-weight: bold;
-    font-family: var(--font-family-sans-serif);
-    font-size: var(--font-reg);
-    background-color: var(--cyan);
-    border: none;
-    padding: var(--spacing-4);
-    transition: background-color 0.3s linear;
-  }
-  .base-button:hover {
-    background-color: var(--cyan-light);
   }
 </style>
