@@ -1,13 +1,29 @@
-.base-button {
+.base-button,
+.hollow-button {
 	cursor: pointer;
 	font-weight: bold;
 	font-family: var(--font-family-sans-serif);
 	font-size: var(--font-reg);
-	background-color: var(--cyan);
-	border: none;
 	padding: var(--spacing-4);
-	transition: background-color 0.3s linear;
+	transition-property: color, background-color, border-color;
+	transition-duration: 0.3s;
+	transition-timing-function: linear;
+}
+
+.base-button {
+	border: none;
+	background-color: var(--cyan);
 }
 .base-button:hover {
-	background-color: var(--cyan-light);
+	background-color: var(--yellow);
+}
+
+.hollow-button {
+	background-color: transparent;
+	border: 2px solid var(--cyan);
+	color: var(--cyan);
+}
+.hollow-button:hover {
+	border-color: var(--yellow);
+	color: var(--yellow);
 }
