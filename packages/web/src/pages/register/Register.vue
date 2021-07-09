@@ -30,6 +30,13 @@
 				</div>
 			</form>
 		</div>
+		<div class="suggestions-section-container">
+			<h1>Suggestions</h1>
+			<p class="subtitle-2">Still making up your mind? Check out the ones below.</p>
+			<ul class="suggestions-list">
+				<li v-for="(suggestion, i) in suggestions" :key="i" @click="setAliasField(suggestion)">{{ suggestion }}</li>
+			</ul>
+		</div>
 	</div>
 </template>
 
@@ -50,7 +57,8 @@
 				},
 				isValid: false,
 				errorMessage: ''
-			}
+			},
+			suggestions: ['faster', 'fester', 'feaster', 'pfister', 'fastr', 'fuster', 'foister', 'fosterer', 'fasta', 'foerster', 'falster']
 		}),
 		methods: {
 			onAliasChange(alias) {
@@ -58,6 +66,10 @@
 			},
 			onDomainChange(domain) {
 				this.form.fields.domain.value = domain;
+			},
+			setAliasField(suggestion) {
+				// TODO: Move window focus to alias field
+				console.log(suggestion);
 			}
 		},
 		components: { SearchAliasField }
@@ -68,6 +80,30 @@
 	.registration-section-container {
 		padding: var(--spacing-10) var(--spacing-4);
 		background-color: var(--black-dark);
+	}
+	.suggestions-section-container {
+		margin-top: var(--spacing-8);
+		padding-top: var(--spacing-4);
+		border-top: 1px solid var(--black);
+	}
+
+	.suggestions-list > li {
+		border: 1px solid var(--cyan);
+		color: var(--cyan);
+		text-align: center;
+		padding: var(--spacing-3);
+		margin-top: var(--spacing-4);
+		user-select: none;
+		font-weight: bold;
+		transition-property: border-color, color;
+		transition-duration: 0.3s;
+		transition-timing-function: linear;
+		cursor: pointer;
+		width: 50%;
+	}
+	.suggestions-list > li:hover {
+		border-color: var(--yellow);
+		color: var(--yellow);
 	}
 
 	.form-control {
