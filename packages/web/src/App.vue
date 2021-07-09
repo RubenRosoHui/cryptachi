@@ -31,24 +31,31 @@
     margin: 0;
   }
 
-  html, body, #app {
+  html, body, #app  {
     height: 100%;
+    min-height: 100%;
+  }
+
+  html, body {
+    max-width: 100%;
+    min-width: 360px;
   }
 
   body {
     font-family: var(--font-family-mono);
     color: var(--text);
     background-color: var(--background);
-    overflow-x: hidden;
   }
 
   #app {
     position: relative;
     display: flex;
     flex-direction: column;
+    height: 100%;
   }
 
   #main-content {
+		background-color: var(--black-dark);
     flex: 1;
   }
 
