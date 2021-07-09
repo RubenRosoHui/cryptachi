@@ -3,7 +3,9 @@
 		<teleport to="body">
 			<div class="backdrop" v-if="isMenuDisplayed" @click="sideMenu('close')" />
 		</teleport>
-		<h1 class="font-lg">Cryptachi</h1>
+		<router-link to="/" id="brand">
+			<h1 class="font-lg">Cryptachi</h1>
+		</router-link>
 		<nav class="font-family-mono font-sm bold">
 			<img id="dropdown-menu" title="Menu" src="../../assets/icons/svg/fi-rr-menu-burger.svg" @click="sideMenu('toggle')" />
 			<ul :class="dropdownStyles" @click="sideMenu('close')">
@@ -79,8 +81,8 @@
 		background: none;
 	}
 
-	h1 {
-		flex: 1;
+	#brand {
+		margin-right: auto;
 	}
 
 	a {
