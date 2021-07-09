@@ -147,7 +147,6 @@
 		.suggestions-list {
 			display: flex;
 			flex-wrap: wrap;
-			/*justify-content: space-between;*/
 			justify-content: flex-start;
 			column-gap: 0.5rem;
 		}
