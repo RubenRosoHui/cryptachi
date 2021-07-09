@@ -130,6 +130,8 @@
 	@media (min-width: 900px) {
 		.registration-section-container {
 			display: table;
+			padding-top: var(--spacing-16);
+			padding-bottom: var(--spacing-16);
 		}
 		.signup-section-container, .suggestions-section-container {
 			display: table-cell;
