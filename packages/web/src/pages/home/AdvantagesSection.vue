@@ -64,7 +64,7 @@
 		background-color: var(--black-dark);
 	}
 	.section-container > header {
-		margin-bottom: var(--spacing-10);
+		margin-bottom: var(--spacing-16);
 	}
 
 	.advantages-list {
@@ -102,10 +102,12 @@
 		}
 		.advantages-list {
 			display: flex;
-			justify-content: space-around;
+			justify-content: space-evenly;
 			flex-wrap: wrap;
+			gap: var(--spacing-8);
 		}
 		.advantages-list li {
+			margin-top: 0;
 			max-width: 450px;
 		}
 	}
