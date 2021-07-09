@@ -3,7 +3,7 @@
 		<div class="textbox" :class="textboxStyles">
 			<div class="form-control ti-container">
 				<label class="hidden" for="check-alias">Check Alias</label>
-				<input id="check-alias" type="text" name="alias" @input="onAliasInput" :disabled="disable"/>
+				<input id="check-alias" :value="alias" type="text" name="alias" @input="onAliasInput" :disabled="disable"/>
 			</div>
 			<div class="form-control sel-container">
 				<label class="hidden" for="domains-dropdown">Select Domain</label>
@@ -28,9 +28,10 @@
 		data: () => ({
 			isAliasAvailable: true,
 			domain: '',
-			alias:''
+			alias: ''
 		}),
 		mounted() {
+			this.domain = this.$refs.domainsDropdown.value;
 			this.$emit('domainChange', this.$refs.domainsDropdown.value);
 		},
 		methods: {
@@ -41,6 +42,10 @@
 			onDomainChange($event) {
 				this.domain = $event.target.value;
 				this.$emit('domainChange', this.domain);
+			},
+			setAlias(alias) {
+				this.alias = alias;
+				this.$emit('aliasChange', this.alias);
 			}
 		},
 		computed: {
