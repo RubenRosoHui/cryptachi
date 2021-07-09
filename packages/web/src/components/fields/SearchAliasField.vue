@@ -62,6 +62,7 @@
 		border: 3px solid var(--black-light);
 		padding: var(--spacing-1);
 		font-size: var(--font-md);
+		transition: border-color 0.3s linear;
 	}
 	.textbox:focus-within {
 		border-color: var(--cyan);
