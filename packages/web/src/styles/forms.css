@@ -38,6 +38,10 @@ input[disabled] {
 }
 
 /* Custom Checkboxes */
+.form-control#checkboxes {
+	display: flex;
+	justify-content: flex-end;
+}
 .checkbox {
 	display: inline-flex;
 	align-items: center;
@@ -45,16 +49,16 @@ input[disabled] {
 label.checkbox-container > input[type="checkbox"] {
 	display: none;
 }
-label.checkbox-container > input[type="checkbox"] + *::before {
+label.checkbox-container > input[type="checkbox"] + *::after {
 	content: "";
 	display: inline-block;
 	vertical-align: bottom;
 	background-image: url("../assets/icons/svg/fi-rr-square.svg");
 	height: 25px;
 	width: 25px;
-	margin-right: var(--spacing-2);
+	margin-left: var(--spacing-2);
 	filter: var(--cyan-filter);
 }
-label.checkbox-container > input[type="checkbox"]:checked + *::before {
+label.checkbox-container > input[type="checkbox"]:checked + *::after {
 	background-image: url("../assets/icons/svg/fi-rr-checkbox.svg");
 }

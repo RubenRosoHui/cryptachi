@@ -4,3 +4,8 @@
 	margin: 0 auto;
 	padding: var(--spacing-4);
 }
+
+.base-container {
+	max-width: 1300px;
+	margin: 0 auto;
+}
