@@ -1,6 +1,9 @@
 :root {
+	--icon-xs: 16px;
 	--icon-sm: 18px;
 	--icon-md: 22px;
 	--icon-lg: 26px;
 	--icon-xl: 30px;
+	--icon-2xl: 32px;
+	--icon-3xl: 34px;
 }
