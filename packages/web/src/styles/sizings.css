@@ -12,6 +12,10 @@
 	--icon-100: 100px;
 }
 
+.icon-sm {
+	width: var(--icon-sm);
+	height: var(--icon-sm);
+}
 .icon-md {
 	width: var(--icon-md);
 	height: var(--icon-md);

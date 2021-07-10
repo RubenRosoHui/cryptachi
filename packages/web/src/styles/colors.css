@@ -47,6 +47,7 @@
 	--red-filter: invert(53%) sepia(85%) saturate(3936%) hue-rotate(330deg) brightness(105%) contrast(99%);
 	--yellow-filter: invert(84%) sepia(38%) saturate(411%) hue-rotate(17deg) brightness(103%) contrast(105%);
 	--cyan-filter: invert(77%) sepia(32%) saturate(839%) hue-rotate(169deg) brightness(110%) contrast(98%);
+	--white-filter: invert(100%) sepia(2%) saturate(682%) hue-rotate(2deg) brightness(93%) contrast(92%);
 }
 
 .green-light {
