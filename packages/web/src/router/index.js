@@ -22,12 +22,12 @@ const router = createRouter({
     }
   },
   routes: [
-    { component: Home, path: '/' },
-    { component: Register, path: '/register' },
-    { component: Login, path: '/login' },
-    { component: Contact, path: '/contact' },
-    { component: Account, path: '/account' },
-		{ component: NotFound, path: '/:catchAll(.*)' }
+    { path: '/', component: Home },
+    { path: '/register', component: Register },
+    { path: '/login', component: Login },
+    { path: '/contact', component: Contact },
+    { path: '/account', component: Account },
+		{ path: '/:catchAll(.*)', component: NotFound }
   ]
 });
 
