@@ -101,7 +101,7 @@
 		margin-top: var(--spacing-4);
 		user-select: none;
 		font-weight: bold;
-		transition-property: color;
+		transition-property: color, background-color;
 		transition-duration: 0.3s;
 		transition-timing-function: linear;
 		cursor: pointer;
@@ -109,6 +109,7 @@
 	}
 	.suggestions-list > li:hover {
 		color: var(--yellow);
+		background-color: var(--yellow-dark);
 	}
 
 	.form-control {
