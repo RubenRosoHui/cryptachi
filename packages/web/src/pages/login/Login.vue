@@ -1,7 +1,7 @@
 <template>
 	<div class="base-container">
 		<h1 class="text-align-center">Login</h1>
-		<form @submit.prevent="submitForm">
+		<form @submit.prevent="login">
 			<div class="form-control">
 				<label for="email" class="hidden">Email</label>
 				<input id="email" type="email" name="email" placeholder="Email" v-model="form.fields.email.value" />
@@ -28,7 +28,12 @@
 					password: { value: '' }
 				}
 			}
-		})
+		}),
+		methods: {
+			login() {
+				this.$router.push('/account');
+			}
+		}
 	}
 </script>
 

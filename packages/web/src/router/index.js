@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../pages/home/Home.vue';
 import Register from '../pages/register/Register.vue';
 import Login from '../pages/login/Login.vue';
+import Contact from '../pages/contact/Contact.vue';
+import Account from '../pages/account/Account.vue';
 import NotFound from '../pages/error/NotFound.vue';
 
 const router = createRouter({
@@ -23,6 +25,8 @@ const router = createRouter({
     { component: Home, path: '/' },
     { component: Register, path: '/register' },
     { component: Login, path: '/login' },
+    { component: Contact, path: '/contact' },
+    { component: Account, path: '/account' },
 		{ component: NotFound, path: '/:catchAll(.*)' }
   ]
 });

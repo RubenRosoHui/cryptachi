@@ -16,7 +16,7 @@
 					</router-link>
 				</li>
 				<li>
-					<router-link to="/">
+					<router-link to="/contact">
 						<span class="link-label">Contact</span>
 						<img title="Contact" src="../../assets/icons/svg/fi-rr-envelope.svg" />
 					</router-link>
