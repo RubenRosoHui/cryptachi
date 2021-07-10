@@ -82,7 +82,6 @@
 
 <style scoped>
 	.registration-section-container {
-		padding: var(--spacing-10) var(--spacing-4);
 		width: 100%;
 		height: 100%;
 	}
@@ -131,8 +130,6 @@
 	@media (min-width: 900px) {
 		.registration-section-container {
 			display: table;
-			padding-top: var(--spacing-16);
-			padding-bottom: var(--spacing-16);
 		}
 		.signup-section-container, .suggestions-section-container {
 			display: table-cell;
