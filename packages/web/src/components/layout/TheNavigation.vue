@@ -106,48 +106,6 @@
 	nav ul.open {
 		display: block;
 	}
- /*
-	nav ul {
-		position: absolute;
-		right: 0;
-		transform: translateX(100%);
-		padding: var(--spacing-4);
-		opacity: 0;
-		transition-property: transform, opacity;
-		transition-duration: 0.3s;
-		transition-timing-function: linear;
-	}
-	nav ul.open {
-		transform: translateX(0);
-		opacity: 1;
-	}
-*/
-
- /*
-	nav ul {
-		display: flex;
-		flex-direction: column;
-		position: absolute;
-		top: 48px;
-		left: 0;
-		height: 300px;
-		z-index: 10;
-		padding: 0 3rem 0 1.5rem;
-		background-color: var(--surface);
-		color: var(--text-dark);
-		transform: translateX(-100%);
-		font-size: 1.4rem;
-		transition: transform 0.3s ease-out;
-		border-right: 1px solid darkgrey;
-	}
-	nav > ul li {
-		margin-top: 0.8rem;
-	}
-	nav ul.open {
-		transform: translateX(0);
-	}
- */
-
 	a, a:visited {
 		color: var(--text-light);
 		text-decoration: none;
