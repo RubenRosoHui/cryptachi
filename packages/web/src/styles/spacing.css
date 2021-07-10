@@ -38,3 +38,10 @@
 .margin-8 {
 	margin: var(--spacing-8);
 }
+
+.margin-top-2 {
+	margin: var(--spacing-2);
+}
+.margin-top-4 {
+	margin: var(--spacing-4);
+}
