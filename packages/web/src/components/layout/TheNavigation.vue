@@ -28,7 +28,7 @@
 					</router-link>
 				</li>
 				<li>
-					<router-link to="/">
+					<router-link to="/login">
 						<span class="link-label">Login</span>
 						<img title="Login" src="../../assets/icons/svg/fi-rr-sign-in.svg" />
 					</router-link>
