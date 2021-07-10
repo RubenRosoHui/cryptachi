@@ -91,10 +91,14 @@
 	}
 
 	li {
-		text-align: right;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
 	}
 
-	nav { z-index: 10 }
+	nav {
+		z-index: 10
+	}
 
 	ul {
 		position: absolute;
