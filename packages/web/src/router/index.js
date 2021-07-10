@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../pages/home/Home.vue';
 import Register from '../pages/register/Register.vue';
 import Login from '../pages/login/Login.vue';
+import NotFound from '../pages/error/NotFound.vue';
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -21,7 +22,8 @@ const router = createRouter({
   routes: [
     { component: Home, path: '/' },
     { component: Register, path: '/register' },
-    { component: Login, path: '/login' }
+    { component: Login, path: '/login' },
+		{ component: NotFound, path: '/:catchAll(.*)' }
   ]
 });
 
