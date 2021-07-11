@@ -22,6 +22,8 @@
 </template>
 
 <script>
+	import { date as dateLib } from '@cryptachi/common';
+
 	export default {
 		name: 'AccountPurchases',
 		data: () => ({
@@ -101,12 +103,7 @@
 			]
 		}),
 		methods: {
-			formatDate(date) {
-				return new Intl.DateTimeFormat('en-US', {
-					timeZone: 'America/Toronto',
-					dateStyle: 'long'
-				}).format(date);
-			}
+			formatDate: dateLib.formatDate
 		}
 	}
 </script>

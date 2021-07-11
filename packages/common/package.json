@@ -1,0 +1,10 @@
+{
+  "name": "@cryptachi/common",
+  "version": "1.0.0",
+  "private":  true,
+  "description": "Libraries and utilities used by multiple packages.",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
