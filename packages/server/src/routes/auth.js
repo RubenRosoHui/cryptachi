@@ -4,7 +4,7 @@ const controller = require('../controllers/auth.js');
 const validators = require('../validators/validators.js');
 
 //USER REGISTRATION
-router.post('/register',validators.validateUser,validators.validateAlias,controller.register);
+router.post('/register',validators.validateUser,validators.validateRegisterAlias,controller.register);
 
 //USER LOGIN
 router.post('/login',controller.login);
