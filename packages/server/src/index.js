@@ -33,7 +33,7 @@ else {
 // Middlewares
 app.use(bodyParser.json());
 
-app.use('/api/alias', aliasRoutes);
+app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 
@@ -41,9 +41,10 @@ app.use( (error,req,res,next)=> {
 	const status = error.statusCode || 500;
 	const name = error.name || 'Internal Server Error';
 	const message = error.message || "The server has encountered an error."
-	res.status(status).json({message: error.message, error:{status}});
+	res.status(status).json({message: message, error:{name}});
 })
 
 mongoose.connect(mongoUrl, mongoOptions).then( () => {
-	app.listen(process.env.PORT, () => console.log('server is running'));
+	const port = process.env.PORT || 3000;
+	app.listen(port, () => console.log(`server is running on port ${port}`));
 } ).catch(error => console.log(error));
