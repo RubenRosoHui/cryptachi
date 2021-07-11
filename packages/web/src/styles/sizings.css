@@ -6,4 +6,25 @@
 	--icon-xl: 30px;
 	--icon-2xl: 32px;
 	--icon-3xl: 34px;
+	--icon-4xl: 36px;
+	--icon-5xl: 38px;
+	--icon-6xl: 40px;
+	--icon-100: 100px;
+}
+
+.icon-sm {
+	width: var(--icon-sm);
+	height: var(--icon-sm);
+}
+.icon-md {
+	width: var(--icon-md);
+	height: var(--icon-md);
+}
+.icon-6xl {
+	width: var(--icon-6xl);
+	height: var(--icon-6xl);
+}
+.icon-100 {
+	width: 100px;
+	height: 100px;
 }

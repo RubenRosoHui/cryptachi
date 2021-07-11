@@ -102,3 +102,13 @@ h1, h2, h3, h4, h5, h6 {
 .error {
 	color: var(--red-light);
 }
+
+.text-align-center {
+	text-align: center;
+}
+.text-align-right {
+	text-align: right;
+}
+.text-align-left {
+	text-align: left;
+}
