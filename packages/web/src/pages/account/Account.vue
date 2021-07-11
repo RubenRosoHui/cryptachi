@@ -35,9 +35,6 @@
 </script>
 
 <style scoped>
-	.base-container {
-		padding-top: var(--spacing-4);
-	}
 	.nav-container {
 		height: 50px;
 		border-bottom: 1px solid var(--black);
