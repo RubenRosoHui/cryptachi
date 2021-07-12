@@ -6,7 +6,7 @@
 @keyframes fade-in-left-keyframes {
 	from {
 		opacity: 0.3;
-		transform: translateX(2rem);
+		transform: translateX(100%);
 	}
 	to {
 		opacity: 1;

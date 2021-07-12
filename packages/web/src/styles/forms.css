@@ -1,0 +1,73 @@
+select {
+	border: none;
+	outline: none;
+	background-color: var(--black);
+	color: var(--cyan);
+}
+
+textarea {
+	resize: vertical;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+textarea {
+	border: 3px solid var(--black-light);
+	font-family: var(--font-family-mono);
+	outline: none;
+	width: 100%;
+	background-color: var(--black-darkest);
+	padding: var(--spacing-2);
+	color: var(--text);
+	transition: border-color 0.3s linear;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus {
+	border-color: var(--cyan);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+select {
+	font-family: var(--font-family-mono);
+	font-size: var(--font-reg);
+	font-weight: bold;
+}
+
+input[disabled] {
+	color: var(--black-light);
+	border-color: var(--black);
+	cursor: not-allowed;
+}
+
+/* Custom Checkboxes */
+.form-control#checkboxes {
+	display: flex;
+	justify-content: flex-end;
+}
+.checkbox {
+	display: inline-flex;
+	align-items: center;
+}
+label.checkbox-container > input[type="checkbox"] {
+	display: none;
+}
+label.checkbox-container > input[type="checkbox"] + *::after {
+	content: "";
+	display: inline-block;
+	vertical-align: bottom;
+	background-image: url("../assets/icons/svg/fi-rr-square.svg");
+	height: 25px;
+	width: 25px;
+	margin-left: var(--spacing-2);
+	filter: var(--cyan-filter);
+}
+label.checkbox-container > input[type="checkbox"]:checked + *::after {
+	background-image: url("../assets/icons/svg/fi-rr-checkbox.svg");
+}

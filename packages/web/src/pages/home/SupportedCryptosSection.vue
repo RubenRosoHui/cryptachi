@@ -20,6 +20,7 @@
 	.section-container {
 		padding: var(--spacing-16) var(--spacing-4);
 		text-align: center;
+		background-color: var(--background);
 	}
 
 	.crypto-list-container {
