@@ -5,7 +5,7 @@ const authMiddleWare = require('../middlewares/auth.js')
 const validators = require('../validators/validators.js');
 
 //QUERY ALIAS
-router.get('/', controller.queryAliases);
+router.get('/', validators.validateQueryAliases,controller.queryAliases);
 
 //ADD ALIAS
 router.post('/:alias', authMiddleWare.validateWebToken, validators.validateAlias, controller.addAlias);
