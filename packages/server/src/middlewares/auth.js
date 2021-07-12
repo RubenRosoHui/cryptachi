@@ -7,8 +7,9 @@ exports.validateWebToken = (req, res, next) => {
 	const token = req.header("authorization");
 	if (!token) throw ErrorLib.authenticationError("Auth Error");//return res.status(401).json({ message: "Auth Error" });
 	try {
-		const decoded = jwt.verify(token,process.env.SECRET);
+		const decoded = jwt.verify(token,process.env.JWT_SECRET);
 		req.user = decoded.user;
+
 		next();
 	} catch (err) {
 		next(err)

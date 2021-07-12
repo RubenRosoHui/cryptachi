@@ -51,26 +51,30 @@ exports.register = async (req, res, next) => {
 				//await user.save();
 			}
 			payload = {
-				id: user.id,
-				email: user.email,
-				roles: user.roles,
-				aliases: [{
-					paid: aliasObject.paid,
-					id: aliasObject.id,
-					alias: aliasObject.alias,
-					domain: aliasObject.domain,
-					records: aliasObject.records,
-					createdAt: aliasObject.createdAt,
-					updatedAt: aliasObject.updatedAt,
-					__v: aliasObject.__v
-				}]
+				user: {
+					id: user.id,
+					email: user.email,
+					roles: user.roles,
+					aliases: [{
+						paid: aliasObject.paid,
+						id: aliasObject.id,
+						alias: aliasObject.alias,
+						domain: aliasObject.domain,
+						records: aliasObject.records,
+						createdAt: aliasObject.createdAt,
+						updatedAt: aliasObject.updatedAt,
+						__v: aliasObject.__v
+					}]
+				}
 			}
 		}
 		else {
 			payload = {
-				id: user.id,
-				email: user.email,
-				roles: user.roles,
+				user: {
+					id: user.id,
+					email: user.email,
+					roles: user.roles,
+				}
 			}
 		}
 
@@ -78,7 +82,7 @@ exports.register = async (req, res, next) => {
 
 		jwt.sign(
 			payload,
-			process.env.SECRET,
+			process.env.JWT_SECRET,
 			{
 				expiresIn: '7d'
 			},
@@ -107,15 +111,17 @@ exports.login = async (req, res, next) => {
 		if (!isMatch) throw ErrorLib.authenticationError("Invalid Credentials");//throw new Error('Invalid Credentials');
 
 		const payload = {
-			id: user.id,
-			email: user.email,
-			roles: user.roles,
-			aliases: user.aliases
+			user: {
+				id: user.id,
+				email: user.email,
+				roles: user.roles,
+				aliases: user.aliases
+			}
 		};
 
 		jwt.sign(
 			payload,
-			process.env.SECRET,
+			process.env.JWT_SECRET,
 			{
 				expiresIn: '7d'
 			},
