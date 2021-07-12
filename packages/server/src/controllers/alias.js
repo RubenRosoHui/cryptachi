@@ -25,7 +25,7 @@ exports.queryAliases = async (req, res, next) => {
 exports.addAlias = async (req, res, next) => {
 
 	const { alias } = req.params;
-	const { domain } = req.body;//req.query;
+	const { domain } = req.query;
 
 	try {
 		//retrieve user from validateWebToken middleware
@@ -72,7 +72,7 @@ exports.addAlias = async (req, res, next) => {
 exports.deleteAlias = async (req, res, next) => {
 
 	const { alias } = req.params;
-	const { domain } = req.body;
+	const { domain } = req.query;
 	try {
 		const user = await User.findById(req.user.id).populate("aliases");
 		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: user });
@@ -81,6 +81,7 @@ exports.deleteAlias = async (req, res, next) => {
 		if (aliasObject) {
 			//remove references from user and alias
 			aliasObject.user = null;
+			aliasObject.records = [];
 			await aliasObject.save();
 			//delete entry from aliases array
 			user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
@@ -105,6 +106,7 @@ exports.addRecord = async (req, res, next) => {
 		if (aliasObject) {
 
 			//Is domain on the free plan and already has 1 record?
+			if(!aliasObject.paid && aliasObject.records.length >= 1) throw ErrorLib.unauthorizedAccessError("You Cannot add more records unless you upgrade this alias")
 
 			//DNSimple API code
 
