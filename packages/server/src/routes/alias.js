@@ -8,7 +8,7 @@ const validators = require('../validators/validators.js');
 router.get('/', validators.validateQueryAliases,controller.queryAliases);
 
 //ADD ALIAS
-router.post('/:alias', authMiddleWare.validateWebToken, validators.validateAlias, controller.addAlias);
+router.post('/:alias', authMiddleWare.validateWebToken, validators.validateAddAlias, controller.addAlias);
 
 //REMOVE ALIAS
 router.delete('/:alias', authMiddleWare.validateWebToken, validators.validateDeleteAlias, controller.deleteAlias);

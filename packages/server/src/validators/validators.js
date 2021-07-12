@@ -33,6 +33,7 @@ exports.validateUser = [
 			let e = ErrorLib.authenticationError(errors.array()[0].msg);
 			next(e);
 		}
+		
 		next();
 	}
 ]
@@ -86,12 +87,27 @@ exports.validateRegisterAlias = [
 ]
 
 //Alias required
-exports.validateAlias = [
+exports.validateAddAlias = [
 	param('alias').exists().withMessage('alias undefined'),
-	body('domain').exists().withMessage('domain undefined'),
+	query('domain').exists().withMessage('domain undefined'),
 	param('alias').toLowerCase(),
-	body('domain').toLowerCase(),
-	aliasDomainValidation,
+	query('domain').toLowerCase(),
+
+	query('domain').custom(async (value, { req }) => {
+		const validDomains = ['cryptachi.com'];
+
+		const alias = req.params.alias// || req.body.alias
+
+		if (validDomains.includes(req.query.domain) && validator.isFQDN(alias + '.' + req.query.domain)) {
+			return true;
+		}
+		else {
+			throw new Error();
+		}
+
+	}).withMessage('Invalid Domain name'),
+
+	//aliasDomainValidation,
 
 	(req, res, next) => {
 		const errors = validationResult(req);
@@ -181,9 +197,9 @@ exports.validateAddRecord = [
 
 exports.validateDeleteAlias = [
 	param('alias').exists().withMessage('alias undefined'),
-	body('domain').exists().withMessage('domain undefined'),
+	query('domain').exists().withMessage('domain undefined'),
 	param('alias').toLowerCase(),
-	body('domain').toLowerCase(),
+	query('domain').toLowerCase(),
 
 
 	(req, res, next) => {
