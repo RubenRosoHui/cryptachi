@@ -2,24 +2,20 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const ErrorLib = require('../lib/error.js')
 
-//GET /?names=x&names=y&names=z:
+//GET /?names=a,b,c&domain=cryptachi.com
 exports.queryAliases = async (req, res, next) => {
-	const { names } = req.query;
+	const { names, domain } = req.query;
 	try {
 		//find all currently taken domains
-		const records = await Alias.find({name:names,user:{"$ne": undefined}});
-		
-		//compare to query
-		let availableDomains;
-		if(Array.isArray(names)) {
-			availableDomains = names.filter(x => !records.map(y => y.name).includes(x));
-		}
-		else {
-			if(!records.map(y => y.name).includes(names)) availableDomains = [names];
-			else availableDomains = [];
-		}
-		//return ones that are not taken
-		return res.status(200).json(availableDomains);
+		let aliases = names.split(',');
+
+		const records = await Alias.find({ alias: aliases, domain: domain, user: { "$ne": null } }).select('alias -_id');
+
+		const takenAliases = records.map(r => r.alias);
+
+		const availableAliases = aliases.filter(alias => !takenAliases.includes(alias));
+
+		return res.status(200).json(availableAliases);
 	}
 	catch (err) {
 		next(err);
@@ -28,7 +24,8 @@ exports.queryAliases = async (req, res, next) => {
 
 exports.addAlias = async (req, res, next) => {
 
-	const { name } = req.params;
+	const { alias } = req.params;
+	const { domain } = req.body;//req.query;
 
 	try {
 		//retrieve user from validateWebToken middleware
@@ -40,30 +37,32 @@ exports.addAlias = async (req, res, next) => {
 		}
 
 		//double check if domain is available
-		let alias = await Alias.findOne({ name: name })
-		if (alias) {
+		let aliasObject = await Alias.findOne({ alias: alias, domain: domain })
+		if (aliasObject) {
 			//alias exists, does it have a user?
-			if (alias.user) {
+			if (aliasObject.user) {
 				throw ErrorLib.unauthorizedAccessError("Alias already exists");
 			}
 			else {
-				alias.user = user;
-				user.aliases.push(alias);
-				await alias.save();
+				aliasObject.user = user;
+				aliasObject.domain = domain;
+				user.aliases.push(aliasObject);
+				await aliasObject.save();
 				await user.save();
 			}
 		}
 		//alias does not exist, create it
 		else {
-			alias = new Alias({
-				name: name,
-				user: user
+			aliasObject = new Alias({
+				alias: alias,
+				user: user,
+				domain: domain
 			})
-			user.aliases.push(alias);
-			await alias.save();
+			user.aliases.push(aliasObject);
+			await aliasObject.save();
 			await user.save();
 		}
-		return res.status(200).json({message:"Alias created successfully"});
+		return res.status(200).json({ message: "Alias created successfully" });
 	}
 	catch (err) {
 		next(err);
@@ -72,20 +71,21 @@ exports.addAlias = async (req, res, next) => {
 
 exports.deleteAlias = async (req, res, next) => {
 
-	const { name } = req.params;
+	const { alias } = req.params;
+	const { domain } = req.body;
 	try {
 		const user = await User.findById(req.user.id).populate("aliases");
-		const alias = await Alias.findOne({ name: name, user: user });
+		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: user });
 
 		//if user owns alias
-		if (alias) {
+		if (aliasObject) {
 			//remove references from user and alias
-			alias.user = undefined;
-			alias.save();
+			aliasObject.user = null;
+			await aliasObject.save();
 			//delete entry from aliases array
-			user.aliases = user.aliases.filter(e => e.name != alias.name);
-			user.save();
-			return res.status(200).json({message:"Alias deleted successfully"});
+			user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
+			await user.save();
+			return res.status(200).json({ message: "Alias deleted successfully" });
 		}
 		else throw ErrorLib.unauthorizedAccessError("You do not own this alias")
 	}
@@ -96,25 +96,22 @@ exports.deleteAlias = async (req, res, next) => {
 
 exports.addRecord = async (req, res, next) => {
 	const { currency, address } = req.body;
-	const { name } = req.params;
+	const { alias } = req.params;
 	try {
 		const user = await User.findById(req.user.id);//.populate("aliases");
-		const alias = await Alias.findOne({ name: name, user: user });
+		const aliasObject = await Alias.findOne({ alias: alias, user: user });
 
 		//if user owns alias
-		if (alias) {
+		if (aliasObject) {
 
 			//Is domain on the free plan and already has 1 record?
-
-			//Is Currency valid?
-			//does a record for this currency already exist?
 
 			//DNSimple API code
 
 			//Add record
-			alias.records.push({ currency: currency, recipientAddress: address });
-			alias.save();
-			return res.status(200).json({message:"Alias record created successfully"});
+			aliasObject.records.push({ currency: currency, recipientAddress: address });
+			await aliasObject.save();
+			return res.status(200).json({ message: "Alias record created successfully" });
 		}
 		else throw ErrorLib.unauthorizedAccessError("You do not own this alias")
 	}
@@ -127,14 +124,14 @@ exports.addRecord = async (req, res, next) => {
 exports.deleteRecord = async (req, res, next) => {
 
 	const { currency } = req.body;
-	const { name } = req.params;
+	const { alias } = req.params;
 	try {
 
 		const user = await User.findById(req.user.id).populate("aliases");
-		const alias = await Alias.findOne({ name: name, user: user });
+		const aliasObject = await Alias.findOne({ alias: alias, user: user, "records.currency": currency });
 
 		//if user owns alias
-		if (alias) {
+		if (aliasObject) {
 
 			//Is Currency Valid?
 			//Does a record with this currency exist?
@@ -142,9 +139,9 @@ exports.deleteRecord = async (req, res, next) => {
 			//DNSimple API code
 
 			//Delete record
-			alias.records = alias.records.filter(e => e.currency != currency);//.push({currency:currency,recipientAddress:address});
-			alias.save();
-			return res.status(200).json({message:"Alias record deleted successfully"});
+			aliasObject.records = aliasObject.records.filter(e => e.currency != currency);//.push({currency:currency,recipientAddress:address});
+			await aliasObject.save();
+			return res.status(200).json({ message: "Alias record deleted successfully" });
 		}
 		else throw ErrorLib.unauthorizedAccessError("You do not own this alias")
 	}
