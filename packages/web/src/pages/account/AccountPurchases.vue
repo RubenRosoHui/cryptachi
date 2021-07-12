@@ -10,7 +10,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr v-for="(purchase, i) in purchases" :key="purchase.id" :class="{ 'dark-background': i % 2 === 0 ? false : true }">
+			<tr v-for="purchase in purchases" :key="purchase.id">
 				<td>{{ formatDate(purchase.createdAt) }}</td>
 				<td>{{ purchase.id }}</td>
 				<td><span class="yellow">{{ purchase.alias.name }}</span>.{{ purchase.alias.domain }}</td>
@@ -111,18 +111,66 @@
 <style scoped>
 	table {
 		width: 100%;
-		text-align: center;
+		border-collapse: collapse;
 	}
 	thead {
 		background-color: var(--cyan-dark);
 		font-family: var(--font-family-sans-serif);
 	}
 	thead tr th,
-	tbody tr td{
+	tbody tr td {
+		text-align: center;
 		padding: var(--spacing-2) var(--spacing-1);
 	}
 
-	.dark-background {
+	tbody tr:nth-of-type(odd) {
 		background-color: rgba(0, 0, 0, 0.2);
+	}
+
+	@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+		tbody tr td {
+			text-align: left;
+		}
+
+		/* NOTE: Force tables to not be like tables anymore */
+		table, thead, tbody, th, td, tr {
+			display: block;
+		}
+
+		/* NOTE: Hide Table headers (but not display:none for accessibilty) */
+		thead tr {
+			position: absolute;
+			top: -100%;
+			left: -100%;
+		}
+
+
+		tbody td {
+			/* Behave like a row */
+			border: none;
+			border-bottom: 1px solid var(--black);
+			position: relative;
+			padding-left: 50%;
+		}
+
+		tbody tr { border: 1px solid var(--black) }
+
+		tbody td:before {
+			/* Now like a table header */
+			display: inline-block;
+
+			/* Top/left values mimic padding */
+			width: 25%;
+			padding-right: 10px;
+			white-space: nowrap;
+			font-weight: bold;
+		}
+
+		/* NOTE: Label the data */
+		tbody td:nth-of-type(1):before { content: "Date:"; }
+		tbody td:nth-of-type(2):before { content: "ID:"; }
+		tbody td:nth-of-type(3):before { content: "Alias:"; }
+		tbody td:nth-of-type(4):before { content: "Plan:"; }
+		tbody td:nth-of-type(5):before { content: "Payment:"; }
 	}
 </style>
