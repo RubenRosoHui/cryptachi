@@ -15,9 +15,9 @@
 					</router-link>
 				</li>
 				<li>
-					<router-link to="/account/purchases">
+					<router-link to="/account/orders">
 						<img src="../../assets/icons/svg/fi-rr-shopping-bag.svg" class="icon-sm cyan-filter"/>
-						Purchases
+						Orders
 					</router-link>
 				</li>
 			</ul>
