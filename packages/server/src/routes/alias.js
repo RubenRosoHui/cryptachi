@@ -2,21 +2,21 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/alias.js')
 const authMiddleWare = require('../middlewares/auth.js')
+const validators = require('../validators/validators.js');
 
 //QUERY ALIAS
-router.get('/');
+router.get('/', validators.validateQueryAliases,controller.queryAliases);
 
 //ADD ALIAS
-// router.post('/',authMiddleWare.validateWebToken,controller.addAlias);
-router.post('/',authMiddleWare.validateWebToken,controller.addAlias);
+router.post('/:alias', authMiddleWare.validateWebToken, validators.validateAddAlias, controller.addAlias);
 
 //REMOVE ALIAS
-router.delete('/',authMiddleWare.validateWebToken,controller.deleteAlias);
+router.delete('/:alias', authMiddleWare.validateWebToken, validators.validateDeleteAlias, controller.deleteAlias);
 
 // ADD ALIAS RECORD
-router.post('/:name');
+router.post('/:alias/records', authMiddleWare.validateWebToken, validators.validateAddRecord, controller.addRecord);
 
 //REMOVE ALIAS RECORD
-router.delete('/:name');
+router.delete('/:alias/records', authMiddleWare.validateWebToken, validators.validateDeleteRecord, controller.deleteRecord);
 
 module.exports = router;

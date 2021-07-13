@@ -1,23 +1,23 @@
 const mongoose = require('mongoose');
 
 const UserSchema = mongoose.Schema({
-	email: {type:String, unique:true, required:true},
-	password: {type:String, required:true},
+	email: { type: String, unique: true, required: true },
+	password: { type: String, required: true },
 	roles: Array,
-    resetToken: String,
-    resetExpiration: Date,
-    aliases: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Alias"
-        }
-    ],
+	resetToken: String,
+	resetExpiration: Date,
+	aliases: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Alias"
+		}
+	],
 	orders: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-            ref: "Order"
+			ref: "Order"
 		}
 	]
-},{timestamps:true});
+}, { timestamps: true });
 
-module.exports = mongoose.model('User',UserSchema);
+module.exports = mongoose.model('User', UserSchema);
