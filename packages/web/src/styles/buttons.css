@@ -39,3 +39,17 @@
 button[disabled] {
 	cursor: not-allowed;
 }
+
+.text-button {
+	cursor: pointer;
+	border: none;
+	background: none;
+	font-size: var(--font-reg);
+	font-weight: bold;
+	font-family: var(--font-family-sans-serif);
+	color: var(--cyan);
+	transition: color 0.3s linear;
+}
+.text-button:hover {
+	color: var(--yellow);
+}

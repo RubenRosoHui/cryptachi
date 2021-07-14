@@ -1,0 +1,26 @@
+.tags > .tag {
+	display: inline;
+	background-color: var(--surface-dark);
+	font-family: var(--font-family-mono);
+	font-weight: bold;
+	font-size: var(--font-sm);
+	padding: var(--spacing-1);
+	color: var(--white);
+}
+
+.tags > .tag {
+	margin-right: var(--spacing-2);
+}
+
+.tag.free {
+	background-color: var(--green-dark);
+}
+
+.tag.warning {
+	color: var(--text);
+	background-color: var(--pink-dark);
+}
+.tag.error {
+	color: var(--text);
+	background-color: var(--red-dark);
+}

@@ -24,6 +24,7 @@
   @import url('./styles/animations.css');
   @import url('./styles/forms.css');
   @import url('./styles/buttons.css');
+  @import url('./styles/ui.css');
 
   * {
     box-sizing: border-box;

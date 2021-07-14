@@ -58,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
 	color: var(--green);
 }
 
-.title-1, .title-2, .title-3, .title-4 {
+.title-1, .title-2, .title-3, .title-4, .title-5 {
 	font-family: var(--font-family-sans-serif);
 	font-weight: bold;
 	color: var(--text-light);
@@ -74,6 +74,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .title-4 {
 	font-size: var(--font-lg);
+}
+.title-5 {
+	font-size: var(--font-md);
 }
 
 .subtitle-1, .subtitle-2, .subtitle-3, subtitle-4 {

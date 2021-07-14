@@ -7,7 +7,7 @@ import Contact from '../pages/contact/Contact.vue';
 import Account from '../pages/account/Account.vue';
 import AccountAliases from '../pages/account/AccountAliases.vue';
 import AccountSecurity from '../pages/account/AccountSecurity.vue';
-import AccountPurchases from '../pages/account/AccountPurchases.vue';
+import AccountOrders from '../pages/account/AccountOrders.vue';
 import NotFound from '../pages/error/NotFound.vue';
 
 const router = createRouter({
@@ -32,7 +32,7 @@ const router = createRouter({
     { path: '/account', component: Account, redirect: '/account/aliases', children: [
       { path: 'aliases', component: AccountAliases },
       { path: 'security', component: AccountSecurity },
-      { path: 'purchases', component: AccountPurchases }
+      { path: 'orders', component: AccountOrders }
     ]},
 		{ path: '/:catchAll(.*)', component: NotFound }
   ]
