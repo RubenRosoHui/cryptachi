@@ -187,9 +187,7 @@
 	}
 	table.records tbody tr:hover td {
 		color: var(--yellow);
-	}
-	table.records tbody tr:hover td img.edit {
-		filter: var(--yellow-filter);
+		font-weight: bold;
 	}
 	table tbody td.actions img {
 		vertical-align: middle;

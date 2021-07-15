@@ -1,41 +1,59 @@
 <template>
-	<base-dialog @close="onEditRecordClose" :show="form.isVisible">
+	<base-dialog @close="recordForm.isVisible = false" :show="recordForm.isVisible">
 		<template v-slot:header>
-			<h1>{{ form.mode === 'add' ? 'Add' : 'Edit' }} Record</h1>
+			<h1>{{ recordForm.mode === 'add' ? 'Add' : 'Edit' }} Record</h1>
 		</template>
 		<form class="edit-record" @submit.prevent="">
 			<div class="form-control">
 				<label for="recipient-name">Recipient Name</label>
-				<input id="recipient-name" type="text" name="recipientName" v-model="form.fields.recipientName.value" />
+				<input id="recipient-name" type="text" name="recipientName" v-model="recordForm.fields.recipientName.value" />
 			</div>
 			<div class="form-control">
 				<label for="recipient-address">Recipient Address</label>
-				<input id="recipient-address" type="text" name="recipientAddress" v-model="form.fields.recipientAddress.value" />
+				<input id="recipient-address" type="text" name="recipientAddress" v-model="recordForm.fields.recipientAddress.value" />
 			</div>
 			<div class="form-control">
 				<label for="description">Description</label>
-				<input id="description" type="text" name="description" v-model="form.fields.description.value" />
+				<input id="description" type="text" name="description" v-model="recordForm.fields.description.value" />
 			</div>
-			<div class="form-control" v-if="form.mode === 'add'">
+			<div class="form-control" v-if="recordForm.mode === 'add'">
 				<label for="currency">Currency</label>
-				<select id="currency" name="currency" v-model="form.fields.currency.value">
-					<option v-for="currency in form.availableCurrencies" :key="currency" :value="currency">{{ currency.toUpperCase() }}</option>
-					<!--
-					<option value="btc">BTC</option>
-					<option value="eth">ETH</option>
-					<option value="xmr">XMR</option>
-					-->
+				<select id="currency" name="currency" v-model="recordForm.fields.currency.value">
+					<option v-for="currency in recordForm.availableCurrencies" :key="currency" :value="currency">{{ currency.toUpperCase() }}</option>
 				</select>
 			</div>
-			<div class="form-control text-align-right" id="form-buttons">
-				<button v-if="form.mode === 'edit'" type="submit" class="base-button" id="edit-button" @click="editRecord">EDIT</button>
+			<div class="form-control text-align-right form-buttons">
+				<button v-if="recordForm.mode === 'edit'" type="submit" class="base-button" id="edit-button" @click="editRecord">EDIT</button>
 				<button v-else type="submit" class="base-button" id="edit-button" @click="addRecord">ADD</button>
+			</div>
+		</form>
+	</base-dialog>
+	<base-dialog @close="aliasForm.isVisible = false" :show="aliasForm.isVisible">
+		<template v-slot:header>
+			<h1>Add Alias</h1>
+		</template>
+		<form @submit.prevent="addAlias">
+			<div class="form-control">
+				<search-alias-field
+					@aliasChange="alias => aliasForm.fields.aliasName = alias"
+					@domainChange="domain => aliasForm.fields.domain = domain"
+				/>
+			</div>
+			<div class="form-control alias-select-type">
+				<label for="alias-type">Type</label>
+				<select id="alias-type" name="type" v-model="aliasForm.fields.type">
+					<option value="upgraded">Upgraded</option>
+					<option value="free">Free</option>
+				</select>
+			</div>
+			<div class="form-control text-align-right form-buttons">
+				<button type="submit" class="base-button">Add</button>
 			</div>
 		</form>
 	</base-dialog>
 	<base-confirm ref="confirmDialog" />
 	<h1 class="hidden">Aliases</h1>
-	<ul id="aliases-list">
+	<ul id="aliases-list" v-if="aliases.length > 0">
 		<alias-list-item
 			class="aliases-list-item"
 			v-for="(alias, i) in aliases"
@@ -47,17 +65,29 @@
 			@deleteAlias="deleteAlias"
 		/>
 	</ul>
+	<div id="empty-aliases" v-else>
+		<h1 class="red">No Aliases</h1>
+		<img class="red-filter" src="../../assets/icons/svg/fi-rr-list.svg" />
+		<p class="red-light bold">You have 0 aliases. Go and add one with the button below.</p>
+	</div>
+	<div class="page-controls">
+		<button class="base-button add-alias" @click="aliasForm.isVisible = true">
+			<img src="../../assets/icons/svg/fi-rr-add.svg">
+			<span>Add Alias</span>
+		</button>
+	</div>
 </template>
 
 <script>
 	import AliasListItem from '../../components/lists/AliasListItem.vue';
+	import SearchAliasField from '../../components/fields/SearchAliasField.vue';
 
 	export default {
 		name: 'AccountAliases',
-		components: { AliasListItem },
-		data: () => ({
-			supportedCurrencies: ['xmr', 'btc', 'eth'],
-			aliases: [
+		components: { AliasListItem, SearchAliasField },
+		beforeMount() {
+			// TODO: Fetch aliases from server.
+			this.aliases = [
 				{
 					name: 'foster',
 					domain: 'cryptachi.com',
@@ -118,8 +148,12 @@
 						}
 					]
 				}
-			],
-			form: {
+			];
+		},
+		data: () => ({
+			supportedCurrencies: ['xmr', 'btc', 'eth'],
+			aliases: [],
+			recordForm: {
 				mode: 'edit', // NOTE: Valid values are: 'edit', 'add'
 				isVisible: false,
 				availableCurrencies: [],
@@ -131,17 +165,22 @@
 					recipientAddress: { value: '' },
 					description: { value: '' }
 				}
+			},
+			aliasForm: {
+				isVisible: false,
+				fields: {
+					aliasName: '',
+					domain: '',
+					type: 'upgraded'
+				}
 			}
 		}),
 		methods: {
-			onEditRecordClose() {
-				this.form.isVisible= false;
-			},
 			showEditRecordForm(payload) {
 				const { record, aliasName, domain } = payload;
-				const formFields = this.form.fields;
+				const formFields = this.recordForm.fields;
 
-				this.form.mode = 'edit';
+				this.recordForm.mode = 'edit';
 				formFields.aliasName = aliasName;
 				formFields.domain = domain;
 				formFields.currency.value = record.currency;
@@ -149,10 +188,10 @@
 				formFields.recipientAddress.value = record.recipientAddress;
 				formFields.description.value = record.description;
 
-				this.form.isVisible = true;
+				this.recordForm.isVisible = true;
 			},
 			editRecord() {
-				const formFields = this.form.fields;
+				const formFields = this.recordForm.fields;
 
 				const newRecord = {
 					currency: formFields.currency.value,
@@ -174,31 +213,31 @@
 				} else {
 					record.push(newRecord);
 				}
-				this.form.isVisible = false;
+				this.recordForm.isVisible = false;
 			},
 			showAddRecordForm({ aliasName, domain, currencies }) {
 				if (currencies.length >= this.supportedCurrencies.length) {
 					const confirmDialog = this.$refs.confirmDialog;
 					confirmDialog.type = 'ok';
 					confirmDialog.title = 'Maximum Reached';
-					confirmDialog.content = 'You cannot add anymore records because you have used every supported currency.';
+					confirmDialog.content = 'You cannot add anymore records because you have used all available currencies.';
 					confirmDialog.show = true;
 				} else {
-					this.form.mode = 'add';
-					this.form.fields.aliasName = aliasName;
-					this.form.fields.domain = domain;
-					this.form.fields.recipientName.value = '';
-					this.form.fields.recipientAddress.value = '';
-					this.form.fields.description.value = '';
-					this.form.availableCurrencies = this.supportedCurrencies.filter(sc => !currencies.includes(sc)).sort();
-					this.form.fields.currency.value = this.form.availableCurrencies[0];
-					this.form.isVisible = true;
+					this.recordForm.mode = 'add';
+					this.recordForm.fields.aliasName = aliasName;
+					this.recordForm.fields.domain = domain;
+					this.recordForm.fields.recipientName.value = '';
+					this.recordForm.fields.recipientAddress.value = '';
+					this.recordForm.fields.description.value = '';
+					this.recordForm.availableCurrencies = this.supportedCurrencies.filter(sc => !currencies.includes(sc)).sort();
+					this.recordForm.fields.currency.value = this.recordForm.availableCurrencies[0];
+					this.recordForm.isVisible = true;
 				}
 			},
 			addRecord() {
-				this.form.isVisible = false;
+				this.recordForm.isVisible = false;
 
-				const formFields = this.form.fields;
+				const formFields = this.recordForm.fields;
 
 				const newRecord = {
 					currency: formFields.currency.value,
@@ -234,6 +273,19 @@
 					this.aliases = this.aliases.filter(alias => `${alias.name}.${alias.domain}` !== `${aliasName}.${domain}`);
 				};
 				confirmDialog.show = true;
+			},
+			addAlias() {
+				this.aliasForm.isVisible = false;
+
+				// TODO: Add and check the server if alias is available.
+
+				this.aliases.push({
+					name: this.aliasForm.fields.aliasName,
+					domain: this.aliasForm.fields.domain,
+					paid: this.aliasForm.fields.type === 'free' ? false : true,
+					expiration: new Date(Date.now() + 2592000000), // 30 days from now.
+					records: []
+				});
 			}
 		}
 	}
@@ -247,13 +299,41 @@
 		margin-top: 0;
 	}
 
-	form.edit-record .form-control {
+	form .form-control {
 		margin-top: var(--spacing-4);
 	}
-	form.edit-record .form-control:first-child {
+	form .form-control:first-child {
 		margin-top: 0;
 	}
-	form.edit-record .form-control label[for="currency"]:after {
+	form .form-control:last-child {
+		margin-top: var(--spacing-8);
+	}
+	form .form-control label[for="currency"]:after,
+	form .form-control label[for="alias-type"]:after {
 		content: ": ";
+	}
+	form .form-control.alias-select-type {
+		margin-top: var(--spacing-8);
+	}
+
+	.page-controls {
+		margin-top: var(--spacing-16);
+	}
+	button.add-alias {
+		display: flex;
+		align-items: center;
+		margin: 0 auto;
+		column-gap: var(--spacing-2);
+	}
+	button.add-alias img {
+		width: var(--icon-md);
+	}
+
+	#empty-aliases {
+		text-align: center;
+	}
+	#empty-aliases img {
+		width: var(--icon-100);
+		margin: var(--spacing-4) 0;
 	}
 </style>

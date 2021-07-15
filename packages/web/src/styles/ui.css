@@ -20,7 +20,7 @@
 	color: var(--text);
 	background-color: var(--pink-dark);
 }
-.tag.error {
+.tag.alert {
 	color: var(--text);
 	background-color: var(--red-dark);
 }
