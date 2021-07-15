@@ -165,7 +165,24 @@ exports.login = async (req, res, next) => {
 
 exports.verifyUser = async (req, res, next) => {
 	const { token } = req.params;
+	const {email} = req.query;
+	try {
+		let user = await User.findOne({ email:email, isEmailConfirmedToken: token});
+		if (user) {
+			if(user.isEmailConfirmed) throw ErrorLib.authenticationError('account already activated')
 
+			user.isEmailConfirmed = true;
+
+			await user.save();
+
+			return res.status(200).json({ message: "Account Activated" });
+		}
+		else throw ErrorLib.authenticationError('Email does not exist');
+
+	}
+	catch (err) {
+		next(err);
+	}
 }
 
 exports.resetPasswordGet = async (req, res, next) => {
@@ -197,12 +214,12 @@ exports.resetPasswordGet = async (req, res, next) => {
 
 }
 exports.resetPasswordPost = async (req, res, next) => {
-	//const {email} = req.query
+	const {email} = req.query
 	const { password, confirmPassword } = req.body;
 	//const { resetToken } = req.query
 	const { token } = req.params;
 	try {
-		let user = await User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
+		let user = await User.findOne({ email:email, resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
 		if (user) {
 
 			const salt = await bcrypt.genSalt(10);
