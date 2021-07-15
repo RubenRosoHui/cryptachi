@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 import Home from '../pages/home/Home.vue';
-import Register from '../pages/register/Register.vue';
-import Login from '../pages/login/Login.vue';
+import Register from '../pages/auth/Register.vue';
+import Login from '../pages/auth/Login.vue';
 import ResetPassword from '../pages/auth/ResetPassword.vue';
 import ResetPasswordLink from '../pages/auth/ResetPasswordLink.vue';
 import Contact from '../pages/contact/Contact.vue';
