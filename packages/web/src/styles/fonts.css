@@ -36,11 +36,14 @@
 .font-sm {
 	font-size: var(--font-sm);
 }
-.font-lg {
-	font-size: var(--font-lg);
-}
 .font-reg {
 	font-size: var(--font-reg);
+}
+.font-md {
+	font-size: var(--font-md);
+}
+.font-lg {
+	font-size: var(--font-lg);
 }
 .font-2xl {
 	font-size: var(--font-2xl);
