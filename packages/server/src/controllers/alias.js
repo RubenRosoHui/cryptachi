@@ -1,6 +1,7 @@
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const ErrorLib = require('../lib/error.js')
+const MongoLib = require('../lib/mongoHelper.js')
 
 //GET /?names=a,b,c&domain=cryptachi.com
 exports.queryAliases = async (req, res, next) => {
@@ -22,10 +23,16 @@ exports.queryAliases = async (req, res, next) => {
 	}
 }
 
+//Renew Alias 
+
 exports.addAlias = async (req, res, next) => {
 
 	const { alias } = req.params;
 	const { domain } = req.query;
+
+	let expiry = new Date()
+	expiry.setDate(expiry.getDate())
+	expiry.setHours(5,0,0,0)
 
 	try {
 		//retrieve user from validateWebToken middleware
@@ -46,6 +53,7 @@ exports.addAlias = async (req, res, next) => {
 			else {
 				aliasObject.user = user;
 				aliasObject.domain = domain;
+				aliasObject.expiration = expiry//Date.now() + 99999999;
 				user.aliases.push(aliasObject);
 				await aliasObject.save();
 				await user.save();
@@ -56,7 +64,8 @@ exports.addAlias = async (req, res, next) => {
 			aliasObject = new Alias({
 				alias: alias,
 				user: user,
-				domain: domain
+				domain: domain,
+				expiration: expiry //Date.now() + 99999999
 			})
 			user.aliases.push(aliasObject);
 			await aliasObject.save();
@@ -80,12 +89,17 @@ exports.deleteAlias = async (req, res, next) => {
 		//if user owns alias
 		if (aliasObject) {
 			//remove references from user and alias
+			/*
 			aliasObject.user = null;
 			aliasObject.records = [];
+			aliasObject.expiration = null;
+			aliasObject.paid = false;
 			await aliasObject.save();
 			//delete entry from aliases array
 			user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
 			await user.save();
+			*/
+			await MongoLib.deleteAlias(aliasObject)
 			return res.status(200).json({ message: "Alias deleted successfully" });
 		}
 		else throw ErrorLib.unauthorizedAccessError("You do not own this alias")

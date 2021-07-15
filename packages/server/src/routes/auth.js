@@ -9,10 +9,12 @@ router.post('/register',validators.validateUser,validators.validateRegisterAlias
 //USER LOGIN
 router.post('/login',controller.login);
 
+router.post('/login/:token',controller.verifyUser)
+
 //RESET LINK
-router.get('/reset-password');
+router.get('/reset',controller.resetPasswordGet);
 
 //RESET PASSWORD
-router.post('/reset-password');
+router.post('/reset/:token',controller.resetPasswordPost);
 
 module.exports = router;

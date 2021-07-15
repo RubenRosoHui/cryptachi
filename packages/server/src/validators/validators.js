@@ -4,6 +4,11 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const ErrorLib = require('../lib/error.js')
 
+exports.validateConfirmedAccount = [
+	//customer validator that checks the user account for the isEmailConfirmed variable
+
+]
+
 exports.validateUser = [
 	body('email').toLowerCase(),
 	body('email').isEmail().withMessage('Invalid email address'),

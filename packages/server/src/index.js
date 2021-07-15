@@ -5,12 +5,16 @@ const bodyParser = require('body-parser');
 const cronLib = require('./cron/AliasExpiration.js');
 const cron = require('node-cron');
 
+const emailLib = require('./lib/email.js')
+
 // Routes
 const aliasRoutes = require('./routes/alias.js');
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js')
 
 const app = express();
+
+//emailLib.sendEmail('Excited User <me@samples.mailgun.org>','mrbru3@hotmail.com','Hello','Testing some Mailgun awesomness!')
 
 // MongoDB Configuration
 const mongoUrl = `mongodb://${process.env.MONGODB_HOSTNAME}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DBNAME}`;
@@ -47,7 +51,7 @@ app.use( (error,req,res,next)=> {
 	res.status(status).json({message: message, error:{name}});
 })
 
-cron.schedule('* * * * *', cronLib.CheckExpiredAliases)
+//cron.schedule('* * * * *', cronLib.CheckExpiredAliases)
 
 mongoose.connect(mongoUrl, mongoOptions).then( () => {
 	const port = process.env.PORT || 3000;

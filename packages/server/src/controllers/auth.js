@@ -1,6 +1,9 @@
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const ErrorLib = require('../lib/error.js')
+const EmailLib = require('../lib/email.js')
+
+const crypto = require('crypto');
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -50,6 +53,7 @@ exports.register = async (req, res, next) => {
 				await aliasObject.save();
 				//await user.save();
 			}
+			/*
 			payload = {
 				user: {
 					id: user.id,
@@ -67,8 +71,10 @@ exports.register = async (req, res, next) => {
 					}]
 				}
 			}
+			*/
 		}
 		else {
+			/*
 			payload = {
 				user: {
 					id: user.id,
@@ -76,10 +82,29 @@ exports.register = async (req, res, next) => {
 					roles: user.roles,
 				}
 			}
+			*/
 		}
 
-		await user.save();
 
+		crypto.randomBytes(32, async (err, buffer) => {
+			if (err) throw ErrorLib.serverError();
+
+			const token = buffer.toString('hex');
+
+			user.isEmailConfirmedToken = token;
+
+			await user.save();
+			await EmailLib.sendAccountVerification(email,token);
+			return res.status(200).json({ message: "Email sent" });
+		}
+		)
+
+
+
+
+		
+		//return res.status(200).json({ message: "Email sent" });
+		/*
 		jwt.sign(
 			payload,
 			process.env.JWT_SECRET,
@@ -93,6 +118,7 @@ exports.register = async (req, res, next) => {
 				});
 			}
 		);
+		*/
 	}
 	catch (err) {
 		next(err); //takes it to the next error middleware
@@ -137,3 +163,59 @@ exports.login = async (req, res, next) => {
 	}
 }
 
+exports.verifyUser = async (req, res, next) => {
+	const { token } = req.params;
+
+}
+
+exports.resetPasswordGet = async (req, res, next) => {
+	const { email } = req.query
+
+	try {
+		//is there an account with this email?
+		let user = await User.findOne({ email: email })
+		if (user) {
+
+			crypto.randomBytes(32, async (err, buffer) => {
+				if (err) throw ErrorLib.serverError();
+
+				const token = buffer.toString('hex');
+
+				user.resetToken = token;
+				user.resetTokenExpiration = Date.now() + 3600000; //in one hour
+				await user.save();
+
+				EmailLib.sendPasswordReset(email, token)
+				return res.status(200).json({ message: "Email sent" });
+			}
+			)
+		}
+		else throw ErrorLib.authenticationError('Email does not exist');
+	} catch (err) {
+		next(err);
+	}
+
+}
+exports.resetPasswordPost = async (req, res, next) => {
+	//const {email} = req.query
+	const { password, confirmPassword } = req.body;
+	//const { resetToken } = req.query
+	const { token } = req.params;
+	try {
+		let user = await User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
+		if (user) {
+
+			const salt = await bcrypt.genSalt(10);
+			user.password = await bcrypt.hash(password, salt);
+
+			await user.save();
+
+			return res.status(200).json({ message: "Password Reset" });
+		}
+		else throw ErrorLib.authenticationError('Email does not exist');
+
+	}
+	catch (err) {
+		next(err);
+	}
+}

@@ -1,6 +1,7 @@
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const ErrorLib = require('../lib/error.js')
+const MongoLib = require('../lib/mongoHelper.js')
 
 exports.CheckExpiredAliases = async (req,res,next) => {
 	//console.log('test');
@@ -14,7 +15,11 @@ exports.CheckExpiredAliases = async (req,res,next) => {
 		aliases.map( async (alias) => {
 			//console.log(alias.expiration)
 			let today = new Date()
+
+			//perhaps this should be either today or an already past date
 			let isToday = (today.toDateString() == alias.expiration.toDateString());
+			console.log(today.toDateString())
+			console.log(alias.expiration.toDateString())
 			//console.log(isToday)
 
 			//is it expired?
@@ -22,7 +27,9 @@ exports.CheckExpiredAliases = async (req,res,next) => {
 				//remove user from alias 
 
 				//WE ALSO NEED TO REMOVE THE ALIAS REFERENCE FROM THE USER DONT FORGET
-
+				await MongoLib.deleteAlias(alias)
+				console.log('deleted')
+				/*
 				//console.log(alias)
 				alias.expiration = null;
 				alias.user = null;
@@ -30,7 +37,7 @@ exports.CheckExpiredAliases = async (req,res,next) => {
 				alias.paid = false;
 				await alias.save()
 				console.log(alias)
-
+				*/
 
 				//send email saying it expired?
 			}
