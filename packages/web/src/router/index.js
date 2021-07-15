@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../pages/home/Home.vue';
 import Register from '../pages/register/Register.vue';
 import Login from '../pages/login/Login.vue';
+import ResetPassword from '../pages/auth/ResetPassword.vue';
+import ResetPasswordLink from '../pages/auth/ResetPasswordLink.vue';
 import Contact from '../pages/contact/Contact.vue';
 import TheFAQ from '../pages/faq/TheFAQ.vue';
 import Account from '../pages/account/Account.vue';
@@ -29,6 +31,8 @@ const router = createRouter({
     { path: '/', component: Home },
     { path: '/register', component: Register },
     { path: '/login', component: Login },
+    { path: '/reset-password', component: ResetPassword },
+    { path: '/reset-password-link', component: ResetPasswordLink },
     { path: '/contact', component: Contact },
     { path: '/faq', component: TheFAQ },
     { path: '/account', component: Account, redirect: '/account/aliases', children: [
