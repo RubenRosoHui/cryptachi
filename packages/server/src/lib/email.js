@@ -3,49 +3,46 @@ const DOMAIN = process.env.MAILGUNDOMAIN;
 const mailgunapi = process.env.MAILGUNKEY;
 const mg = mailgun({apiKey: mailgunapi,domain: DOMAIN})
 
+//function sendEmail()
+
+
 exports.sendEmail = function(from,to,subject,text){
+	
 	const data = {
-		from: 'Excited User <me@samples.mailgun.org>',
-		to: 'mrbru3@hotmail.com',
-		subject: 'Hello',
-		text: 'Testing some Mailgun awesomness!'
+		from: from,
+		to: to,
+		subject: subject,
+		text: text
 	};
 	mg.messages().send(data,function(error,body){
 		console.log(body);
 	})
 
 }
-
-exports.sendPasswordReset = function(to,token){
-	const data = {
-		from: 'Excited User <me@samples.mailgun.org>',
-		to: to,
-		subject: 'Password Reset - Cryptachi.com',
-		text: `you requested a password reset Click this link to set new password
-			<a href="http://localhost:3000/reset/${token}">Link</a>
-		
+//set port to 8080
+exports.sendPasswordReset = async function(to,token){
+	//modules.export.sendEmail();
+	await module.exports.sendEmail(
+		'Excited User <me@samples.mailgun.org>',
+		to,
+		'Password Reset - Cryptachi.com',
 		`
-	};
-	console.log(data)
-	mg.messages().send(data,function(error,body){
-		console.log(body);
-	})
+		you requested a password reset Click this link to set new password
+			<a href=" http://localhost:3000/reset-password?token=${token}&email=${to} ">Link</a>
+		
+		`);
 }
 
-exports.sendAccountVerification = function(to,token){
-	const data = {
-		from: 'Excited User <me@samples.mailgun.org>',
-		to: to,
-		subject: 'Account Activation - Cryptachi.com',
-		text: `you requested a password reset Click this link to set new password
-			<a href="http://localhost:3000/reset/${token}">Link</a>
-		
+exports.sendAccountVerification = async function(to,token){
+
+	await module.exports.sendEmail(
+		'Excited User <me@samples.mailgun.org>',
+		to,
+		'Account Activation - Cryptachi.com',
+		`Please click the llink below to confirm your new cryptachi account
+			<a href=" http://localhost:3000/reset/${token} ">Link</a>
 		`
-	};
-	console.log(data)
-	mg.messages().send(data,function(error,body){
-		console.log(body);
-	})
+	)
 }
 
 exports.sendAliasExpiryWarning = function(to){
