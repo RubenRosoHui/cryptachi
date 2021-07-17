@@ -1,7 +1,46 @@
 const fetch = require("node-fetch")
 const { sendEmail } = require("./email")
 
-exports.addRecord = async (req,res,next) => {
+//Create record in DNSimple and retrun the records ID
+exports.addRecord = async function(alias,domain,currency,address) {
+
+	//add zone record
+	let e;
+	await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${process.env.DNSIMPLE_ZONE}/records`, {
+		headers: {
+			'Authorization' : `Bearer ${process.env.DNSIMPLE_TOKEN}`,
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		method: 'POST',
+		body: JSON.stringify({
+			name: alias,
+			type: 'TXT',
+			content: `oa1:${currency} recipient_address=${address};`
+		})
+
+	}).then((res) => res.json()).then(responseData => {
+		console.log(responseData)
+		e = responseData.data.id
+		//return e;
+	})
+	return e;
+	//console.log(e)
+	//console.log(response.json())
+}
+exports.deleteRecord = async function(id) {
+		await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${process.env.DNSIMPLE_ZONE}/records/${id}`, {
+			headers: {
+				'Authorization' : `Bearer ${process.env.DNSIMPLE_TOKEN}`,
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			method: 'DELETE'
+	
+		}).then(res => console.log(res))
+}
+
+/*
 	await fetch(`${process.env.DNSIMPLE_DOMAIN}/whoami`, {
 		headers: {
 			'Authorization' : `Bearer ${process.env.DNSIMPLE_TOKEN}`
@@ -27,23 +66,4 @@ exports.addRecord = async (req,res,next) => {
 		//console.log(id)
 
 	})
-	//add zone record
-	await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${process.env.DNSIMPLE_ZONE}/records`, {
-		headers: {
-			'Authorization' : `Bearer ${process.env.DNSIMPLE_TOKEN}`,
-			'Accept': 'application/json',
-			'Content-Type': 'application/json'
-		},
-		method: 'POST',
-		body: JSON.stringify({
-			name: "test",
-			type: 'TXT',
-			content: 'XMR=afsehjfkasfwas'
-		})
-
-	}).then((res) => res.json()).then(responseData => {
-		console.log(responseData)
-	})
-	//console.log(response.json())
-
-}
+	*/

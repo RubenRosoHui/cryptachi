@@ -12,10 +12,10 @@ exports.deleteAlias = async function(aliasObject){
 	await aliasObject.save();
 	//delete entry from aliases array
 
-	console.log(user)
-	console.log(user.id)
+	//console.log(user)
+	//console.log(user.id)
 	user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
-	console.log(user.aliases.filter(e => e.alias != aliasObject.alias))
+	//console.log(user.aliases.filter(e => e.alias != aliasObject.alias))
 	await user.save();
 }
 /*

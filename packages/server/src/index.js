@@ -38,8 +38,14 @@ else {
 	};
 }
 
-dnsimpleLib.addRecord()
+//let fun = async function(){
+//	let e = await dnsimpleLib.addRecord('matthew','cryptachi.com','xmr','dasdg')
+//	console.log(e)
+//}
+//fun()
 
+//let e = dnsimpleLib.addRecord()
+//console.log(e)
 // Middlewares
 app.use(bodyParser.json());
 
