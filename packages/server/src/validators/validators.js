@@ -6,7 +6,22 @@ const ErrorLib = require('../lib/error.js')
 
 exports.validateConfirmedAccount = [
 	//customer validator that checks the user account for the isEmailConfirmed variable
-
+	body('email').custom(async (value, { req }) => {
+		let user = await User.findOne({ email: value });
+		if (!user.isEmailConfirmed) {
+			throw ErrorLib.authenticationError('User Account Not activated yet');
+		}
+		return true;
+	}),
+	(req, res, next) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			let e = ErrorLib.authenticationError(errors.array()[0].msg);
+			next(e);
+		}
+		
+		next();
+	}
 ]
 
 exports.validateUser = [
