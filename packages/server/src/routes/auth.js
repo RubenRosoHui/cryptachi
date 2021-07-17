@@ -11,7 +11,7 @@ router.post('/register',validators.validateUser,validators.validateRegisterAlias
 router.get('/register/:token',controller.verifyUser)
 
 //USER LOGIN
-router.post('/login',controller.login);
+router.post('/login',validators.validateConfirmedAccount,controller.login);
 
 router.post('/login/:token',controller.verifyUser)
 
