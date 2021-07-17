@@ -6,6 +6,7 @@ const cronLib = require('./cron/AliasExpiration.js');
 const cron = require('node-cron');
 
 const emailLib = require('./lib/email.js')
+const dnsimpleLib = require('./lib/dnsimple.js')
 
 // Routes
 const aliasRoutes = require('./routes/alias.js');
@@ -36,6 +37,8 @@ else {
 		useUnifiedTopology: true
 	};
 }
+
+dnsimpleLib.addRecord()
 
 // Middlewares
 app.use(bodyParser.json());

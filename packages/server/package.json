@@ -23,6 +23,7 @@
     "mailgun-js": "^0.22.0",
     "mongoose": "^5.12.15",
     "node-cron": "^3.0.0",
+    "node-fetch": "^2.6.1",
     "validator": "^13.6.0"
   },
   "devDependencies": {

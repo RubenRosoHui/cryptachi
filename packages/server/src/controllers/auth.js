@@ -94,7 +94,8 @@ exports.register = async (req, res, next) => {
 			user.isEmailConfirmedToken = token;
 
 			await user.save();
-			await EmailLib.sendAccountVerification(email,token);
+			let e =await EmailLib.sendAccountVerification(email,token);
+			console.log(`reset token ${token}`)
 			return res.status(200).json({ message: "Email sent" });
 		}
 		)
@@ -202,7 +203,8 @@ exports.resetPasswordGet = async (req, res, next) => {
 				user.resetTokenExpiration = Date.now() + 3600000; //in one hour
 				await user.save();
 
-				EmailLib.sendPasswordReset(email, token)
+				await EmailLib.sendPasswordReset(email, token)
+				console.log(`reset token ${token}`)
 				return res.status(200).json({ message: "Email sent" });
 			}
 			)
