@@ -2,7 +2,8 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const ErrorLib = require('../lib/error.js')
 const MongoLib = require('../lib/mongoHelper.js')
-const dnsimpleLib = require('../lib/dnsimple.js')
+const dnsimpleLib = require('../lib/dnsimple.js');
+const { mongo } = require('mongoose');
 
 
 //GET /?names=a,b,c&domain=cryptachi.com
@@ -31,11 +32,11 @@ exports.addAlias = async (req, res, next) => {
 
 	const { alias } = req.params;
 	const { domain } = req.query;
-
+	/*
 	let expiry = new Date()
 	expiry.setDate(expiry.getDate())
 	expiry.setHours(5, 0, 0, 0)
-
+	*/
 	try {
 		//retrieve user from validateWebToken middleware
 		const user = await User.findById(req.user.id);
@@ -44,7 +45,8 @@ exports.addAlias = async (req, res, next) => {
 		if (user.aliases.length >= 1) {
 			throw ErrorLib.unauthorizedAccessError("Only one alias per user");
 		}
-
+		await MongoLib.addAlias(user,alias,domain)
+		/*
 		//double check if domain is available
 		let aliasObject = await Alias.findOne({ alias: alias, domain: domain })
 		if (aliasObject) {
@@ -72,7 +74,7 @@ exports.addAlias = async (req, res, next) => {
 			user.aliases.push(aliasObject);
 			await aliasObject.save();
 			await user.save();
-		}
+		}*/
 		return res.status(200).json({ message: "Alias created successfully" });
 	}
 	catch (err) {
@@ -90,22 +92,6 @@ exports.deleteAlias = async (req, res, next) => {
 
 		//if user owns alias
 		if (aliasObject) {
-			//remove references from user and alias
-			/*
-			aliasObject.user = null;
-			aliasObject.records = [];
-			aliasObject.expiration = null;
-			aliasObject.paid = false;
-			await aliasObject.save();
-			//delete entry from aliases array
-			user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
-			await user.save();
-			*/
-			//delete all instances of dnsimple records
-			aliasObject.records.forEach(record => {
-				dnsimpleLib.deleteRecord(record.dnsimpleID)
-			})
-
 			await MongoLib.deleteAlias(aliasObject)
 			return res.status(200).json({ message: "Alias deleted successfully" });
 		}
@@ -126,15 +112,20 @@ exports.addRecord = async (req, res, next) => {
 		//if user owns alias
 		if (aliasObject) {
 
+			
 			//Is domain on the free plan and already has 1 record?
 			if (!aliasObject.paid && aliasObject.records.length >= 1) throw ErrorLib.unauthorizedAccessError("You Cannot add more records unless you upgrade this alias")
+			
+			await MongoLib.addRecord(aliasObject,currency,address)
 
+			/*
 			//DNSimple API code
 			let id = await dnsimpleLib.addRecord(aliasObject.alias,aliasObject.domain, currency, address)
 			//console.log(id)
 			//Add record
 			aliasObject.records.push({ dnsimpleID:id,currency: currency, recipientAddress: address });
 			await aliasObject.save();
+			*/
 			return res.status(200).json({ message: "Alias record created successfully" });
 		}
 		else throw ErrorLib.unauthorizedAccessError("You do not own this alias")
@@ -156,13 +147,7 @@ exports.deleteRecord = async (req, res, next) => {
 
 		//if user owns alias
 		if (aliasObject) {
-
-			//Is Currency Valid?
-			//Does a record with this currency exist?
-
-			//DNSimple API code
-			//return record with the specified currency
-			//[].find()
+			/*
 			let record = aliasObject.records.find(record => record.currency == currency)//.filter(record => record.currency == currency);
 			//retrieve its id
 			console.log(record.dnsimpleID)
@@ -174,6 +159,8 @@ exports.deleteRecord = async (req, res, next) => {
 			//Delete record
 			aliasObject.records = aliasObject.records.filter(e => e.currency != currency);//.push({currency:currency,recipientAddress:address});
 			await aliasObject.save();
+			*/
+			await MongoLib.deleteRecord(aliasObject,currency)
 			return res.status(200).json({ message: "Alias record deleted successfully" });
 		}
 		else throw ErrorLib.unauthorizedAccessError("You do not own this alias")

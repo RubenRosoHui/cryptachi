@@ -2,6 +2,7 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const ErrorLib = require('../lib/error.js')
 const EmailLib = require('../lib/email.js')
+const MongoLib = require('../lib/mongoHelper.js')
 
 const crypto = require('crypto');
 
@@ -28,6 +29,8 @@ exports.register = async (req, res, next) => {
 		let payload;
 		let aliasObject;
 		if (alias && domain) {
+			MongoLib.addAlias(user,alias,domain)
+			/*
 			aliasObject = await Alias.findOne({ alias: alias, domain: domain })
 			if (aliasObject) {
 				//alias exists, does it have a user?
@@ -52,7 +55,9 @@ exports.register = async (req, res, next) => {
 				user.aliases.push(aliasObject);
 				await aliasObject.save();
 				//await user.save();
+				
 			}
+			*/
 			/*
 			payload = {
 				user: {
@@ -94,7 +99,7 @@ exports.register = async (req, res, next) => {
 			user.isEmailConfirmedToken = token;
 
 			await user.save();
-			let e =await EmailLib.sendAccountVerification(email,token);
+			let e = await EmailLib.sendAccountVerification(email, token);
 			console.log(`reset token ${token}`)
 			return res.status(200).json({ message: "Email sent" });
 		}
@@ -103,7 +108,7 @@ exports.register = async (req, res, next) => {
 
 
 
-		
+
 		//return res.status(200).json({ message: "Email sent" });
 		/*
 		jwt.sign(
@@ -166,11 +171,11 @@ exports.login = async (req, res, next) => {
 
 exports.verifyUser = async (req, res, next) => {
 	const { token } = req.params;
-	const {email} = req.query;
+	const { email } = req.query;
 	try {
-		let user = await User.findOne({ email:email, isEmailConfirmedToken: token});
+		let user = await User.findOne({ email: email, isEmailConfirmedToken: token });
 		if (user) {
-			if(user.isEmailConfirmed) throw ErrorLib.authenticationError('account already activated')
+			if (user.isEmailConfirmed) throw ErrorLib.authenticationError('account already activated')
 
 			user.isEmailConfirmed = true;
 
@@ -216,12 +221,12 @@ exports.resetPasswordGet = async (req, res, next) => {
 
 }
 exports.resetPasswordPost = async (req, res, next) => {
-	const {email} = req.query
+	const { email } = req.query
 	const { password, confirmPassword } = req.body;
 	//const { resetToken } = req.query
 	const { token } = req.params;
 	try {
-		let user = await User.findOne({ email:email, resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
+		let user = await User.findOne({ email: email, resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
 		if (user) {
 
 			const salt = await bcrypt.genSalt(10);
