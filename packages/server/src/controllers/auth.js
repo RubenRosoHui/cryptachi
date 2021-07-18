@@ -38,7 +38,7 @@ exports.register = async (req, res, next) => {
 
 			await user.save();
 			let e = await EmailLib.sendAccountVerification(email, token);
-			console.log(`reset token ${token}`)
+			console.log(`activation token ${token}`)
 			return res.status(200).json({ message: "Email sent" });
 		}
 		)

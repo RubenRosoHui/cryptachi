@@ -20,7 +20,7 @@ exports.addRecord = async function(alias,domain,currency,address) {
 		})
 
 	}).then((res) => res.json()).then(responseData => {
-		console.log(responseData)
+		//console.log(responseData)
 		id = responseData.data.id
 	})
 	return id;
@@ -34,5 +34,5 @@ exports.deleteRecord = async function(id) {
 			},
 			method: 'DELETE'
 	
-		}).then(res => console.log(res))
+		})//.then(res => console.log(res))
 }

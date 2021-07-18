@@ -5,7 +5,6 @@ const MongoLib = require('../lib/mongoHelper.js')
 const emailLib = require('../lib/email.js')
 
 exports.CheckExpiredAliases = async (req, res, next) => {
-	//console.log('test');
 
 	//greater than today, less than 3-5 days from now
 	//let e = await Alias.find({expiration: { $gte: '2021-07-13', $lte: '2021-08-13'  }}, async (err,aliases) => {
@@ -21,17 +20,17 @@ exports.CheckExpiredAliases = async (req, res, next) => {
 			let user = await User.findById(alias.user)
 			await emailLib.sendAliasExpiry(user.email)
 			console.log(`${alias.alias} is expired`)
-			console.log(alias.expiration)
-			console.log(expiry)
-			console.log(expiry >= alias.expiration)
-			console.log(expiry <= alias.expiration)
+			//console.log(alias.expiration)
+			//console.log(expiry)
+			//console.log(expiry >= alias.expiration)
+			//console.log(expiry <= alias.expiration)
 
 			//alias.records.forEach(record => {
 			//	dnsimpleLib.deleteRecord(record.dnsimpleID)
 			//})
 			await MongoLib.deleteAlias(alias)
 			
-			console.log('deleted')
+			//console.log('deleted')
 		})
 
 	});
