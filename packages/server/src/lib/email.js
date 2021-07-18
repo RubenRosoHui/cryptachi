@@ -49,6 +49,12 @@ exports.sendAliasExpiryWarning = function(to){
 
 }
 
-exports.sendAliasExpiry = function(to) {
-
+exports.sendAliasExpiry = async function(to) {
+	await module.exports.sendEmail(
+		'Excited User <me@samples.mailgun.org>',
+		to,
+		'Alias Expired - Cryptachi.com',
+		`Your alias has expired!
+		`
+	)
 }
