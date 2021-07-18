@@ -5,7 +5,7 @@ const { sendEmail } = require("./email")
 exports.addRecord = async function(alias,domain,currency,address) {
 
 	//add zone record
-	let e;
+	let id;
 	await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${process.env.DNSIMPLE_ZONE}/records`, {
 		headers: {
 			'Authorization' : `Bearer ${process.env.DNSIMPLE_TOKEN}`,
@@ -21,12 +21,9 @@ exports.addRecord = async function(alias,domain,currency,address) {
 
 	}).then((res) => res.json()).then(responseData => {
 		console.log(responseData)
-		e = responseData.data.id
-		//return e;
+		id = responseData.data.id
 	})
-	return e;
-	//console.log(e)
-	//console.log(response.json())
+	return id;
 }
 exports.deleteRecord = async function(id) {
 		await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${process.env.DNSIMPLE_ZONE}/records/${id}`, {
@@ -39,31 +36,3 @@ exports.deleteRecord = async function(id) {
 	
 		}).then(res => console.log(res))
 }
-
-/*
-	await fetch(`${process.env.DNSIMPLE_DOMAIN}/whoami`, {
-		headers: {
-			'Authorization' : `Bearer ${process.env.DNSIMPLE_TOKEN}`
-		}
-
-	}).then((res) => res.json()).then(responseData => {
-		console.log(responseData)
-		//let {email,id} = responseData.data.user;
-		//console.log(email)
-		//console.log(id)
-
-	})
-	//list zone records
-	await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${process.env.DNSIMPLE_ZONE}/records`, {
-		headers: {
-			'Authorization' : `Bearer ${process.env.DNSIMPLE_TOKEN}`
-		}
-
-	}).then((res) => res.json()).then(responseData => {
-		console.log(responseData)
-		//let {email,id} = responseData.data.user;
-		//console.log(email)
-		//console.log(id)
-
-	})
-	*/

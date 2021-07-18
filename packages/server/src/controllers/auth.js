@@ -14,7 +14,6 @@ exports.register = async (req, res, next) => {
 
 	const { email, password, confirmPassword, alias, domain, free, ct } = req.body;
 	try {
-		// let user = await User.findOne({ email });
 
 		//Create user
 		let user = new User({
@@ -26,70 +25,9 @@ exports.register = async (req, res, next) => {
 		user.password = await bcrypt.hash(password, salt);
 
 		//if user is signing up with an alias
-		let payload;
-		let aliasObject;
 		if (alias && domain) {
 			MongoLib.addAlias(user,alias,domain)
-			/*
-			aliasObject = await Alias.findOne({ alias: alias, domain: domain })
-			if (aliasObject) {
-				//alias exists, does it have a user?
-				if (aliasObject.user) {
-					throw ErrorLib.unauthorizedAccessError("Alias already exists");
-				}
-				else {
-					aliasObject.user = user;
-					aliasObject.domain = domain;
-					user.aliases.push(aliasObject);
-					await aliasObject.save();
-					//await user.save();
-				}
-			}
-			//alias does not exist, create it
-			else {
-				aliasObject = new Alias({
-					alias: alias,
-					user: user,
-					domain: domain
-				})
-				user.aliases.push(aliasObject);
-				await aliasObject.save();
-				//await user.save();
-				
-			}
-			*/
-			/*
-			payload = {
-				user: {
-					id: user.id,
-					email: user.email,
-					roles: user.roles,
-					aliases: [{
-						paid: aliasObject.paid,
-						id: aliasObject.id,
-						alias: aliasObject.alias,
-						domain: aliasObject.domain,
-						records: aliasObject.records,
-						createdAt: aliasObject.createdAt,
-						updatedAt: aliasObject.updatedAt,
-						__v: aliasObject.__v
-					}]
-				}
-			}
-			*/
 		}
-		else {
-			/*
-			payload = {
-				user: {
-					id: user.id,
-					email: user.email,
-					roles: user.roles,
-				}
-			}
-			*/
-		}
-
 
 		crypto.randomBytes(32, async (err, buffer) => {
 			if (err) throw ErrorLib.serverError();
@@ -104,27 +42,6 @@ exports.register = async (req, res, next) => {
 			return res.status(200).json({ message: "Email sent" });
 		}
 		)
-
-
-
-
-
-		//return res.status(200).json({ message: "Email sent" });
-		/*
-		jwt.sign(
-			payload,
-			process.env.JWT_SECRET,
-			{
-				expiresIn: '7d'
-			},
-			(err, authorization) => {
-				if (err) throw err;
-				res.status(200).json({
-					authorization, payload //include payload in repsonse
-				});
-			}
-		);
-		*/
 	}
 	catch (err) {
 		next(err); //takes it to the next error middleware
@@ -137,10 +54,10 @@ exports.login = async (req, res, next) => {
 		let user = await User.findOne({
 			email
 		}).populate('aliases');
-		if (!user) throw ErrorLib.authenticationError("Invalid Credentials");//throw new Error('Invalid Credentials');
+		if (!user) throw ErrorLib.authenticationError("Invalid Credentials");
 
 		const isMatch = await bcrypt.compare(password, user.password);
-		if (!isMatch) throw ErrorLib.authenticationError("Invalid Credentials");//throw new Error('Invalid Credentials');
+		if (!isMatch) throw ErrorLib.authenticationError("Invalid Credentials");
 
 		const payload = {
 			user: {

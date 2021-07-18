@@ -15,11 +15,7 @@ exports.deleteAlias = async function (aliasObject) {
 	aliasObject.paid = false;
 	await aliasObject.save();
 	//delete entry from aliases array
-
-	//console.log(user)
-	//console.log(user.id)
 	user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
-	//console.log(user.aliases.filter(e => e.alias != aliasObject.alias))
 	await user.save();
 }
 exports.deleteRecord = async function (aliasObject, currency) {
@@ -36,7 +32,6 @@ exports.addRecord = async function (aliasObject, currency, address) {
 
 	//DNSimple API code
 	let id = await dnsimpleLib.addRecord(aliasObject.alias, aliasObject.domain, currency, address)
-	//console.log(id)
 	//Add record
 	aliasObject.records.push({ dnsimpleID: id, currency: currency, recipientAddress: address });
 	await aliasObject.save();
@@ -56,7 +51,7 @@ exports.addAlias = async function (user, alias, domain) {
 		else {
 			aliasObject.user = user;
 			aliasObject.domain = domain;
-			aliasObject.expiration = expiry//Date.now() + 99999999;
+			aliasObject.expiration = expiry
 			user.aliases.push(aliasObject);
 			await aliasObject.save();
 			await user.save();
@@ -68,41 +63,10 @@ exports.addAlias = async function (user, alias, domain) {
 			alias: alias,
 			user: user,
 			domain: domain,
-			expiration: expiry //Date.now() + 99999999
+			expiration: expiry
 		})
 		user.aliases.push(aliasObject);
 		await aliasObject.save();
 		await user.save();
 	}
 }
-
-/*
-exports.addAlias = async function(user,aliasName,domainName){
-	let alias = await Alias.findOne({ name: aliasName })
-	if (alias) {
-		//alias exists, does it have a user?
-		if (alias.user) {
-			throw ErrorLib.unauthorizedAccessError("Alias already exists");
-		}
-		else {
-			alias.user = user;
-			user.aliases.push(alias);
-			await alias.save();
-			await user.save();
-		}
-	}
-	//alias does not exist, create it
-	else {
-		alias = new Alias({
-			name: aliasName,
-			user: user
-		})
-		user.aliases.push(alias);
-		console.log("alias");
-		await alias.save();
-		await user.save();
-
-	}
-	return alias;
-}
-*/

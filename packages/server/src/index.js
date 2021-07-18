@@ -5,17 +5,12 @@ const bodyParser = require('body-parser');
 const cronLib = require('./cron/AliasExpiration.js');
 const cron = require('node-cron');
 
-const emailLib = require('./lib/email.js')
-const dnsimpleLib = require('./lib/dnsimple.js')
-
 // Routes
 const aliasRoutes = require('./routes/alias.js');
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js')
 
 const app = express();
-
-//emailLib.sendEmail('Excited User <me@samples.mailgun.org>','mrbru3@hotmail.com','Hello','Testing some Mailgun awesomness!')
 
 // MongoDB Configuration
 const mongoUrl = `mongodb://${process.env.MONGODB_HOSTNAME}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DBNAME}`;
@@ -38,14 +33,6 @@ else {
 	};
 }
 
-//let fun = async function(){
-//	let e = await dnsimpleLib.addRecord('matthew','cryptachi.com','xmr','dasdg')
-//	console.log(e)
-//}
-//fun()
-
-//let e = dnsimpleLib.addRecord()
-//console.log(e)
 // Middlewares
 app.use(bodyParser.json());
 

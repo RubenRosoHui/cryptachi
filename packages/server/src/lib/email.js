@@ -3,11 +3,7 @@ const DOMAIN = process.env.MAILGUNDOMAIN;
 const mailgunapi = process.env.MAILGUNKEY;
 const mg = mailgun({apiKey: mailgunapi,domain: DOMAIN})
 
-//function sendEmail()
-
-
 exports.sendEmail = function(from,to,subject,text){
-	
 	const data = {
 		from: from,
 		to: to,
@@ -17,11 +13,9 @@ exports.sendEmail = function(from,to,subject,text){
 	mg.messages().send(data,function(error,body){
 		console.log(body);
 	})
-
 }
-//set port to 8080
+
 exports.sendPasswordReset = async function(to,token){
-	//modules.export.sendEmail();
 	await module.exports.sendEmail(
 		'Excited User <me@samples.mailgun.org>',
 		to,
@@ -34,7 +28,6 @@ exports.sendPasswordReset = async function(to,token){
 }
 
 exports.sendAccountVerification = async function(to,token){
-
 	await module.exports.sendEmail(
 		'Excited User <me@samples.mailgun.org>',
 		to,

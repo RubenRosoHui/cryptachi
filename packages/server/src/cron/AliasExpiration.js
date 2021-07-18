@@ -3,7 +3,6 @@ const Alias = require('../models/alias.js');
 const ErrorLib = require('../lib/error.js')
 const MongoLib = require('../lib/mongoHelper.js')
 const emailLib = require('../lib/email.js')
-const dnsimpleLib = require('../lib/dnsimple.js')
 
 exports.CheckExpiredAliases = async (req, res, next) => {
 	//console.log('test');
