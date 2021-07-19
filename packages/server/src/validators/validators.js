@@ -132,7 +132,7 @@ exports.validateAddAlias = [
 	(req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			let e = ErrorLib.unauthorizedAccessError(errors.array()[0].msg);
+			let e = ErrorLib.unprocessableEntityError(errors.array()[0].msg);
 			next(e);
 		}
 		next();
@@ -161,7 +161,7 @@ exports.validateDeleteRecord = [
 	(req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			let e = ErrorLib.unauthorizedAccessError(errors.array()[0].msg);
+			let e = ErrorLib.unprocessableEntityError(errors.array()[0].msg);
 			next(e);
 		}
 		next();
@@ -208,7 +208,7 @@ exports.validateAddRecord = [
 	(req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			let e = ErrorLib.unauthorizedAccessError(errors.array()[0].msg);
+			let e = ErrorLib.unprocessableEntityError(errors.array()[0].msg);
 			next(e);
 		}
 		next();
@@ -225,7 +225,7 @@ exports.validateDeleteAlias = [
 	(req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			let e = ErrorLib.unauthorizedAccessError(errors.array()[0].msg);
+			let e = ErrorLib.unprocessableEntityError(errors.array()[0].msg);
 			next(e);
 		}
 		next();
@@ -238,9 +238,7 @@ exports.validateQueryAliases = [
 	query('domain').toLowerCase(),
 	query('names').toLowerCase(),
 
-	//test if each given name results in a FQDN?
-
-
+	//test if each given name results in a FQDN
 	query('domain').custom(async (value, { req }) => {
 		const validDomains = ['cryptachi.com'];
 
@@ -255,7 +253,7 @@ exports.validateQueryAliases = [
 	(req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			let e = ErrorLib.unauthorizedAccessError(errors.array()[0].msg);
+			let e = ErrorLib.unprocessableEntityError(errors.array()[0].msg);
 			next(e);
 		}
 		next();

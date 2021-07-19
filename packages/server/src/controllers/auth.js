@@ -75,7 +75,7 @@ exports.login = async (req, res, next) => {
 				expiresIn: '7d'
 			},
 			(err, authorization) => {
-				if (err) throw err;
+				if (err) throw ErrorLib.serverError(err.message);
 				res.status(200).json({
 					authorization, payload //include payload in repsonse
 				});
@@ -92,7 +92,7 @@ exports.verifyUser = async (req, res, next) => {
 	try {
 		let user = await User.findOne({ email: email, isEmailConfirmedToken: token });
 		if (user) {
-			if (user.isEmailConfirmed) throw ErrorLib.authenticationError('account already activated')
+			if (user.isEmailConfirmed) throw ErrorLib.conflictError('account already activated')
 
 			user.isEmailConfirmed = true;
 
@@ -100,7 +100,7 @@ exports.verifyUser = async (req, res, next) => {
 
 			return res.status(200).json({ message: "Account Activated" });
 		}
-		else throw ErrorLib.authenticationError('Email does not exist');
+		else throw ErrorLib.unprocessableEntityError('Email does not exist');
 
 	}
 	catch (err) {
@@ -131,7 +131,7 @@ exports.resetPasswordGet = async (req, res, next) => {
 			}
 			)
 		}
-		else throw ErrorLib.authenticationError('Email does not exist');
+		else throw ErrorLib.unprocessableEntityError('Email does not exist');
 	} catch (err) {
 		next(err);
 	}
@@ -153,7 +153,7 @@ exports.resetPasswordPost = async (req, res, next) => {
 
 			return res.status(200).json({ message: "Password Reset" });
 		}
-		else throw ErrorLib.authenticationError('Email does not exist');
+		else throw ErrorLib.authenticationError('Invalid Email and/or token');
 
 	}
 	catch (err) {
