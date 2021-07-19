@@ -7,7 +7,7 @@ exports.deleteAlias = async function (aliasObject) {
 	user = await User.findById(aliasObject.user).populate("aliases")
 
 	await aliasObject.records.forEach(record => {
-		dnsimpleLib.deleteRecord(record.dnsimpleID)
+		dnsimpleLib.deleteRecord(record.dnsimpleID,aliasObject.domain)
 	})
 	aliasObject.user = null;
 	aliasObject.records = [];
@@ -22,7 +22,7 @@ exports.deleteRecord = async function (aliasObject, currency) {
 	let record = aliasObject.records.find(record => record.currency == currency)
 	let id = record.dnsimpleID
 	//send Id to dnsimple for deletion
-	await dnsimpleLib.deleteRecord(id)
+	await dnsimpleLib.deleteRecord(id,aliasObject.domain)
 
 	//Delete record
 	aliasObject.records = aliasObject.records.filter(record => record.currency != currency);//.push({currency:currency,recipientAddress:address});

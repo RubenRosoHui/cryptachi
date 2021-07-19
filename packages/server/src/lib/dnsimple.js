@@ -27,8 +27,8 @@ exports.addRecord = async function (alias, domain, currency, address) {
 	})
 	return id;
 }
-exports.deleteRecord = async function (id) {
-
+exports.deleteRecord = async function (id, domain) {
+	
 	if (process.env.DNSIMPLE_ZONE) domain = process.env.DNSIMPLE_ZONE
 
 	await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${domain}/records/${id}`, {
