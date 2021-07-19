@@ -10,6 +10,8 @@ const aliasRoutes = require('./routes/alias.js');
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js')
 
+const authMiddleWare = require('./middlewares/auth.js')
+
 const app = express();
 
 // MongoDB Configuration
@@ -38,7 +40,7 @@ app.use(bodyParser.json());
 
 app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
+app.use('/api/user', authMiddleWare.validateWebToken,userRoutes);
 
 app.use( (error,req,res,next)=> {
 	const status = error.statusCode || 500;
