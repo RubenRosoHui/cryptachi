@@ -4,12 +4,10 @@ const ErrorLib = require('../lib/error.js')
 const MongoLib = require('../lib/mongoHelper.js')
 
 exports.getAliases = async (req, res, next) => {
-	const { alias } = req.params;
 	const user = await User.findById(req.user.id).populate("aliases");
 
 	return res.status(200).json(user.aliases);
 }
-
 
 //Renew Alias 
 

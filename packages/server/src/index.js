@@ -48,7 +48,7 @@ app.use( (error,req,res,next)=> {
 	const message = error.message || "The server has encountered an error."
 	res.status(status).json({message: message, error:{name}});
 })
-
+//cron.schedule('0 18 * * *', cronLib.CheckExpiredAliases)
 //cron.schedule('* * * * *', cronLib.CheckExpiredAliases)
 
 mongoose.connect(mongoUrl, mongoOptions).then( () => {

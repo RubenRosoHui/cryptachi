@@ -26,7 +26,7 @@ exports.register = async (req, res, next) => {
 
 		//if user is signing up with an alias
 		if (alias && domain) {
-			await MongoLib.addAlias(user,alias,domain)
+			await MongoLib.addAlias(user, alias, domain)
 		}
 
 		crypto.randomBytes(32, async (err, buffer) => {
