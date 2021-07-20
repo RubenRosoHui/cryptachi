@@ -10,6 +10,7 @@ exports.sendEmail = function(from,to,subject,text){
 		subject: subject,
 		text: text
 	};
+	//createa a promise here 
 	mg.messages().send(data,function(error,body){
 		console.log(body);
 	})
@@ -22,7 +23,7 @@ exports.sendPasswordReset = async function(to,token){
 		'Password Reset - Cryptachi.com',
 		`
 		you requested a password reset Click this link to set new password
-			<a href=" http://localhost:3000/reset-password?token=${token}&email=${to} ">Link</a>
+			<a href=" ${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset-password?token=${token}&email=${to} ">Link</a>
 		
 		`);
 }
@@ -33,7 +34,7 @@ exports.sendAccountVerification = async function(to,token){
 		to,
 		'Account Activation - Cryptachi.com',
 		`Please click the llink below to confirm your new cryptachi account
-			<a href=" http://localhost:3000/reset/${token} ">Link</a>
+			<a href=" ${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset/${token} ">Link</a>
 		`
 	)
 }
