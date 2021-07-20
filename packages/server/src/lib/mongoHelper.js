@@ -55,7 +55,7 @@ exports.addAlias = async function (user, alias, domain) {
 			user.aliases.push(aliasObject);
 			//await aliasObject.save();
 			//await user.save();
-			Promise.all([aliasObject.save(),user.save()])
+			return Promise.all([aliasObject.save(),user.save()])
 
 		}
 	}
@@ -70,6 +70,6 @@ exports.addAlias = async function (user, alias, domain) {
 		user.aliases.push(aliasObject);
 		//await aliasObject.save();
 		//await user.save();
-		Promise.all([aliasObject.save(),user.save()])
+		return Promise.all([aliasObject.save(),user.save()])
 	}
 }
