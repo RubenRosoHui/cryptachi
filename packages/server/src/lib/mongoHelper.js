@@ -53,8 +53,10 @@ exports.addAlias = async function (user, alias, domain) {
 			aliasObject.domain = domain;
 			aliasObject.expiration = expiry
 			user.aliases.push(aliasObject);
-			await aliasObject.save();
-			await user.save();
+			//await aliasObject.save();
+			//await user.save();
+			Promise.all([aliasObject.save(),user.save()])
+
 		}
 	}
 	//alias does not exist, create it
@@ -66,7 +68,8 @@ exports.addAlias = async function (user, alias, domain) {
 			expiration: expiry
 		})
 		user.aliases.push(aliasObject);
-		await aliasObject.save();
-		await user.save();
+		//await aliasObject.save();
+		//await user.save();
+		Promise.all([aliasObject.save(),user.save()])
 	}
 }
