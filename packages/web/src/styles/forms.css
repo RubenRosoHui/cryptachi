@@ -71,3 +71,28 @@ label.checkbox-container > input[type="checkbox"] + *::after {
 label.checkbox-container > input[type="checkbox"]:checked + *::after {
 	background-image: url("../assets/icons/svg/fi-rr-checkbox.svg");
 }
+
+/* Radio Buttons */
+.radio-buttons1 {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--spacing-4);
+	justify-content: space-between;
+}
+.radio-buttons1 label {
+	position: relative;
+	text-align: center;
+	width: 120px;
+}
+.radio-buttons1 input[type="radio"] {
+	position: absolute;
+	opacity: 0;
+}
+
+/* Form layout */
+.form-control {
+	margin-top: var(--spacing-4);
+}
+.form-control:last-child {
+	margin-top: var(--spacing-8);
+}
