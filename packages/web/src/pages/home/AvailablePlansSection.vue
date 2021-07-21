@@ -102,8 +102,11 @@
 		flex-direction: column;
 		align-items: flex-start;
 	}
+	ul.features > li {
+		display: flex;
+	}
 	ul.features > li:before {
-		display: inline-block;
+		display: inline-flex;
 		content: url('../../assets/icons/svg/fi-rr-check.svg');
 		width: 16px;
 		filter: var(--green-filter);
