@@ -29,6 +29,12 @@
 .bold {
 	font-weight: bold;
 }
+.underline {
+	text-decoration: underline;
+}
+.wrap {
+	word-wrap: break-word;
+}
 
 .font-xs {
 	font-size: var(--font-xs);
