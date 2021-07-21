@@ -127,3 +127,27 @@
 .purple-dark {
 	color: var(--purple-dark);
 }
+
+.blue-light {
+	color: var(--blue-light);
+}
+.blue {
+	color: var(--blue);
+}
+
+.pink {
+	color: var(--pink);
+}
+
+.bg-red {
+	background-color: var(--red);
+}
+.bg-red-dark {
+	background-color: var(--red-dark);
+}
+.bg-green {
+	background-color: var(--green);
+}
+.bg-green-dark {
+	background-color: var(--green-dark);
+}

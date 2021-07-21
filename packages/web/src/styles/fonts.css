@@ -35,6 +35,9 @@
 .wrap {
 	word-wrap: break-word;
 }
+.italic {
+	font-style: italic;
+}
 
 .font-xs {
 	font-size: var(--font-xs);
