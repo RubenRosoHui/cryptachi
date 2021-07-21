@@ -146,6 +146,7 @@
 	.discount {
 		display: inline-block;
 		font-weight: bold;
+		color: var(--text-light);
 		padding: var(--spacing-2);
 	}
 
