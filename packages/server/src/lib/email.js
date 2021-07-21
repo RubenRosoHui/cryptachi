@@ -1,22 +1,19 @@
 const mailgun = require('mailgun-js');
 const DOMAIN = process.env.MAILGUNDOMAIN;
 const mailgunapi = process.env.MAILGUNKEY;
-const mg = mailgun({apiKey: mailgunapi,domain: DOMAIN})
+const mg = mailgun({ apiKey: mailgunapi, domain: DOMAIN })
 
-exports.sendEmail = function(from,to,subject,text){
+exports.sendEmail = function (from, to, subject, text) {
 	const data = {
 		from: from,
 		to: to,
 		subject: subject,
 		text: text
 	};
-	//createa a promise here 
-	mg.messages().send(data,function(error,body){
-		console.log(body);
-	})
+	return mg.messages().send(data).then(value => console.log(value))
 }
 
-exports.sendPasswordReset = async function(to,token){
+exports.sendPasswordReset = async function (to, token) {
 	await module.exports.sendEmail(
 		'Excited User <me@samples.mailgun.org>',
 		to,
@@ -28,7 +25,7 @@ exports.sendPasswordReset = async function(to,token){
 		`);
 }
 
-exports.sendAccountVerification = async function(to,token){
+exports.sendAccountVerification = async function (to, token) {
 	await module.exports.sendEmail(
 		'Excited User <me@samples.mailgun.org>',
 		to,
@@ -39,11 +36,11 @@ exports.sendAccountVerification = async function(to,token){
 	)
 }
 
-exports.sendAliasExpiryWarning = function(to){
+exports.sendAliasExpiryWarning = function (to) {
 
 }
 
-exports.sendAliasExpiry = async function(to) {
+exports.sendAliasExpiry = async function (to) {
 	await module.exports.sendEmail(
 		'Excited User <me@samples.mailgun.org>',
 		to,
