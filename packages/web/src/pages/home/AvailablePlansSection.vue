@@ -14,7 +14,7 @@
 			</li>
 			<li class="one-year">
 				<h2 class="pink">One Year</h2>
-				<p class="price">$3.00</p>
+				<p class="price">$6.00</p>
 				<div>
 					<p class="discount bg-red-dark">Save 0%</p>
 				</div>
@@ -26,7 +26,7 @@
 			</li>
 			<li class="two-year">
 				<h2 class="yellow">Two Years</h2>
-				<p class="price">$5.70</p>
+				<p class="price">$11.40</p>
 				<div>
 					<p class="discount bg-green-dark">Save 5%</p>
 				</div>
@@ -38,7 +38,7 @@
 			</li>
 			<li class="three-year">
 				<h2 class="red">Three Years</h2>
-				<p class="price">$8.10</p>
+				<p class="price">$16.20</p>
 				<div>
 					<p class="discount bg-green-dark">Save 10%</p>
 				</div>
@@ -50,7 +50,7 @@
 			</li>
 			<li class="four-year">
 				<h2 class="purple">Four Years</h2>
-				<p class="price">$10.20</p>
+				<p class="price">$20.40</p>
 				<div>
 					<p class="discount bg-green-dark">Save 15%</p>
 				</div>
@@ -62,7 +62,7 @@
 			</li>
 			<li class="five-year">
 				<h2 class="cyan">Five Years</h2>
-				<p class="price">$12.00</p>
+				<p class="price">$24.00</p>
 				<div>
 					<p class="discount bg-green-dark">Save 1 year</p>
 				</div>
@@ -73,7 +73,7 @@
 				</ul>
 			</li>
 		</ul>
-		<p>All prices are in CAD.</p>
+		<p>All prices are in USD.</p>
 	</div>
 </template>
 
@@ -107,13 +107,14 @@
 	}
 	ul.features > li:before {
 		display: inline-flex;
-		content: url('../../assets/icons/svg/fi-rr-check.svg');
+		/*content: url('../../assets/icons/svg/fi-rr-check.svg');*/
+		content: url('../../assets/icons/svg/fi-rr-angle-small-right.svg');
 		width: 16px;
 		filter: var(--green-filter);
 		margin-right: var(--spacing-2);
 	}
 	ul.features > li.unfeature:before {
-		content: url('../../assets/icons/svg/fi-rr-cross.svg');
+		/*content: url('../../assets/icons/svg/fi-rr-cross.svg');*/
 		filter: var(--red-filter);
 	}
 
