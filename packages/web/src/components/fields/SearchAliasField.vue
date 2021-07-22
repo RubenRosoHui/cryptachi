@@ -81,6 +81,11 @@
 		background-color: var(--black-dark);
 	}
 
+	.form-control.sel-container,
+	.form-control.ti-container {
+		margin-top: 0;
+	}
+
 	select {
 		font-size: inherit;
 	}

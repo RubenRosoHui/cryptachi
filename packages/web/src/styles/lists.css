@@ -1,0 +1,6 @@
+ul.base-list > li {
+	margin-left: var(--spacing-4);
+}
+ul.base-list > li:before {
+	content: "- ";
+}
