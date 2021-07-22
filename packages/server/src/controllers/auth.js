@@ -36,7 +36,7 @@ exports.register = async (req, res, next) => {
 		await EmailLib.sendAccountVerification(email, token);
 
 		console.log(`activation token ${token}`)
-		return res.status(200).json({ message: "Email sent" });
+		return res.status(200).json({ message: "User registered successfully." });
 	}
 	catch (err) {
 		next(err); //takes it to the next error middleware
