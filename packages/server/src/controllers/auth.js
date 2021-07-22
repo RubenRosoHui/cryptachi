@@ -29,19 +29,14 @@ exports.register = async (req, res, next) => {
 			await MongoLib.addAlias(user, alias, domain)
 		}
 
-		crypto.randomBytes(32, async (err, buffer) => {
-			if (err) throw ErrorLib.serverError();
+		const token = crypto.randomBytes(32).toString('hex')
+		user.isEmailConfirmedToken = token;
 
-			const token = buffer.toString('hex');
+		await EmailLib.sendAccountVerification(email, token);
 
-			user.isEmailConfirmedToken = token;
-
-			await user.save();
-			let e = await EmailLib.sendAccountVerification(email, token);
-			console.log(`activation token ${token}`)
-			return res.status(200).json({ message: "Email sent" });
-		}
-		)
+		await user.save();
+		console.log(`activation token ${token}`)
+		return res.status(200).json({ message: "Email sent" });
 	}
 	catch (err) {
 		next(err); //takes it to the next error middleware
@@ -116,20 +111,14 @@ exports.resetPasswordGet = async (req, res, next) => {
 		let user = await User.findOne({ email: email })
 		if (user) {
 
-			crypto.randomBytes(32, async (err, buffer) => {
-				if (err) throw ErrorLib.serverError();
+			const token = crypto.randomBytes(32).toString('hex')
 
-				const token = buffer.toString('hex');
-
-				user.resetToken = token;
-				user.resetTokenExpiration = Date.now() + 3600000; //in one hour
-				await user.save();
-
-				await EmailLib.sendPasswordReset(email, token)
-				console.log(`reset token ${token}`)
-				return res.status(200).json({ message: "Email sent" });
-			}
-			)
+			user.resetToken = token;
+			user.resetTokenExpiration = Date.now() + 3600000; //in one hour
+			await EmailLib.sendAccountVerification(email, token);
+			await user.save();
+			console.log(`reset token ${token}`)
+			return res.status(200).json({ message: "Email sent" });
 		}
 		else throw ErrorLib.unprocessableEntityError('Email does not exist');
 	} catch (err) {
