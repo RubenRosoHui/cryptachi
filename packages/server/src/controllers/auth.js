@@ -46,7 +46,7 @@ exports.register = async (req, res, next) => {
     });
 	}
 	catch (err) {
-		next(err); //takes it to the next error middleware
+		next(ErrorLib.errorWrapper(err)); //takes it to the next error middleware
 	}
 }
 
@@ -81,7 +81,7 @@ exports.login = async (req, res, next) => {
 			}
 		);
 	} catch (err) {
-		next(err);
+		next(ErrorLib.errorWrapper(err));
 	}
 }
 
@@ -103,7 +103,7 @@ exports.verifyUser = async (req, res, next) => {
 
 	}
 	catch (err) {
-		next(err);
+		next(ErrorLib.errorWrapper(err));
 	}
 }
 
@@ -126,7 +126,7 @@ exports.resetPasswordGet = async (req, res, next) => {
 		}
 		else throw ErrorLib.unprocessableEntityError('Email does not exist');
 	} catch (err) {
-		next(err);
+		next(ErrorLib.errorWrapper(err));
 	}
 
 }
@@ -150,6 +150,6 @@ exports.resetPasswordPost = async (req, res, next) => {
 
 	}
 	catch (err) {
-		next(err);
+		next(ErrorLib.errorWrapper(err));
 	}
 }
