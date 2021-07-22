@@ -15,7 +15,7 @@ exports.register = async (req, res, next) => {
 	try {
 
 		//Create user
-		let user = new User({
+		const user = new User({
 			email,
 			password,
 			roles: ["user"]
@@ -84,7 +84,7 @@ exports.verifyUser = async (req, res, next) => {
 	const { token } = req.params;
 	const { email } = req.query;
 	try {
-		let user = await User.findOne({ email: email, isEmailConfirmedToken: token });
+		const user = await User.findOne({ email: email, isEmailConfirmedToken: token });
 		if (user) {
 			if (user.isEmailConfirmed) throw ErrorLib.conflictError('account already activated')
 
@@ -107,7 +107,7 @@ exports.resetPasswordGet = async (req, res, next) => {
 
 	try {
 		//is there an account with this email?
-		let user = await User.findOne({ email: email })
+		const user = await User.findOne({ email: email })
 		if (user) {
 
 			const token = crypto.randomBytes(32).toString('hex')
@@ -131,7 +131,7 @@ exports.resetPasswordPost = async (req, res, next) => {
 	//const { resetToken } = req.query
 	const { token } = req.params;
 	try {
-		let user = await User.findOne({ email: email, resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
+		const user = await User.findOne({ email: email, resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
 		if (user) {
 
 			const salt = await bcrypt.genSalt(10);
