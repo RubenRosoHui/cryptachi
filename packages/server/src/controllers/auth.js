@@ -8,7 +8,6 @@ const crypto = require('crypto');
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const alias = require('../models/alias.js');
 
 exports.register = async (req, res, next) => {
 
