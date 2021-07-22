@@ -54,7 +54,7 @@
 			</li>
 			<li>
 				<h2>What is your refund policy?</h2>
-				<p>No refunds.</p>
+				<p>At this time we currently do not offer refunds.</p>
 			</li>
 		</ul>
 		<footer>

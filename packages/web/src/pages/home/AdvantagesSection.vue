@@ -17,7 +17,7 @@
 					<img src="../../assets/icons/svg/fi-rr-incognito.svg" />
 					<h2>Anonymous</h2>
 				</header>
-				<p>We do not require or log your personal information when using our aliases. Only an email is needed for account registration and management.</p>
+				<p>We do not require or log your personal information. Only an email is needed for account registration and management.</p>
 			</li>
 			<li>
 				<header>
@@ -104,7 +104,7 @@
 		}
 		ul.advantages-list {
 			display: flex;
-			justify-content: space-between;
+			justify-content: space-evenly;
 			flex-wrap: wrap;
 			width: 950px;
 			margin: 0 auto;
