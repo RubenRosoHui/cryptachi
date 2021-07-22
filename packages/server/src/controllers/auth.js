@@ -46,7 +46,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
 	const { email, password } = req.body;
 	try {
-		let user = await User.findOne({
+		const user = await User.findOne({
 			email
 		}).populate('aliases');
 		if (!user) throw ErrorLib.authenticationError("Invalid Credentials");
