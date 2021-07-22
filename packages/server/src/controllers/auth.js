@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res, next) => {
 
-	const { email, password, confirmPassword, alias, domain, free, ct } = req.body;
+	const { email, password, alias, domain, free } = req.body;
 	try {
 
 		//Create user
@@ -53,9 +53,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
 	const { email, password } = req.body;
 	try {
-		const user = await User.findOne({
-			email
-		}).populate('aliases');
+		const user = await User.findOne({email});
 		if (!user) throw ErrorLib.authenticationError("Invalid Credentials");
 
 		const isMatch = await bcrypt.compare(password, user.password);
@@ -66,7 +64,6 @@ exports.login = async (req, res, next) => {
 				id: user.id,
 				email: user.email,
 				roles: user.roles,
-				//aliases: user.aliases
 			}
 		};
 
