@@ -99,7 +99,7 @@ exports.verifyUser = async (req, res, next) => {
 
 			return res.status(200).json({ message: "Account Activated" });
 		}
-		else throw ErrorLib.unprocessableEntityError('Email does not exist');
+		else throw ErrorLib.notFoundError('Email or token not found.');
 
 	}
 	catch (err) {
@@ -141,6 +141,9 @@ exports.resetPasswordPost = async (req, res, next) => {
 
 			const salt = await bcrypt.genSalt(10);
 			user.password = await bcrypt.hash(password, salt);
+
+      user.resetToken = null;
+      user.resetTokenExpiration = null;
 
 			await user.save();
 
