@@ -9,7 +9,7 @@ exports.validateConfirmedAccount = [
 	body('email').custom(async (value, { req }) => {
 		let user = await User.findOne({ email: value });
 
-    if (!user) throw ErrorLib.notFoundError('Email not valid.');
+    if (!user) throw ErrorLib.notFoundError('User not found.');
 
 		if (!user.isEmailConfirmed) {
 			throw ErrorLib.authenticationError('User Account Not activated yet');
