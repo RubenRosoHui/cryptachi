@@ -7,16 +7,4 @@ const validators = require('../validators/validators.js');
 //QUERY ALIAS
 router.get('/', validators.validateQueryAliases,controller.queryAliases);
 
-//ADD ALIAS
-router.post('/:alias', authMiddleWare.validateWebToken, validators.validateAddAlias, controller.addAlias);
-
-//REMOVE ALIAS
-router.delete('/:alias', authMiddleWare.validateWebToken, validators.validateDeleteAlias, controller.deleteAlias);
-
-// ADD ALIAS RECORD
-router.post('/:alias/records', authMiddleWare.validateWebToken, validators.validateAddRecord, controller.addRecord);
-
-//REMOVE ALIAS RECORD
-router.delete('/:alias/records', authMiddleWare.validateWebToken, validators.validateDeleteRecord, controller.deleteRecord);
-
 module.exports = router;

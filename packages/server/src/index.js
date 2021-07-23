@@ -2,10 +2,15 @@ const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const cronLib = require('./cron/AliasExpiration.js');
+const cron = require('node-cron');
+
 // Routes
 const aliasRoutes = require('./routes/alias.js');
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js')
+
+const authMiddleWare = require('./middlewares/auth.js')
 
 const app = express();
 
@@ -35,7 +40,7 @@ app.use(bodyParser.json());
 
 app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
+app.use('/api/user', authMiddleWare.validateWebToken,userRoutes);
 
 app.use( (error,req,res,next)=> {
 	const status = error.statusCode || 500;
@@ -43,6 +48,8 @@ app.use( (error,req,res,next)=> {
 	const message = error.message || "The server has encountered an error."
 	res.status(status).json({message: message, error:{name}});
 })
+//cron.schedule('0 18 * * *', cronLib.CheckExpiredAliases)
+//cron.schedule('* * * * *', cronLib.CheckExpiredAliases)
 
 mongoose.connect(mongoUrl, mongoOptions).then( () => {
 	const port = process.env.PORT || 3000;
