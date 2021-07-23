@@ -8,6 +8,9 @@ exports.validateConfirmedAccount = [
 	//customer validator that checks the user account for the isEmailConfirmed variable
 	body('email').custom(async (value, { req }) => {
 		let user = await User.findOne({ email: value });
+
+    if (!user) throw ErrorLib.notFoundError('Email not valid.');
+
 		if (!user.isEmailConfirmed) {
 			throw ErrorLib.authenticationError('User Account Not activated yet');
 		}
