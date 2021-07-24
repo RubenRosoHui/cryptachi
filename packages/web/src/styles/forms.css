@@ -71,3 +71,11 @@ label.checkbox-container > input[type="checkbox"] + *::after {
 label.checkbox-container > input[type="checkbox"]:checked + *::after {
 	background-image: url("../assets/icons/svg/fi-rr-checkbox.svg");
 }
+
+/* Form layout */
+.form-control {
+	margin-top: var(--spacing-4);
+}
+.form-control:last-child {
+	margin-top: var(--spacing-8);
+}

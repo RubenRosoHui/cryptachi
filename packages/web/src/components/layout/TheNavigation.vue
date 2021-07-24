@@ -22,6 +22,12 @@
 					</router-link>
 				</li>
 				<li>
+					<router-link to="/faq">
+						<span class="link-label">FAQ</span>
+						<img title="FAQ" src="../../assets/icons/svg/fi-rr-interrogation.svg" />
+					</router-link>
+				</li>
+				<li>
 					<router-link to="/register">
 						<span class="link-label">Sign Up</span>
 						<img title="Sign Up" src="../../assets/icons/svg/fi-rr-form.svg" />

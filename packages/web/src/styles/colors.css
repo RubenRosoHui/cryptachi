@@ -75,6 +75,9 @@
 .white-darker {
 	color: #666661;
 }
+.white-filter {
+	filter: invert(98%) sepia(3%) saturate(707%) hue-rotate(331deg) brightness(103%) contrast(79%);
+}
 
 .red-light {
 	color: var(--red-light);
@@ -113,4 +116,38 @@
 }
 .cyan-filter {
 	filter: invert(77%) sepia(32%) saturate(839%) hue-rotate(169deg) brightness(110%) contrast(98%);
+}
+
+.purple-light {
+	color: var(--purple-light);
+}
+.purple {
+	color: var(--purple);
+}
+.purple-dark {
+	color: var(--purple-dark);
+}
+
+.blue-light {
+	color: var(--blue-light);
+}
+.blue {
+	color: var(--blue);
+}
+
+.pink {
+	color: var(--pink);
+}
+
+.bg-red {
+	background-color: var(--red);
+}
+.bg-red-dark {
+	background-color: var(--red-dark);
+}
+.bg-green {
+	background-color: var(--green);
+}
+.bg-green-dark {
+	background-color: var(--green-dark);
 }

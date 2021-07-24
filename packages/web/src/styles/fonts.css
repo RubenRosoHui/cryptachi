@@ -29,6 +29,15 @@
 .bold {
 	font-weight: bold;
 }
+.underline {
+	text-decoration: underline;
+}
+.wrap {
+	word-wrap: break-word;
+}
+.italic {
+	font-style: italic;
+}
 
 .font-xs {
 	font-size: var(--font-xs);
@@ -36,11 +45,14 @@
 .font-sm {
 	font-size: var(--font-sm);
 }
-.font-lg {
-	font-size: var(--font-lg);
-}
 .font-reg {
 	font-size: var(--font-reg);
+}
+.font-md {
+	font-size: var(--font-md);
+}
+.font-lg {
+	font-size: var(--font-lg);
 }
 .font-2xl {
 	font-size: var(--font-2xl);
