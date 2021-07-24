@@ -1,25 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/auth.js');
-const validators = require('../validators/validators.js');
+const validators = require('../validators/auth.js');
 
-//USER REGISTRATION
-router.post('/register', validators.validateUser, validators.validateRegisterAlias, controller.register);
+router.post('/register', validators.register, controller.register);
 
-//USER ACCOUNT ACTIVATION
-//register/:token?email=something@something.com
-router.get('/register/:token', controller.verifyUser)
+router.post('/login', validators.login, controller.login);
 
-//USER LOGIN
-router.post('/login', validators.validateConfirmedAccount, controller.login);
+router.post('/login/:token', validators.confirmEmail, controller.confirmEmail)
 
-router.post('/login/:token', controller.verifyUser)
+router.get('/reset', validators.getResetLink, controller.getResetLink);
 
-//RESET LINK
-router.get('/reset', controller.resetPasswordGet);
-
-//RESET PASSWORD
-//reset/:token?email=something@something.com
-router.post('/reset/:token', controller.resetPasswordPost);
+router.post('/reset/:token', validators.postResetPassword, controller.postResetPassword);
 
 module.exports = router;

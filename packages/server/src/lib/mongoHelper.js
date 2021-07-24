@@ -14,7 +14,7 @@ exports.deleteAlias = async function (aliasObject) {
 	aliasObject.expiration = null;
 	aliasObject.paid = false;
 	await aliasObject.save();
-	//delete entry from aliases array
+	// delete entry from aliases array
 	user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
 	await user.save();
 }
@@ -32,16 +32,17 @@ exports.addRecord = async function (aliasObject, currency, address) {
 
 	//DNSimple API code
 	let id = await dnsimpleLib.addRecord(aliasObject.alias, aliasObject.domain, currency, address)
+  console.log(id); // 20 or 30
 	//Add record
 	aliasObject.records.push({ dnsimpleID: id, currency: currency, recipientAddress: address });
 	await aliasObject.save();
 }
 exports.addAlias = async function (user, alias, domain) {
-
 	let expiry = new Date()
 	expiry.setDate(expiry.getDate())
 	expiry.setHours(5, 0, 0, 0)
 
+	// TODO: Remove validation checks. They belong to the validation step.
 	let aliasObject = await Alias.findOne({ alias: alias, domain: domain })
 	if (aliasObject) {
 		//alias exists, does it have a user?
@@ -53,9 +54,8 @@ exports.addAlias = async function (user, alias, domain) {
 			aliasObject.domain = domain;
 			aliasObject.expiration = expiry
 			user.aliases.push(aliasObject);
-			//await aliasObject.save();
-			//await user.save();
-			return Promise.all([aliasObject.save(),user.save()])
+
+			return Promise.all([aliasObject.save(),user.save()]);
 
 		}
 	}
@@ -66,10 +66,8 @@ exports.addAlias = async function (user, alias, domain) {
 			user: user,
 			domain: domain,
 			expiration: expiry
-		})
+		});
 		user.aliases.push(aliasObject);
-		//await aliasObject.save();
-		//await user.save();
 		return Promise.all([aliasObject.save(),user.save()])
 	}
 }

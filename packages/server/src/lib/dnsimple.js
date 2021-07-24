@@ -8,6 +8,7 @@ exports.addRecord = async function (alias, domain, currency, address) {
 
 	//add zone record
 	let id;
+  // TODO: Rewrite code.
 	await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${domain}/records`, {
 		headers: {
 			'Authorization': `Bearer ${process.env.DNSIMPLE_TOKEN}`,
@@ -25,6 +26,8 @@ exports.addRecord = async function (alias, domain, currency, address) {
 		//console.log(responseData)
 		id = responseData.data.id
 	})
+
+  // Test: id = 20;
 	return id;
 }
 exports.deleteRecord = async function (id, domain) {

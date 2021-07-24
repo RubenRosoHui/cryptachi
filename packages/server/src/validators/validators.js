@@ -115,7 +115,7 @@ exports.validateAddAlias = [
     .toLowerCase()
     .exists().withMessage('domain undefined')
     .custom(async (value, { req }) => {
-			const validDomains = ['cryptachi.com'];
+			const validDomains = ['cryptachi.com', 'cryptachitest.com'];
 
 			const alias = req.params.alias// || req.body.alias
 

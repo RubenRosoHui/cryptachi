@@ -5,13 +5,11 @@ const EmailLib = require('../lib/email.js')
 const MongoLib = require('../lib/mongoHelper.js')
 
 const crypto = require('crypto');
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res, next) => {
-
-	const { email, password, alias, domain, free } = req.body;
+	const { email, password, alias, domain } = req.body;
 	try {
 
 		//Create user
@@ -85,72 +83,65 @@ exports.login = async (req, res, next) => {
 	}
 }
 
-exports.verifyUser = async (req, res, next) => {
+exports.confirmEmail = async (req, res, next) => {
 	const { token } = req.params;
 	const { email } = req.query;
+
 	try {
 		const user = await User.findOne({ email: email, isEmailConfirmedToken: token });
-		if (user) {
-			if (user.isEmailConfirmed) throw ErrorLib.conflictError('account already activated')
 
-			user.isEmailConfirmed = true;
+		user.isEmailConfirmed = true;
+    user.isEmailConfirmedToken = null;
 
-			await user.save();
+		await user.save();
 
-			return res.status(200).json({ message: "Account Activated" });
-		}
-		else throw ErrorLib.notFoundError('Email or token not found.');
-
+		return res.status(200).json({ message: "Account Activated" });
 	}
 	catch (err) {
 		next(ErrorLib.errorWrapper(err));
 	}
 }
 
-exports.resetPasswordGet = async (req, res, next) => {
-	const { email } = req.query
+exports.getResetLink = async (req, res, next) => {
+	const { email } = req.query;
 
 	try {
-		//is there an account with this email?
-		const user = await User.findOne({ email: email })
-		if (user) {
+		const user = await User.findOne({ email: email });
 
-			const token = crypto.randomBytes(32).toString('hex')
+		const token = crypto.randomBytes(32).toString('hex');
 
-			user.resetToken = token;
-			user.resetTokenExpiration = Date.now() + 3600000; //in one hour
-			await user.save();
-			await EmailLib.sendAccountVerification(email, token);
-			console.log(`reset token ${token}`)
-			return res.status(200).json({ message: "Email sent" });
-		}
-		else throw ErrorLib.unprocessableEntityError('Email does not exist');
+		user.resetToken = token;
+		user.resetTokenExpiration = Date.now() + 3600000; //in one hour
+
+		await user.save();
+		await EmailLib.sendAccountVerification(email, token);
+
+		console.log(`reset token ${token}`);
+
+		return res.status(200).json({ message: "Email sent" });
 	} catch (err) {
 		next(ErrorLib.errorWrapper(err));
 	}
 
 }
-exports.resetPasswordPost = async (req, res, next) => {
+
+exports.postResetPassword = async (req, res, next) => {
 	const { email } = req.query
-	const { password, confirmPassword } = req.body;
-	//const { resetToken } = req.query
+	const { password } = req.body;
 	const { token } = req.params;
+
 	try {
-		const user = await User.findOne({ email: email, resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
-		if (user) {
+		const user = await User.findOne({ email: email, resetToken: token });
 
-			const salt = await bcrypt.genSalt(10);
-			user.password = await bcrypt.hash(password, salt);
+		const salt = await bcrypt.genSalt(10);
+		user.password = await bcrypt.hash(password, salt);
 
-      user.resetToken = null;
-      user.resetTokenExpiration = null;
+		user.resetToken = null;
+		user.resetTokenExpiration = null;
 
-			await user.save();
+		await user.save();
 
-			return res.status(200).json({ message: "Password Reset" });
-		}
-		else throw ErrorLib.authenticationError('Invalid Email and/or token');
-
+		return res.status(200).json({ message: "Password Reset" });
 	}
 	catch (err) {
 		next(ErrorLib.errorWrapper(err));
