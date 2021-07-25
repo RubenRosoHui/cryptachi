@@ -1,4 +1,3 @@
-const { param } = require('express-validator');
 const validate = require('../lib/validate.js');
 
 exports.login = [
@@ -17,18 +16,18 @@ exports.register = [
 ];
 
 exports.confirmEmail = [
-  validate.email(),
+  validate.email({ checkValueIn: 'query' }),
   validate.emailConfirmedToken(),
   validate.checkValidationResults
 ];
 
 exports.getResetLink = [
-  validate.email(),
+  validate.email({ checkValueIn: 'query' }),
   validate.checkValidationResults
 ];
 
 exports.postResetPassword = [
-  validate.email(),
+  validate.email({ checkValueIn: 'body' }),
   validate.password({ isStrong: true }),
   validate.confirmPassword(),
   validate.resetPasswordToken(),
