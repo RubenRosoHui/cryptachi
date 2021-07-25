@@ -19,11 +19,11 @@ exports.needsWebToken = (req, res, next) => {
 // NOTE: This needs the req.user object from the needsWebToken middleware.
 //       Always have the needsWebToken before this middleware.
 exports.needsVerifiedAccount = async (req, res, next) => {
+  // This is mostly to ensure that needsWebToken was properly added
+	// before this middleware and that it succeeded in validation.
+  if (!req.user) return next(errorLib.authenticationError('Authentication is required.'));
+
   const user = await User.findById(req.user.id);
 
-  // This is mostly to ensure that needsWebToken was properly added
-	// before this middleware or succeeded.
-  if (!user) return next(errorLib.authenticationError('Authentication is required.'));
-
-  user.isEmailConfirmed ? next() : next(errorLib.unauthorizedError('Access cannot be given until account is confirmed.'));
+  user.isEmailConfirmed ? next() : next(errorLib.unauthorizedAccessError('Access granted only to confirmed accounts.'));
 }
