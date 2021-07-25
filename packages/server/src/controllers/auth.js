@@ -37,7 +37,7 @@ exports.register = async (req, res, next) => {
     // TODO: Remove console log when production ready.
 		console.log(`activation token ${token}`);
 
-		res.status(200).json({
+		res.status(201).json({
       message: "User registered successfully.",
       user: {
         id: user._id,
@@ -53,12 +53,12 @@ exports.register = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
 	const { email, password } = req.body;
+
 	try {
 		const user = await User.findOne({email});
-		if (!user) throw ErrorLib.authenticationError("Invalid Credentials");
 
 		const isMatch = await bcrypt.compare(password, user.password);
-		if (!isMatch) throw ErrorLib.authenticationError("Invalid Credentials");
+		if (!isMatch) throw ErrorLib.authenticationError("Invalid credentials.");
 
 		const payload = {
 			user: {
@@ -77,7 +77,8 @@ exports.login = async (req, res, next) => {
 			(err, authorization) => {
 				if (err) throw ErrorLib.serverError(err.message);
 				res.status(200).json({
-					authorization, payload //include payload in repsonse
+					authorization,
+          payload
 				});
 			}
 		);
