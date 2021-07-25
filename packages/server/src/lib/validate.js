@@ -123,6 +123,7 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
 
   aliasValidator
     .exists().withMessage('Alias field required.')
+    .isAlphanumeric().withMessage('Alias can only contain numbers or letters.')
     .toLowerCase()
     .bail()
     .custom(async (value, {req}) => {
