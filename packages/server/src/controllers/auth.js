@@ -10,31 +10,34 @@ const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res, next) => {
 	const { email, password, alias, domain } = req.body;
-	try {
 
-		//Create user
+	try {
 		const user = new User({
 			email,
 			password,
 			roles: ["user"]
-		})
+		});
+
 		const salt = await bcrypt.genSalt(10);
 		user.password = await bcrypt.hash(password, salt);
 
 		//if user is signing up with an alias
 		if (alias && domain) {
-			await MongoLib.addAlias(user, alias, domain)
+			await MongoLib.addAlias(user, alias, domain);
 		}
 
-		const token = crypto.randomBytes(32).toString('hex')
+		const token = crypto.randomBytes(32).toString('hex');
 		user.isEmailConfirmedToken = token;
 
 		await user.save();
 
-		await EmailLib.sendAccountVerification(email, token);
+    // No need to await
+		EmailLib.sendAccountVerification(email, token);
 
-		console.log(`activation token ${token}`)
-		return res.status(200).json({
+    // TODO: Remove console log when production ready.
+		console.log(`activation token ${token}`);
+
+		res.status(200).json({
       message: "User registered successfully.",
       user: {
         id: user._id,
