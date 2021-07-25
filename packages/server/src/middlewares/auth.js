@@ -18,8 +18,8 @@ exports.needsWebToken = (req, res, next) => {
 
 // NOTE: This needs the req.user object from the needsWebToken middleware.
 //       Always have the needsWebToken before this middleware.
-exports.needsVerifiedAccount = (req, res, next) => {
-  const user = User.findById(req.user.id);
+exports.needsVerifiedAccount = async (req, res, next) => {
+  const user = await User.findById(req.user.id);
 
   // This is mostly to ensure that needsWebToken was properly added
 	// before this middleware or succeeded.
