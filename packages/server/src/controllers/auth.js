@@ -60,28 +60,21 @@ exports.login = async (req, res, next) => {
 		const isMatch = await bcrypt.compare(password, user.password);
 		if (!isMatch) throw ErrorLib.authenticationError("Invalid credentials.");
 
-		const payload = {
-			user: {
-				id: user.id,
-				email: user.email,
-				roles: user.roles,
-			}
-		};
+    const payload = {
+			id: user.id,
+			email: user.email,
+			roles: user.roles,
+    };
 
-		jwt.sign(
-			payload,
-			process.env.JWT_SECRET,
-			{
-				expiresIn: '7d'
-			},
-			(err, authorization) => {
-				if (err) throw ErrorLib.serverError(err.message);
-				res.status(200).json({
-					authorization,
-          payload
-				});
-			}
-		);
+		jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, authorization) => {
+			if (err) throw ErrorLib.serverError(err.message);
+
+			res.status(200).json({
+        message: "Logged in successfully.",
+				jsonWebToken: authorization,
+				user: payload
+			});
+		});
 	} catch (err) {
 		next(ErrorLib.errorWrapper(err));
 	}
