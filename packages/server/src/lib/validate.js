@@ -148,11 +148,7 @@ exports.domain = function({ checkAliasFieldIn='body', requireAliasField=true, op
   return domainValidator;
 }
 
-exports.free = () => body('free', value => `Invalid value for free field: ${value}`)
-  .exists().withMessage('Free field is required.')
-  .isBoolean();
-
-exports.emailConfirmedToken = () => param('token')
+exports.emailConfirmedToken = () => query('token')
   .exists(existsOpts).withMessage('Token is required.')
   .bail()
   .custom(async value => {
@@ -165,12 +161,12 @@ exports.emailConfirmedToken = () => param('token')
     return true;
   });
 
-exports.resetPasswordToken = () => param('token')
+exports.resetPasswordToken = () => body('token')
   .exists(existsOpts).withMessage('Token is required.')
   .bail()
   .custom(async (value, {req}) => {
     const user = await User.findOne({
-      email: req.query.email,
+      email: req.body.email,
       resetToken: value,
       resetTokenExpiration: {$gt: Date.now()}
     });

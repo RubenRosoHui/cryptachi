@@ -84,8 +84,7 @@ exports.login = async (req, res, next) => {
 }
 
 exports.confirmEmail = async (req, res, next) => {
-	const { token } = req.params;
-	const { email } = req.query;
+	const { email, token } = req.query;
 
 	try {
 		const user = await User.findOne({ email: email, isEmailConfirmedToken: token });
@@ -126,9 +125,7 @@ exports.getResetLink = async (req, res, next) => {
 }
 
 exports.postResetPassword = async (req, res, next) => {
-	const { email } = req.query
-	const { password } = req.body;
-	const { token } = req.params;
+	const { email, password, token } = req.body;
 
 	try {
 		const user = await User.findOne({ email: email, resetToken: token });
