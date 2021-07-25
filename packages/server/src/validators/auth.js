@@ -2,17 +2,17 @@ const { param } = require('express-validator');
 const validate = require('../lib/validate.js');
 
 exports.login = [
-  validate.email(),
+  validate.email({ checkValueIn: 'body' }),
   validate.password(),
   validate.checkValidationResults
 ];
 
 exports.register = [
-  validate.email({ checkExisting: false, checkTaken: true }),
+  validate.email({ checkValueIn: 'body', checkExisting: false, checkTaken: true }),
   validate.password({ isStrong: true }),
   validate.confirmPassword(),
-  validate.alias({ optional: true }),
-  validate.domain({ optional: true }),
+  validate.alias({ checkValueIn: 'body', optional: true }),
+  validate.domain({ checkValueIn: 'body', optional: true }),
   validate.checkValidationResults
 ];
 

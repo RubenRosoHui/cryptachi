@@ -34,8 +34,26 @@ exports.checkValidationResults = (req, _, next) => {
 	}
 };
 
-exports.email = function({ checkTaken=false, checkExisting=true } = { checkTaken:false, checkExisting:true }) {
-  const emailValidator = check('email', value => `Invalid email: ${value}`)
+exports.email = function({ checkValueIn='any', checkTaken=false, checkExisting=true } = { checkValueIn: 'any', checkTaken:false, checkExisting:true }) {
+  const defaultMessage = value => `Invalid email: ${value}`;
+  let emailValidator;
+
+  switch(checkValueIn) {
+		case 'body':
+      emailValidator = body('email', defaultMessage);
+      break;
+    case 'query':
+      emailValidator = query('email', defaultMessage);
+      break;
+    case 'param':
+      emailValidator = param('email', defaultMessage);
+      break;
+    default:
+      emailValidator = check('email', defaultMessage);
+      break;
+  }
+
+  emailValidator
 		.exists(existsOpts).withMessage('Email is required')
 		.toLowerCase()
 		.isEmail()
@@ -74,14 +92,30 @@ exports.confirmPassword = () => body('confirmPassword')
     return true;
   });
 
-exports.alias = function({ checkDomainFieldIn='body', requireDomainField=true, allowTaken=false, allowExisting=false, optional=false } = { checkDomainFieldIn:'body', requireDomainField:true, allowExists:false, allowTaken:false, optional:false }) {
-  const aliasValidator = check('alias');
+exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requireDomainField=true, allowTaken=false, allowExisting=false, optional=false } = { checkValueIn:'any', checkDomainValueIn:'body', requireDomainField:true, allowExists:false, allowTaken:false, optional:false }) {
+  const defaultMessage = value => `Invalid alias: ${value}`;
+  let aliasValidator;
+
+  switch(checkValueIn) {
+		case 'body':
+      aliasValidator = body('alias', defaultMessage);
+      break;
+    case 'query':
+      aliasValidator = query('alias', defaultMessage);
+      break;
+    case 'param':
+      aliasValidator = param('alias', defaultMessage);
+      break;
+    default:
+      aliasValidator = check('alias', defaultMessage);
+      break;
+  }
 
   if (optional) aliasValidator.optional();
 
   if (requireDomainField) {
 		aliasValidator.custom((_, {req}) => {
-			const domain = req[checkDomainFieldIn].domain;
+			const domain = req[checkDomainValueIn].domain;
 			if (!domain) throw 'Domain field required when alias is provided.';
 			return true;
 		}).bail();
@@ -92,7 +126,7 @@ exports.alias = function({ checkDomainFieldIn='body', requireDomainField=true, a
     .toLowerCase()
     .bail()
     .custom(async (value, {req}) => {
-      const aliasFound = await Alias.findOne({ alias: value, domain: req[checkDomainFieldIn].domain });
+      const aliasFound = await Alias.findOne({ alias: value, domain: req[checkDomainValueIn].domain });
 
       // Check if alias exists
 			if (!allowExisting && aliasFound) throw 'Alias already exists.';
@@ -107,7 +141,7 @@ exports.alias = function({ checkDomainFieldIn='body', requireDomainField=true, a
 	return aliasValidator;
 };
 
-exports.domain = function({ checkAliasFieldIn='body', requireAliasField=true, optional=false } = {  checkAliasFieldIn:'body', requireAliasField:true, optional:false  }) {
+exports.domain = function({ checkValueIn='any', checkAliasValueIn='body', requireAliasField=true, optional=false } = {  checkValueIn:'any', checkAliasValueIn:'body', requireAliasField:true, optional:false  }) {
 	let validDomains;
 	if (process.env.NODE_ENV === 'development') {
 		validDomains = ['cryptachi.com', 'cryptachitest.com'];
@@ -116,13 +150,29 @@ exports.domain = function({ checkAliasFieldIn='body', requireAliasField=true, op
 		validDomains = [];
 	}
 
-  const domainValidator = check('domain', value => `Invalid domain: ${value}`);
+  const defaultMessage = value => `Invalid domain: ${value}`;
+  let domainValidator;
+
+  switch(checkValueIn) {
+		case 'body':
+      domainValidator = body('domain', defaultMessage);
+      break;
+    case 'query':
+      domainValidator = query('domain', defaultMessage);
+      break;
+    case 'param':
+      domainValidator = param('domain', defaultMessage);
+      break;
+    default:
+      domainValidator = check('domain', defaultMessage);
+      break;
+  }
 
   if (optional) domainValidator.optional();
 
   if (requireAliasField) {
 		domainValidator.custom((_, {req}) => {
-			const alias = req[checkAliasFieldIn].alias;
+			const alias = req[checkAliasValueIn].alias;
 			if (!alias) throw 'Alias field required when domain is provided.';
 			return true;
 		}).bail();
@@ -135,12 +185,12 @@ exports.domain = function({ checkAliasFieldIn='body', requireAliasField=true, op
 
 		// NOTE: Do a check if alias field exists since the following validation chains require it.
 		.if((_, {req}) => {
-			const alias = req[checkAliasFieldIn].alias;
+			const alias = req[checkAliasValueIn].alias;
       if (alias) return true;
       return false;
     })
     .custom(async (value, {req}) => {
-			const alias = req[checkAliasFieldIn].alias;
+			const alias = req[checkAliasValueIn].alias;
 			if (!validator.isFQDN(alias + '.' + value)) return false;
 			return true;
 		});
