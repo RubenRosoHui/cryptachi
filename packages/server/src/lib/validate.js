@@ -79,6 +79,7 @@ exports.password = function({ isStrong=false } = { isStrong:false }) {
   const passwordValidator = body('password')
 		.exists(existsOpts).withMessage('Password is required.')
     .isString().withMessage('Password must be a string.')
+    .trim()
 		.isLength({ max: 30 }).withMessage('Password cannot exceed 30 characters');
 
   if (isStrong) passwordValidator.isStrongPassword().withMessage('Weak Password. Must be a minimum of 8 characters long and contain 1 uppercase, 1 lowercase, 1 number, and 1 symbol.');
@@ -124,6 +125,7 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
   aliasValidator
     .exists(existsOpts).withMessage('Alias field required.')
     .isAlphanumeric().withMessage('Alias can only contain numbers or letters.')
+    .trim()
     .toLowerCase()
     .bail()
     .custom(async (value, {req}) => {
@@ -184,6 +186,7 @@ exports.domain = function({ checkValueIn='any', checkAliasValueIn='body', requir
 
   domainValidator
     .exists(existsOpts).withMessage('Domain field required.')
+    .trim()
     .toLowerCase()
     .isIn(validDomains)
 
@@ -238,6 +241,7 @@ exports.currency = function({ allowExisting=false, mustExist=false } = { allowEx
 
   currencyValidator
     .exists(existsOpts).withMessage('Currency is required')
+    .trim()
     .toLowerCase()
     .isIn(validCurrencies)
     .bail()
@@ -262,9 +266,16 @@ exports.currency = function({ allowExisting=false, mustExist=false } = { allowEx
 exports.recipientAddress = () => body('recipientAddress', value => `Invalid recipient address: ${value}`)
   .exists(existsOpts).withMessage('Recipient address required.')
   .isString()
+  .trim()
   .isLength({ Max: 150 }).withMessage('Recipient Address cannot be longer than 150 characters.');
 
 exports.recipientName = () => body('recipientName', value => `Invalid recipient name: ${value}`)
   .exists(existsOpts).withMessage('Recipient name required.')
   .isString()
+  .trim()
   .isLength({ Max: 50 }).withMessage('Recipient Address cannot be longer than 50 characters.');
+
+exports.aliasList = () => query('names')
+  .exists(existsOpts).withMessage('Names field is required.')
+  .toLowerCase()
+  .trim(' ,'); // Trims both whitespaces and commas
