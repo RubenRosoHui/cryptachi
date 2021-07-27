@@ -14,7 +14,30 @@ exports.getAliases = async (req, res, next) => {
   }
 }
 
-// TODO: Renew Alias
+exports.renewAlias = async (req, res, next) => {
+  const alias = req.params.alias;
+  const domain = req.body.domain;
+
+  try {
+    const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
+
+    if (!aliasObject) throw errorLib.authenticationError('You do not own this alias');
+
+    const now = new Date();
+
+    if (now > aliasObject.expiration) throw errorLib.unprocessableEntityError('Cannot renew an expired alias.');
+
+		const remainingDays = aliasObject.expiration.getDate() - now.getDate();
+    aliasObject.expiration.setDate(now.getDate() + (30 - remainingDays));
+
+    await aliasObject.save();
+
+    res.status(200).json({ message: 'Alias renewed successfully.', alias: {expiration: aliasObject.expiration.toString()} });
+  }
+  catch(err) {
+    next(errorLib.errorWrapper(err));
+  }
+}
 
 exports.addFreeAlias = async (req, res, next) => {
 	const { alias } = req.params;
