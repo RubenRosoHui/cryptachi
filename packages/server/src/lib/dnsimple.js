@@ -2,13 +2,13 @@ const fetch = require("node-fetch")
 const { sendEmail } = require("./email")
 
 //Create record in DNSimple and retrun the records ID
-exports.addRecord = async function (alias, domain, currency, address) {
+exports.addRecord = async function (alias, domain, currency, recipientAddress, recipientName) {
 	//Override domain if zone has been specified in .env. This is due to DNSimples sandbox not allowing the registration of existing domains
 	if (process.env.DNSIMPLE_ZONE) domain = process.env.DNSIMPLE_ZONE
 
 	//add zone record
 	let id;
-	await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${domain}/records`, {
+	const response = await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${domain}/records`, {
 		headers: {
 			'Authorization': `Bearer ${process.env.DNSIMPLE_TOKEN}`,
 			'Accept': 'application/json',
@@ -18,13 +18,14 @@ exports.addRecord = async function (alias, domain, currency, address) {
 		body: JSON.stringify({
 			name: alias,
 			type: 'TXT',
-			content: `oa1:${currency} recipient_address=${address};`
+			content: `oa1:${currency} recipient_address=${recipientAddress}; recipient_name=${recipientName};`
 		})
+	});
 
-	}).then((res) => res.json()).then(responseData => {
-		//console.log(responseData)
-		id = responseData.data.id
-	})
+  const responseData = await response.json();
+
+  id = responseData.data.id;
+
 	return id;
 }
 exports.deleteRecord = async function (id, domain) {
@@ -38,6 +39,5 @@ exports.deleteRecord = async function (id, domain) {
 			'Content-Type': 'application/json'
 		},
 		method: 'DELETE'
-
 	})//.then(res => console.log(res))
 }

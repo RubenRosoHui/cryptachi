@@ -10,7 +10,7 @@ const aliasRoutes = require('./routes/alias.js');
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js')
 
-const authMiddleWare = require('./middlewares/auth.js')
+const { needsWebToken, needsVerifiedAccount } = require('./middlewares/auth.js')
 
 const app = express();
 
@@ -40,18 +40,18 @@ app.use(bodyParser.json());
 
 app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/user', authMiddleWare.validateWebToken,userRoutes);
+app.use('/api/user', needsWebToken, needsVerifiedAccount, userRoutes);
 
-app.use( (error,req,res,next)=> {
+app.use((error, req, res, next) => {
 	const status = error.statusCode || 500;
 	const name = error.name || 'Internal Server Error';
 	const message = error.message || "The server has encountered an error."
 	res.status(status).json({message: message, error:{name}});
-})
+});
 //cron.schedule('0 18 * * *', cronLib.CheckExpiredAliases)
 //cron.schedule('* * * * *', cronLib.CheckExpiredAliases)
 
-mongoose.connect(mongoUrl, mongoOptions).then( () => {
+mongoose.connect(mongoUrl, mongoOptions).then(() => {
 	const port = process.env.PORT || 3000;
 	app.listen(port, () => console.log(`server is running on port ${port}`));
-} ).catch(error => console.log(error));
+}).catch(error => console.log(error));

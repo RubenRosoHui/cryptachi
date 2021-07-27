@@ -8,41 +8,55 @@ exports.sendEmail = function (from, to, subject, text) {
 		from: from,
 		to: to,
 		subject: subject,
-		text: text
+		html: text
 	};
-	return mg.messages().send(data).then(value => console.log(value))
+
+	return mg.messages().send(data).then(value => console.log(value));
 }
 
-exports.sendPasswordReset = async function (to, token) {
-	await module.exports.sendEmail(
-		'Excited User <me@samples.mailgun.org>',
+exports.sendPasswordReset = function (to, token) {
+  const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset-password?token=${token}&email=${to}`;
+
+	return module.exports.sendEmail(
+		'mail@cryptachi.com',
 		to,
 		'Password Reset - Cryptachi.com',
 		`
-		you requested a password reset Click this link to set new password
-			<a href=" ${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset-password?token=${token}&email=${to} ">Link</a>
-		
-		`);
+			<p>
+				You requested a password reset. To set a new password, click <a href="${link}">here</a>.
+			</p>
+			<p>
+				Or copy and paste the following link into your browser:
+				<span style="text-decoration: underline;">${link}</span>
+			</p>
+		`
+  );
 }
 
-exports.sendAccountVerification = async function (to, token) {
-	await module.exports.sendEmail(
-		'Excited User <me@samples.mailgun.org>',
+exports.sendAccountVerification = function (to, token) {
+  const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset/${token}`;
+
+	return module.exports.sendEmail(
+		'mail@cryptachi.com',
 		to,
 		'Account Activation - Cryptachi.com',
-		`Please click the llink below to confirm your new cryptachi account
-			<a href=" ${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset/${token} ">Link</a>
 		`
-	)
+			<p>
+				To confirm your new Cryptachi account, click <a href="${link}">here</a>.
+			</p>
+			<p>
+				Or copy and paste the following link into your browser:
+				<span style="text-decoration: underline;">${link}</span>
+			</p>
+		`
+	);
 }
 
-exports.sendAliasExpiryWarning = function (to) {
+exports.sendAliasExpiryWarning = function (to) {}
 
-}
-
-exports.sendAliasExpiry = async function (to) {
-	await module.exports.sendEmail(
-		'Excited User <me@samples.mailgun.org>',
+exports.sendAliasExpiry = function (to) {
+	return module.exports.sendEmail(
+		'mail@cryptachi.com',
 		to,
 		'Alias Expired - Cryptachi.com',
 		`Your alias has expired!
