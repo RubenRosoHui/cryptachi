@@ -6,17 +6,20 @@ const dnsimpleLib = require('../lib/dnsimple.js')
 exports.deleteAlias = async function (aliasObject) {
 	user = await User.findById(aliasObject.user).populate("aliases")
 
+  // Delete the alias from DNSimple
+  // REVIEW: Resource intensive. Is there a way to do a batch delete?
 	await aliasObject.records.forEach(record => {
 		dnsimpleLib.deleteRecord(record.dnsimpleID,aliasObject.domain)
-	})
+	});
+
+  // Delete the alias on our end.
 	aliasObject.user = null;
 	aliasObject.records = [];
 	aliasObject.expiration = null;
 	aliasObject.paid = false;
-	await aliasObject.save();
-	// delete entry from aliases array
 	user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
-	await user.save();
+
+  return Promise.all([aliasObject.save(), user.save()]);
 }
 exports.deleteRecord = async function (aliasObject, currency) {
 	let record = aliasObject.records.find(record => record.currency == currency)
@@ -28,13 +31,13 @@ exports.deleteRecord = async function (aliasObject, currency) {
 	aliasObject.records = aliasObject.records.filter(record => record.currency != currency);//.push({currency:currency,recipientAddress:address});
 	await aliasObject.save();
 }
-exports.addRecord = async function (aliasObject, currency, address) {
+exports.addRecord = async function (aliasObject, currency, recipientAddress, recipientName) {
 
 	//DNSimple API code
-	let id = await dnsimpleLib.addRecord(aliasObject.alias, aliasObject.domain, currency, address)
+	const id = await dnsimpleLib.addRecord(aliasObject.alias, aliasObject.domain, currency, recipientAddress, recipientName);
   console.log(id); // 20 or 30
 	//Add record
-	aliasObject.records.push({ dnsimpleID: id, currency: currency, recipientAddress: address });
+	aliasObject.records.push({ dnsimpleID: id, currency, recipientAddress, recipientName });
 	await aliasObject.save();
 }
 exports.addAlias = async function (user, alias, domain) {
@@ -55,8 +58,7 @@ exports.addAlias = async function (user, alias, domain) {
 			aliasObject.expiration = expiry
 			user.aliases.push(aliasObject);
 
-			return Promise.all([aliasObject.save(),user.save()]);
-
+			return Promise.all([aliasObject.save(), user.save()]);
 		}
 	}
 	//alias does not exist, create it

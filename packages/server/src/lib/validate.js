@@ -4,7 +4,7 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js')
 
-existsOpts = { checkFalsy: true };
+const existsOpts = { checkFalsy: true };
 
 const customValidationResult = validationResult.withDefaults({
 	formatter: error => {
@@ -75,7 +75,7 @@ exports.email = function({ checkValueIn='any', checkTaken=false, checkExisting=t
   return emailValidator;
 }
 
-exports.password = function({ isStrong=false } = { isStrong: false }) {
+exports.password = function({ isStrong=false } = { isStrong:false }) {
   const passwordValidator = body('password')
 		.exists(existsOpts).withMessage('Password is required.')
     .isString().withMessage('Password must be a string.')
@@ -92,7 +92,7 @@ exports.confirmPassword = () => body('confirmPassword')
     return true;
   });
 
-exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requireDomainField=true, allowTaken=false, allowExisting=false, optional=false } = { checkValueIn:'any', checkDomainValueIn:'body', requireDomainField:true, allowExists:false, allowTaken:false, optional:false }) {
+exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requireDomainField=true, allowTaken=false, allowExisting=false, optional=false, mustExist=false } = { checkValueIn:'any', checkDomainValueIn:'body', requireDomainField:true, allowExists:false, allowTaken:false, optional:false, mustExist:false }) {
   const defaultMessage = value => `Invalid alias: ${value}`;
   let aliasValidator;
 
@@ -122,7 +122,7 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
   }
 
   aliasValidator
-    .exists().withMessage('Alias field required.')
+    .exists(existsOpts).withMessage('Alias field required.')
     .isAlphanumeric().withMessage('Alias can only contain numbers or letters.')
     .toLowerCase()
     .bail()
@@ -131,6 +131,9 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
 
       // Check if alias exists
 			if (!allowExisting && aliasFound) throw 'Alias already exists.';
+
+      // Alias must exist
+			if (mustExist && !aliasFound) throw 'Alias does not exist.';
 
       // Check if alias is taken
       const aliasTaken = Boolean(aliasFound && aliasFound.user);
@@ -192,7 +195,8 @@ exports.domain = function({ checkValueIn='any', checkAliasValueIn='body', requir
     })
     .custom(async (value, {req}) => {
 			const alias = req[checkAliasValueIn].alias;
-			if (!validator.isFQDN(alias + '.' + value)) return false;
+      const fqdn = alias + '.' + value;
+			if (!validator.isFQDN(fqdn)) throw `Not a valid FQDN: ${fqdn}`;
 			return true;
 		});
 
@@ -226,3 +230,41 @@ exports.resetPasswordToken = () => body('token')
 
     return true;
   });
+
+exports.currency = function({ allowExisting=false, mustExist=false } = { allowExisting:false, mustExist:false }) {
+  const validCurrencies = ['xmr', 'btc', 'eth'];
+
+  const currencyValidator = body('currency', value => `Invalid currency: ${value}`);
+
+  currencyValidator
+    .exists(existsOpts).withMessage('Currency is required')
+    .toLowerCase()
+    .isIn(validCurrencies)
+    .bail()
+    .custom(async (value, {req}) => {
+      const alias = await Alias.findOne({
+        alias: req.params.alias,
+        domain: req.body.domain
+      });
+
+      const currencyExists = alias.records.some(record => record.currency === value);
+
+      if (!allowExisting && currencyExists) throw `This alias already has an existing record for ${value}. Please choose another currency.`;
+
+      if (mustExist && !currencyExists) throw `This alias does not have the record: ${value}.`;
+
+      return true;
+    });
+
+  return currencyValidator;
+};
+
+exports.recipientAddress = () => body('recipientAddress', value => `Invalid recipient address: ${value}`)
+  .exists(existsOpts).withMessage('Recipient address required.')
+  .isString()
+  .isLength({ Max: 150 }).withMessage('Recipient Address cannot be longer than 150 characters.');
+
+exports.recipientName = () => body('recipientName', value => `Invalid recipient name: ${value}`)
+  .exists(existsOpts).withMessage('Recipient name required.')
+  .isString()
+  .isLength({ Max: 50 }).withMessage('Recipient Address cannot be longer than 50 characters.');

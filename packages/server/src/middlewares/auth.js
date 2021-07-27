@@ -5,7 +5,7 @@ const errorLib = require('../lib/error.js');
 exports.needsWebToken = async (req, res, next) => {
 	const token = req.header('Authorization');
 
-	if (!token) throw errorLib.authenticationError("Authentication token is required.");
+	if (!token) return next(errorLib.authenticationError("Authentication token is required."));
 
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);

@@ -11,7 +11,7 @@ const AliasSchema = mongoose.Schema({
 			_id: false,
 			dnsimpleID: String,
 			currency: { type: String, required: true },
-			recipientName: String,
+			recipientName: { type: String, required: true },
 			recipientAddress: { type: String, required: true },
 			description: String
 		}
