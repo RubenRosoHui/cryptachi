@@ -23,14 +23,17 @@ exports.renewAlias = async (req, res, next) => {
 
     const now = new Date();
 
-    if (now > aliasObject.expiration) throw errorLib.unprocessableEntityError('Cannot renew an expired alias.');
+    if (now > aliasObject.expiration) throw errorLib.badRequestError('Cannot renew an expired alias.');
 
 		const remainingDays = aliasObject.expiration.getDate() - now.getDate();
     aliasObject.expiration.setDate(now.getDate() + (30 - remainingDays));
 
     await aliasObject.save();
 
-    res.status(200).json({ message: 'Alias renewed successfully.', alias: {expiration: aliasObject.expiration.toString()} });
+    res.status(200).json({
+      message: 'Alias renewed successfully.',
+      alias: { expiration: aliasObject.expiration.toString() }
+    });
   }
   catch(err) {
     next(errorLib.errorWrapper(err));
