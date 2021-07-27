@@ -36,7 +36,8 @@ exports.deleteAlias = [
     checkDomainValueIn: 'query',
     allowTaken: true,
     allowExisting: true,
-    mustExist: true
+    mustExist: true,
+    checkOwnership: true
   }),
   validate.domain({
     checkValueIn: 'query',
@@ -51,7 +52,8 @@ exports.addRecord = [
     checkDomainValueIn: 'body',
     allowTaken: true,
     allowExisting: true,
-    mustExist: true
+    mustExist: true,
+    checkOwnership: true
   }),
   validate.domain({
     checkValueIn: 'body',
@@ -69,7 +71,8 @@ exports.deleteRecord = [
     checkDomainValueIn: 'body',
     allowTaken: true,
     allowExisting: true,
-    mustExist: true
+    mustExist: true,
+    checkOwnership: true
   }),
   validate.domain({
     checkValueIn: 'body',

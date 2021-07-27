@@ -21,8 +21,6 @@ exports.renewAlias = async (req, res, next) => {
   try {
     const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
 
-    if (!aliasObject) throw errorLib.authenticationError('You do not own this alias');
-
     const now = new Date();
 
     if (now > aliasObject.expiration) throw errorLib.unprocessableEntityError('Cannot renew an expired alias.');
@@ -66,8 +64,6 @@ exports.deleteAlias = async (req, res, next) => {
 	try {
 		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: req.user.id });
 
-		if (!aliasObject) throw errorLib.unauthorizedAccessError("You do not own this alias.");
-
 		await MongoLib.deleteAlias(aliasObject);
 
 		return res.status(200).json({ message: "Alias deleted successfully" });
@@ -83,8 +79,6 @@ exports.addRecord = async (req, res, next) => {
 
 	try {
 		const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
-
-    if (!aliasObject) throw errorLib.unauthorizedAccessError("You do not own this alias");
 
 		// Is domain on the free plan and already has 1 record?
 		if (!aliasObject.paid && aliasObject.records.length >= 1) throw errorLib.unauthorizedAccessError("You Cannot add more records unless you upgrade this alias");
@@ -104,8 +98,6 @@ exports.deleteRecord = async (req, res, next) => {
 
 	try {
 		const aliasObject = await Alias.findOne({ domain, alias, user: req.user.id, "records.currency": currency });
-
-		if (!aliasObject) throw errorLib.unauthorizedAccessError("You do not own this alias");
 
 		await MongoLib.deleteRecord(aliasObject,currency);
 
