@@ -255,7 +255,7 @@ exports.currency = function({ allowExisting=false, mustExist=false } = { allowEx
 
       if (!allowExisting && currencyExists) throw `This alias already has an existing record for ${value}. Please choose another currency.`;
 
-      if (mustExist && !currencyExists) throw `This alias does not have the record: ${value}.`;
+      if (mustExist && !currencyExists) throw `This alias does not have the record: ${value}`;
 
       return true;
     });

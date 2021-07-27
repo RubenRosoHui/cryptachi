@@ -25,11 +25,11 @@ exports.addFreeAlias = async (req, res, next) => {
 
 		// Prevent user from owning multiple FREE aliases
     const hasFreeAlias = user.aliases.some(alias => alias.paid === false);
-		if (hasFreeAlias) throw errorLib.paymentRequiredError("Only one free alias per user.");
+		if (hasFreeAlias) throw errorLib.paymentRequiredError('Only one free alias per user.');
 
 		await MongoLib.addAlias(user,alias,domain)
 
-		return res.status(200).json({ message: "Alias created successfully" });
+		return res.status(200).json({ message: 'Alias created successfully.' });
 	}
 	catch (err) {
 		next(err);
@@ -41,10 +41,9 @@ exports.deleteAlias = async (req, res, next) => {
 	const { domain } = req.query;
 
 	try {
-		const user = await User.findById(req.user.id).populate("aliases");
-		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: user });
+		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: req.user.id });
 
-		if (!aliasObject) errorLib.unauthorizedAccessError("You do not own this alias");
+		if (!aliasObject) throw errorLib.unauthorizedAccessError("You do not own this alias.");
 
 		await MongoLib.deleteAlias(aliasObject);
 
@@ -60,43 +59,36 @@ exports.addRecord = async (req, res, next) => {
 	const { alias } = req.params;
 
 	try {
-		const user = await User.findById(req.user.id);//.populate("aliases");
-		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: user });
+		const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
 
-		//if user owns alias
-		if (aliasObject) {
-			//Is domain on the free plan and already has 1 record?
-			if (!aliasObject.paid && aliasObject.records.length >= 1) throw errorLib.unauthorizedAccessError("You Cannot add more records unless you upgrade this alias")
+    if (!aliasObject) throw errorLib.unauthorizedAccessError("You do not own this alias");
+
+		// Is domain on the free plan and already has 1 record?
+		if (!aliasObject.paid && aliasObject.records.length >= 1) throw errorLib.unauthorizedAccessError("You Cannot add more records unless you upgrade this alias");
 			
-			await MongoLib.addRecord(aliasObject, currency, recipientAddress, recipientName);
+		await MongoLib.addRecord(aliasObject, currency, recipientAddress, recipientName);
 
-			return res.status(200).json({ message: "Alias record created successfully" });
-		}
-		else throw errorLib.unauthorizedAccessError("You do not own this alias")
+		return res.status(200).json({ message: "Alias record created successfully" });
 	}
 	catch (err) {
-		next(err);
+		next(errorLib.errorWrapper(err));
 	}
-
 }
 
 exports.deleteRecord = async (req, res, next) => {
-
 	const { currency,domain } = req.body;
 	const { alias } = req.params;
+
 	try {
+		const aliasObject = await Alias.findOne({ domain, alias, user: req.user.id, "records.currency": currency });
 
-		const user = await User.findById(req.user.id).populate("aliases");
-		const aliasObject = await Alias.findOne({ domain:domain,alias: alias, user: user, "records.currency": currency });
+		if (!aliasObject) throw errorLib.unauthorizedAccessError("You do not own this alias");
 
-		//if user owns alias
-		if (aliasObject) {
-			await MongoLib.deleteRecord(aliasObject,currency)
-			return res.status(200).json({ message: "Alias record deleted successfully" });
-		}
-		else throw errorLib.unauthorizedAccessError("You do not own this alias")
+		await MongoLib.deleteRecord(aliasObject,currency);
+
+		return res.status(200).json({ message: "Alias record deleted successfully" });
 	}
 	catch (err) {
-		next(err);
+		next(errorLib.errorWrapper(err));
 	}
 }

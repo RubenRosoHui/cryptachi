@@ -24,6 +24,6 @@ exports.addRecord = [
 exports.deleteRecord = [
   validate.alias({ checkValueIn: 'param', checkDomainValueIn: 'body', allowTaken: true, allowExisting: true, mustExist: true }),
   validate.domain({ checkValueIn: 'body', checkAliasValueIn: 'params' }),
-  validate.currency({ mustExist: true }),
+  validate.currency({ allowExisting: true, mustExist: true }),
   validate.checkValidationResults
 ];
