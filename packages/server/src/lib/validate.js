@@ -93,7 +93,7 @@ exports.confirmPassword = () => body('confirmPassword')
     return true;
   });
 
-exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requireDomainField=true, allowTaken=false, allowExisting=false, optional=false, mustExist=false } = { checkValueIn:'any', checkDomainValueIn:'body', requireDomainField:true, allowExists:false, allowTaken:false, optional:false, mustExist:false }) {
+exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requireDomainField=true, allowTaken=false, allowExisting=false, optional=false, mustExist=false, checkOwnership=false } = { checkValueIn:'any', checkDomainValueIn:'body', requireDomainField:true, allowExists:false, allowTaken:false, optional:false, mustExist:false, checkOwnership:false }) {
   const defaultMessage = value => `Invalid alias: ${value}`;
   let aliasValidator;
 
@@ -140,6 +140,20 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
       // Check if alias is taken
       const aliasTaken = Boolean(aliasFound && aliasFound.user);
       if (!allowTaken && aliasTaken) throw 'Alias is taken.';
+
+      return true;
+    })
+    .bail()
+    .if(() => checkOwnership)
+    .custom(async (value, {req}) => {
+      if (!req.user) {
+        console.error('Unable to check ownership since req.user was not found.');
+        throw { type: 'ServerError', msg: 'Something went wrong. If you are the admin, check the server logs.' };
+      }
+
+      const aliasFound = await Alias.findOne({ alias: value, domain: req[checkDomainValueIn].domain, user: req.user.id });
+
+      if (!aliasFound) throw errorLib.authenticationError('You do not own this alias. From validator.');
 
       return true;
     });
