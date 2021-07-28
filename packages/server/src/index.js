@@ -9,6 +9,7 @@ const cron = require('node-cron');
 const aliasRoutes = require('./routes/alias.js');
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js')
+const checkoutRoutes = require('./routes/checkout.js')
 
 const { needsWebToken, needsVerifiedAccount } = require('./middlewares/auth.js')
 
@@ -41,6 +42,9 @@ app.use(bodyParser.json());
 app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', needsWebToken, needsVerifiedAccount, userRoutes);
+app.use('/api/checkout', checkoutRoutes);
+
+// TODO: Add catch all route.
 
 app.use((error, req, res, next) => {
 	const status = error.statusCode || 500;
