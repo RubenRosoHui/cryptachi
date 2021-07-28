@@ -55,7 +55,11 @@ exports.postPaymentIntent = async (req, res, next) => {
   console.log('Calculated price: ', calculatedPrice);
 
   // TODO: Request a payment intent from the gateway
-	const paymentIntent = { id: 12345, status: 'awaiting-transaction', address: 'btcaddress' };
+	const paymentIntent = {
+    id: 12345,
+    status: 'awaiting-transaction',
+    address: 'btcaddress'
+  };
 
   res.status(200).json({
     message: 'Payment Intent successfully created.',
