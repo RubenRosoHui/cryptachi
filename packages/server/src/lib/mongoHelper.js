@@ -1,15 +1,15 @@
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
-const ErrorLib = require('../lib/error.js')
-const dnsimpleLib = require('../lib/dnsimple.js')
+const errorLib = require('../lib/error.js');
+const dnsimpleLib = require('../lib/dnsimple.js');
 
 exports.deleteAlias = async function (aliasObject) {
-	user = await User.findById(aliasObject.user).populate("aliases")
+	const user = await User.findById(aliasObject.user).populate("aliases");
 
   // Delete the alias from DNSimple
   // REVIEW: Resource intensive. Is there a way to do a batch delete?
 	await aliasObject.records.forEach(record => {
-		dnsimpleLib.deleteRecord(record.dnsimpleID,aliasObject.domain)
+		dnsimpleLib.deleteRecord(record.dnsimpleID,aliasObject.domain);
 	});
 
   // Delete the alias on our end.
@@ -23,9 +23,9 @@ exports.deleteAlias = async function (aliasObject) {
 }
 exports.deleteRecord = async function (aliasObject, currency) {
 	let record = aliasObject.records.find(record => record.currency == currency)
-	let id = record.dnsimpleID
+	let id = record.dnsimpleID;
 	//send Id to dnsimple for deletion
-	await dnsimpleLib.deleteRecord(id,aliasObject.domain)
+	await dnsimpleLib.deleteRecord(id,aliasObject.domain);
 
 	//Delete record
 	aliasObject.records = aliasObject.records.filter(record => record.currency != currency);//.push({currency:currency,recipientAddress:address});
@@ -41,16 +41,16 @@ exports.addRecord = async function (aliasObject, currency, recipientAddress, rec
 	await aliasObject.save();
 }
 exports.addAlias = async function (user, alias, domain) {
-	let expiry = new Date()
-	expiry.setDate(expiry.getDate())
-	expiry.setHours(5, 0, 0, 0)
+	let expiry = new Date();
+	expiry.setDate(expiry.getDate());
+	expiry.setHours(5, 0, 0, 0);
 
 	// TODO: Remove validation checks. They belong to the validation step.
-	let aliasObject = await Alias.findOne({ alias: alias, domain: domain })
+	let aliasObject = await Alias.findOne({ alias: alias, domain: domain });
 	if (aliasObject) {
 		//alias exists, does it have a user?
 		if (aliasObject.user) {
-			throw ErrorLib.unauthorizedAccessError("Alias already exists");
+			throw errorLib.unauthorizedAccessError("Alias already exists");
 		}
 		else {
 			aliasObject.user = user;
@@ -70,6 +70,6 @@ exports.addAlias = async function (user, alias, domain) {
 			expiration: expiry
 		});
 		user.aliases.push(aliasObject);
-		return Promise.all([aliasObject.save(),user.save()])
+		return Promise.all([aliasObject.save(),user.save()]);
 	}
 }
