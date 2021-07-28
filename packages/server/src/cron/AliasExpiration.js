@@ -1,25 +1,25 @@
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
-const ErrorLib = require('../lib/error.js')
-const MongoLib = require('../lib/mongoHelper.js')
-const emailLib = require('../lib/email.js')
+const errorLib = require('../lib/error.js');
+const mongoLib = require('../lib/mongoHelper.js');
+const emailLib = require('../lib/email.js');
 
 exports.CheckExpiredAliases = async (req, res, next) => {
 
 	//greater than today, less than 3-5 days from now
 	//let e = await Alias.find({expiration: { $gte: '2021-07-13', $lte: '2021-08-13'  }}, async (err,aliases) => {
-
-	let expiry = new Date()
-	expiry.setDate(expiry.getDate())
-	expiry.setHours(6, 0, 0, 0)
+	//
+	let expiry = new Date();
+  expiry.setDate(expiry.getDate());
+	expiry.setHours(6, 0, 0, 0);
 
 	//find all expired, send email and delete
 	let expiredAliases = await Alias.find({ expiration: { $lte: expiry/*Date.now()*/ } }, async (err, aliases) => {
 
 		aliases.map(async (alias) => {
-			let user = await User.findById(alias.user)
-			await emailLib.sendAliasExpiry(user.email)
-			console.log(`${alias.alias} is expired`)
+			let user = await User.findById(alias.user);
+			await emailLib.sendAliasExpiry(user.email);
+			console.log(`${alias.alias} is expired`);
 			//console.log(alias.expiration)
 			//console.log(expiry)
 			//console.log(expiry >= alias.expiration)
@@ -28,7 +28,7 @@ exports.CheckExpiredAliases = async (req, res, next) => {
 			//alias.records.forEach(record => {
 			//	dnsimpleLib.deleteRecord(record.dnsimpleID)
 			//})
-			await MongoLib.deleteAlias(alias)
+			await mongoLib.deleteAlias(alias);
 			
 			//console.log('deleted')
 		})
@@ -61,7 +61,7 @@ exports.CheckExpiredAliases = async (req, res, next) => {
 			if (isToday) {
 				//remove user from alias 
 
-				//await MongoLib.deleteAlias(alias)
+				//await mongoLib.deleteAlias(alias)
 				console.log('deleted')
 
 				//send email saying it expired?
