@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require('../models/user.js');
 const errorLib = require('../lib/error.js');
+const fetch = require('node-fetch');
 
 exports.needsWebToken = async (req, res, next) => {
 	const token = req.header('Authorization');
@@ -34,3 +35,23 @@ exports.needsVerifiedAccount = async (req, res, next) => {
 
   req.user.isEmailConfirmed ? next() : next(errorLib.unauthorizedAccessError('Access granted only to confirmed accounts.'));
 }
+
+exports.needsCaptcha = async (req, res, next) => {
+	const recaptchaResponse = req.query.captcharesponse;
+
+	if (!recaptchaResponse) return next(errorLib.authenticationError('Valid captcha token required.'));
+
+	let verificationResult;
+	const secret = process.env.RECAPTCHA_SECRET;
+	const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${recaptchaResponse}`;
+
+	try {
+		const response = await fetch(url, { method: 'POST' });
+		if (!response.ok) throw 'Failed to fetch captcha verification response';
+		verificationResult = await response.json();
+	} catch (err) {
+		return next(errorLib.errorWrapper(err));
+	};
+
+	verificationResult.success ? next() : next(authenticationError('Requires verified captcha.'));
+};
