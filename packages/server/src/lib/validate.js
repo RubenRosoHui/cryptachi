@@ -145,6 +145,7 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
     })
     .bail()
     .if(() => checkOwnership)
+		// REVIEW: This could be done in the first custom function
     .custom(async (value, {req}) => {
       if (!req.user) {
         console.error('Unable to check ownership since req.user was not found.');
@@ -293,3 +294,37 @@ exports.aliasList = () => query('names')
   .exists(existsOpts).withMessage('Names field is required.')
   .toLowerCase()
   .trim(' ,'); // Trims both whitespaces and commas
+
+exports.plan = () => body('plan', value => `Invalid plan: ${value}`)
+  .exists(existsOpts).withMessage('Plan field is required.')
+  .isString()
+  .isIn(['oneYear', 'twoYear', 'threeYear', 'fourYear', 'fiveYear']);
+
+exports.paymentUnit = () => body('payment.unit', value => `Invalid payment unit: ${value}`)
+  .exists(existsOpts).withMessage('Payment unit is required.')
+  .custom((value, {req}) => {
+    const denominationMapping = {
+      'xmr': 'piconero',
+      'btc': 'satoshi',
+      'eth': 'wei'
+    };
+
+    const currency = req.body.payment.currency;
+    const smallestDenomination = denominationMapping[currency];
+
+    const denomIsValid = value === smallestDenomination;
+    if (!denomIsValid) throw `Invalid denomination: ${value}. Valid denomination for ${currency} is ${smallestDenomination}.`;
+
+    return true;
+  });
+
+exports.paymentPrice = () => body('payment.price')
+  .exists(existsOpts).withMessage('Payment price is required.')
+  .isInt().withMessage('Payment price must be an integer.')
+  .toInt()
+
+exports.paymentCurrency = () => body('payment.currency', value => `Not a valid currency: ${value}`)
+  .exists(existsOpts).withMessage('Payment currency is required.')
+  .isString()
+  .toLowerCase()
+  .isIn(['btc', 'xmr', 'eth'])
