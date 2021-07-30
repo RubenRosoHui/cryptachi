@@ -52,7 +52,15 @@ exports.sendAccountVerification = function (to, token) {
 	);
 }
 
-exports.sendAliasExpiryWarning = function (to) {}
+exports.sendAliasExpiryWarning = function (to,expirationDate) {
+	return module.exports.sendEmail(
+		'mail@cryptachi.com',
+		to,
+		'Alias Expiring Soon! - Cryptachi.com',
+		`Your alias is gonna expire on ${expirationDate}
+		`
+	)
+}
 
 exports.sendAliasExpiry = function (to) {
 	return module.exports.sendEmail(
