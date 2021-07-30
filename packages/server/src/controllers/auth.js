@@ -109,8 +109,7 @@ exports.getResetLink = async (req, res, next) => {
 		user.resetToken = token;
 		user.resetTokenExpiration = Date.now() + 3600000; //in one hour
 
-		await user.save();
-		await EmailLib.sendAccountVerification(email, token);
+    await Promise.all([user.save(), EmailLib.sendPasswordReset(email, token)])
 
 		console.log(`reset token ${token}`);
 
