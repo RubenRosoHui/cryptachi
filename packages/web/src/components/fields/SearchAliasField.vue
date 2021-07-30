@@ -7,13 +7,13 @@
 			</div>
 			<div class="form-control sel-container">
 				<label class="hidden" for="domains-dropdown">Select Domain</label>
-				<select id="domains-dropdown" name="domain" ref="domainsDropdown" @change="onDomainChange" :disabled="disable">
-					<option v-for="(domain, i) in availableDomains" :key="i" :value="domain" :label="'.' + domain" :selected="i === 0 ? true : false"/>
+				<select id="domains-dropdown" name="domain" ref="domainsDropdown" @change="onDomainChange" :disabled="disable" v-model="domain">
+					<option v-for="(domain, i) in availableDomains" :key="i" :value="domain" :label="'.' + domain" />
 				</select>
 			</div>
 		</div>
 		<div v-if="!disable" class="message">
-			<p v-if="alias.successMessage" class="success">{{ alias.successMessage }}</p>
+			<p v-if="alias.successMessage && alias.value" class="success">{{ alias.successMessage }}</p>
 			<p v-else-if="alias.errorMessage" class="error">{{ alias.errorMessage }}</p>
 		</div>
 	</div>
@@ -47,8 +47,8 @@
 			}
 		},
 		mounted() {
-			this.domain = this.$refs.domainsDropdown.value;
-			this.$emit('domainChange', this.$refs.domainsDropdown.value);
+			this.domain = this.availableDomains[0];
+			this.$emit('domainChange', this.domain);
 		},
 		methods: {
 			async onAliasInput($event) {
@@ -65,18 +65,24 @@
 				this.alias.value = alias;
 				this.$emit('aliasChange', this.alias.value);
 			},
+			setDomain(domain) {
+				this.domain = domain;
+				this.$emit('domainChange', this.domain);
+			},
 			async validateAlias() {
 				const alias = this.alias;
 
 				if (this.aliasRequired && validator.isEmpty(alias.value)) {
 					alias.errorMessage = 'Alias is required.';
+					alias.successMessage = '';
 					alias.isValid = false;
 				}
-				else if (this.aliasRequired && !validator.isAlphanumeric(alias.value)) {
+				else if (alias.value && !validator.isAlphanumeric(alias.value)) {
 					alias.errorMessage = 'Alias can only contain alphanumeric characters.';
+					alias.successMessage = '';
 					alias.isValid = false;
 				}
-				else if (this.aliasRequired && !(await this.checkAvailability())) {
+				else if (alias.value && !(await this.checkAvailability())) {
 					alias.isValid = false;
 				}
 				else {

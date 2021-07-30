@@ -74,6 +74,12 @@
 			},
 			suggestions: ['faster', 'fester', 'feaster', 'pfister', 'fastr', 'fuster', 'foister', 'fosterer', 'fasta', 'foerster', 'falster', 'feister', 'fest', 'fetter', 'festers', 'festered', 'festa', 'fessed', 'fenster']
 		}),
+		mounted() {
+			this.$refs.searchAliasField.setAlias(this.$route.query.alias);
+
+			if (this.$route.query.domain)
+				this.$refs.searchAliasField.setDomain(this.$route.query.domain);
+		},
 		methods: {
 			onAliasFieldValidate({ isValid }) {
 				this.form.fields.alias.isValid = isValid;
