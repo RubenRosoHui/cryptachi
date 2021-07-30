@@ -11,7 +11,10 @@
   import TheFooter from './components/layout/TheFooter.vue';
 
   export default {
-    components: { TheNavigation, TheFooter }
+    components: { TheNavigation, TheFooter },
+    async mounted() {
+      await this.$store.dispatch('loadAuthFromStorage');
+    }
   };
 </script>>
 

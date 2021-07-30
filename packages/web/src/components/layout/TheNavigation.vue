@@ -10,34 +10,46 @@
 			<img id="dropdown-menu" title="Menu" src="../../assets/icons/svg/fi-rr-menu-burger.svg" @click="sideMenu('toggle')" />
 			<ul :class="dropdownStyles" @click="sideMenu('close')">
 				<li>
-					<router-link to="/">
+					<router-link to="/" class="link-item">
 						<span class="link-label">Home</span>
 						<img title="Home" src="../../assets/icons/svg/fi-rr-home.svg" />
 					</router-link>
 				</li>
 				<li>
-					<router-link to="/contact">
+					<router-link to="/contact" class="link-item">
 						<span class="link-label">Contact</span>
 						<img title="Contact" src="../../assets/icons/svg/fi-rr-envelope.svg" />
 					</router-link>
 				</li>
 				<li>
-					<router-link to="/faq">
+					<router-link to="/faq" class="link-item">
 						<span class="link-label">FAQ</span>
 						<img title="FAQ" src="../../assets/icons/svg/fi-rr-interrogation.svg" />
 					</router-link>
 				</li>
-				<li>
-					<router-link to="/register">
+				<li v-if="!isAuthenticated">
+					<router-link to="/register" class="link-item">
 						<span class="link-label">Sign Up</span>
 						<img title="Sign Up" src="../../assets/icons/svg/fi-rr-form.svg" />
 					</router-link>
 				</li>
-				<li>
-					<router-link to="/login">
+				<li v-else>
+					<router-link to="/account" class="link-item">
+						<span class="link-label">Account</span>
+						<img title="Account" src="../../assets/icons/svg/fi-rr-user.svg" />
+					</router-link>
+				</li>
+				<li v-if="!isAuthenticated">
+					<router-link to="/login" class="link-item">
 						<span class="link-label">Login</span>
 						<img title="Login" src="../../assets/icons/svg/fi-rr-sign-in.svg" />
 					</router-link>
+				</li>
+				<li v-else @click="logout" class="logout">
+					<div class="link-item">
+						<span class="link-label">Logout</span>
+						<img title="Logout" src="../../assets/icons/svg/fi-rr-sign-out.svg" class="logout" />
+					</div>
 				</li>
 			</ul>
 		</nav>
@@ -45,6 +57,8 @@
 </template>
 
 <script>
+	import { mapGetters } from 'vuex';
+
 	export default {
 		name: 'TheNavigation',
 		data: () => ({ isMenuDisplayed: false }),
@@ -64,6 +78,10 @@
 						this.isMenuDisplayed = false;
 						break;
 				}
+			},
+			logout() {
+				this.$store.dispatch('logout');
+				this.$router.push('/');
 			}
 		},
 		computed: {
@@ -71,7 +89,8 @@
 				const styles = {};
 				styles.open = this.isMenuDisplayed;
 				return styles;
-			}
+			},
+			...mapGetters(['isAuthenticated'])
 		}
 	};
 </script>
@@ -87,7 +106,7 @@
 		margin-right: auto;
 	}
 
-	a {
+	.link-item {
 		display: inline-flex;
 		align-items: center;
 	}
@@ -117,6 +136,11 @@
 		text-decoration: none;
 	}
 
+	li:hover img,
+	li.logout:hover img {
+		filter: var(--yellow-filter);
+	}
+
 	img#dropdown-menu, li img {
 		width: var(--icon-md);
 		filter: var(--cyan-filter);
@@ -125,7 +149,16 @@
 		cursor: pointer;
 	}
 
+	li img.logout {
+		filter: var(--red-filter);
+		transition: filter 0.5s linear;
+	}
+	li.logout {
+		cursor: pointer;
+	}
+
 	nav ul li img {
+		transition: filter 0.5s linear;
 		margin: var(--spacing-2) 0 var(--spacing-2) 0;
 	}
 

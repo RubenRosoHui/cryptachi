@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
+import store from '../store/index.js';
+
 import Home from '../pages/home/Home.vue';
 import Register from '../pages/auth/Register.vue';
 import Login from '../pages/auth/Login.vue';
@@ -38,17 +40,39 @@ const router = createRouter({
     { path: '/reset-password-link', component: ResetPasswordLink },
     { path: '/contact', component: Contact },
     { path: '/faq', component: TheFAQ },
-    { path: '/account', component: Account, redirect: '/account/aliases', children: [
-      { path: 'aliases', component: AccountAliases },
-      { path: 'security', component: AccountSecurity },
-      { path: 'orders', component: AccountOrders }
-    ]},
-    { path: '/checkout', component: Checkout, redirect: '/checkout/details', children: [
-      { path: 'details', component: CheckoutDetails, name: 'CheckoutDetails' },
-      { path: 'payment', component: CheckoutPayment }
-    ]},
+    {
+      path: '/account',
+      component: Account,
+      redirect: '/account/aliases',
+      meta: { needsAuth: true },
+      children: [
+        { path: 'aliases', component: AccountAliases },
+        { path: 'security', component: AccountSecurity },
+        { path: 'orders', component: AccountOrders }
+      ]
+    },
+    {
+      path: '/checkout',
+      component: Checkout,
+      redirect: '/checkout/details',
+      meta: { needsUserInfo: true },
+      children: [
+        { path: 'details', component: CheckoutDetails, name: 'CheckoutDetails' },
+        { path: 'payment', component: CheckoutPayment }
+      ]
+    },
 		{ path: '/:catchAll(.*)', component: NotFound }
   ]
+});
+
+router.beforeEach(to => {
+  if (to.meta.needsAuth && !store.getters.isAuthenticated) {
+    return { path: '/login' };
+  }
+
+  if (to.meta.needsUserInfo && !store.getters.user) {
+    return { path: '/' }
+  }
 });
 
 export default router;
