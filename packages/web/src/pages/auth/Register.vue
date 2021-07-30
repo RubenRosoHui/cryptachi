@@ -44,12 +44,16 @@
 		<div class="suggestions-section-container">
 			<h1>Suggestions</h1>
 			<p class="subtitle-2">Still making up your mind? Check out the ones below.</p>
-			<ul v-if="suggestions.length > 0" class="suggestions-list">
+			<div v-if="isLoadingSuggestions" class="text-align-center margin-top-16">
+				<img src="../../assets/icons/svg/fi-rr-spinner-alt.svg" class="yellow-filter icon-100" />
+				<p class="yellow margin-top-4">Loading suggestions. Please standby...</p>
+			</div>
+			<ul v-else-if="suggestions.length > 0" class="suggestions-list">
 				<li v-for="(suggestion, i) in suggestions" :key="i" @click="setAliasField(suggestion)">{{ suggestion }}</li>
 			</ul>
 			<div v-else class="text-align-center margin-top-16">
-				<img src="../../assets/icons/svg/fi-rr-add.svg" class="red-filter icon-100" />
-				<p class="error">Nothing here. Start typing on the search box to get some suggestions.</p>
+				<img src="../../assets/icons/svg/fi-rr-asterisk.svg" class="red-filter icon-100" />
+				<p class="error margin-top-4">No suggestions to show.<br/>Start typing on the search box to get some suggestions.</p>
 			</div>
 		</div>
 	</div>
@@ -67,6 +71,7 @@
 		components: { SearchAliasField },
 		data: () => ({
 			suggestions: [],
+			isLoadingSuggestions: false,
 			form: {
 				fields: {
 					email: { value: '', isValid: false, errorMessage: '' },
@@ -98,7 +103,9 @@
 				}
 
 				suggestionsTimeoutID = setTimeout(async () => {
+					this.isLoadingSuggestions = true;
 					this.suggestions = await this.getSuggestions(alias, this.form.fields.domain.value);
+					this.isLoadingSuggestions = false;
 				}, 1000);
 			},
 			onDomainChange(domain) {
