@@ -44,9 +44,13 @@
 		<div class="suggestions-section-container">
 			<h1>Suggestions</h1>
 			<p class="subtitle-2">Still making up your mind? Check out the ones below.</p>
-			<ul class="suggestions-list">
+			<ul v-if="suggestions.length > 0" class="suggestions-list">
 				<li v-for="(suggestion, i) in suggestions" :key="i" @click="setAliasField(suggestion)">{{ suggestion }}</li>
 			</ul>
+			<div v-else class="text-align-center margin-top-16">
+				<img src="../../assets/icons/svg/fi-rr-add.svg" class="red-filter icon-100" />
+				<p class="error">Nothing here. Start typing on the search box to get some suggestions.</p>
+			</div>
 		</div>
 	</div>
 </template>
@@ -56,10 +60,13 @@
 
 	import SearchAliasField from '../../components/fields/SearchAliasField.vue';
 
+	let suggestionsTimeoutID;
+
 	export default {
 		name: 'RegistrationPage',
 		components: { SearchAliasField },
 		data: () => ({
+			suggestions: [],
 			form: {
 				fields: {
 					email: { value: '', isValid: false, errorMessage: '' },
@@ -71,8 +78,7 @@
 				},
 				isValid: false,
 				message: ''
-			},
-			suggestions: ['faster', 'fester', 'feaster', 'pfister', 'fastr', 'fuster', 'foister', 'fosterer', 'fasta', 'foerster', 'falster', 'feister', 'fest', 'fetter', 'festers', 'festered', 'festa', 'fessed', 'fenster']
+			}
 		}),
 		mounted() {
 			this.$refs.searchAliasField.setAlias(this.$route.query.alias);
@@ -86,6 +92,14 @@
 			},
 			onAliasChange(alias) {
 				this.form.fields.alias.value = alias;
+
+				if (suggestionsTimeoutID) {
+					clearTimeout(suggestionsTimeoutID);
+				}
+
+				suggestionsTimeoutID = setTimeout(async () => {
+					this.suggestions = await this.getSuggestions(alias, this.form.fields.domain.value);
+				}, 1000);
 			},
 			onDomainChange(domain) {
 				this.form.fields.domain.value = domain;
@@ -187,6 +201,24 @@
 						console.error(err);
 					}
 				}
+			},
+			async getSuggestions(alias, domain) {
+				if (!alias || !domain) return [];
+
+				// Pull list of suggestions from datamuse.
+				const dmResponse = await fetch(`https://api.datamuse.com/words?sl=${alias}`);
+				if (!dmResponse.ok) throw Error('Failed to get list of suggestion from Datamuse.');
+				const dmSuggestions = await dmResponse.json();
+
+				// Send the list to the server to determine availability.
+				const query = `names=${dmSuggestions.map(s => s.word).join(',')}&domain=${domain}`;
+				const serverResponse = await fetch(`/api/aliases?${query}`);
+				if (!serverResponse.ok) throw Error('Failed to get list of suggestions from server.');
+				const serverSuggestions = await serverResponse.json();
+
+				return serverSuggestions
+					.filter(suggestion => suggestion !== alias && validator.isAlphanumeric(suggestion))
+					.slice(0, 21);
 			}
 		}
 	}
