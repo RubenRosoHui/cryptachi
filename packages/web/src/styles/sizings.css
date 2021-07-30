@@ -20,6 +20,10 @@
 	width: var(--icon-md);
 	height: var(--icon-md);
 }
+.icon-lg {
+	width: var(--icon-lg);
+	height: var(--icon-lg);
+}
 .icon-6xl {
 	width: var(--icon-6xl);
 	height: var(--icon-6xl);
