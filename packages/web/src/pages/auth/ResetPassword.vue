@@ -13,7 +13,7 @@
 				<p v-if="form.fields.confirmPassword.errorMessage" class="error">{{  form.fields.confirmPassword.errorMessage }}</p>
 			</div>
 			<div class="form-control text-align-right" id="form-buttons">
-				<button type="submit" class="base-button">Submit</button>
+				<button type="submit" class="base-button" :disabled="enableSubmit">Submit</button>
 			</div>
 		</form>
 		<div v-if="isMessageVisible" class="text-align-center margin-top-8">
@@ -41,9 +41,11 @@
 				},
 				successMessage: '',
 				errorMessage: '',
-				isValid: false
+				isValid: false,
+				enableSubmit: true
 			},
-			isMessageVisible: false
+			isMessageVisible: false,
+
 		}),
 		methods: {
 			async submitForm() {
@@ -78,9 +80,14 @@
 				}
 
 				this.isMessageVisible = true;
+
+				if (this.form.successMessage) this.form.enableSubmit = false;
+
 				setTimeout(() => {
 					this.isMessageVisible = false;
-					if (this.form.successMessage) this.$router.push('/login');
+					if (this.form.successMessage) {
+						this.$router.push('/login');
+					}
 				}, 10000);
 			},
 			validatePassword() {
