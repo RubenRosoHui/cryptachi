@@ -53,6 +53,7 @@
 
 					this.form.successMessage = jsonResponse.message;
 					this.form.errorMessage = '';
+					this.form.fields.email.value = '';
 				} catch (err) {
 					this.form.successMessage = '';
 					this.form.errorMessage = err.message;

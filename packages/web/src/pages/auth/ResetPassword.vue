@@ -37,7 +37,7 @@
 			form: {
 				fields: {
 					password: { value: '', errorMessage: '', isValid: false },
-					confirmPassword: { value: '', erroMessage: '', isValid: false }
+					confirmPassword: { value: '', errorMessage: '', isValid: false }
 				},
 				successMessage: '',
 				errorMessage: '',
