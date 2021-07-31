@@ -111,8 +111,9 @@
 			onDomainChange(domain) {
 				this.form.fields.domain.value = domain;
 			},
-			setAliasField(suggestion) {
+			async setAliasField(suggestion) {
 				this.$refs.searchAliasField.setAlias(suggestion);
+				await this.$refs.searchAliasField.validateAlias();
 				this.$router.push('#signup-section');
 			},
 			validateEmail() {
