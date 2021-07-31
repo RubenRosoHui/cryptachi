@@ -80,7 +80,7 @@ exports.password = function({ isStrong=false } = { isStrong:false }) {
 		.exists(existsOpts).withMessage('Password is required.')
     .isString().withMessage('Password must be a string.')
     .trim()
-		.isLength({ max: 30 }).withMessage('Password cannot exceed 30 characters');
+		.isLength({ max: 100 }).withMessage('Password cannot exceed 100 characters');
 
   if (isStrong) passwordValidator.isStrongPassword().withMessage('Weak Password. Must be a minimum of 8 characters long and contain 1 uppercase, 1 lowercase, 1 number, and 1 symbol.');
 
