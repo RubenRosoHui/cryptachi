@@ -86,7 +86,7 @@
 			}
 		}),
 		mounted() {
-			this.$refs.searchAliasField.setAlias(this.$route.query.alias);
+			this.$refs.searchAliasField.setAlias(this.$route.query.alias || '');
 
 			if (this.$route.query.domain)
 				this.$refs.searchAliasField.setDomain(this.$route.query.domain);
@@ -145,6 +145,8 @@
 					password.errorMessage = '';
 
 				if (password.errorMessage) password.isValid = false;
+
+				this.validateConfirmPassword();
 			},
 			validateConfirmPassword() {
 				const password = this.form.fields.password;
@@ -162,7 +164,6 @@
 			async validateForm() {
 				this.validateEmail();
 				this.validatePassword();
-				this.validateConfirmPassword();
 				await this.$refs.searchAliasField.validateAlias();
 
 				this.form.isValid = Object.keys(this.form.fields).every(field => this.form.fields[field].isValid === true);
@@ -225,7 +226,7 @@
 				const serverSuggestions = await serverResponse.json();
 
 				return serverSuggestions
-					.filter(suggestion => suggestion !== alias && validator.isAlphanumeric(suggestion))
+					.filter(suggestion => suggestion.toLowerCase() !== alias.toLowerCase() && validator.isAlphanumeric(suggestion))
 					.slice(0, 21);
 			}
 		}

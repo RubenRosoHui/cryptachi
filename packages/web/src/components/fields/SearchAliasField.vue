@@ -36,7 +36,7 @@
 				errorMessage: '',
 				successMessage: '',
 				isValid: false,
-				isAvailable: true,
+				isAvailable: true
 			},
 			// TODO: Fill with purchased domain/s from DNSimple
 			availableDomains: []
@@ -107,7 +107,7 @@
 
 				const availableAliases = await response.json();
 
-				if (availableAliases.includes(alias)) {
+				if (availableAliases.includes(alias.toLowerCase())) {
 					this.alias.errorMessage = '';
 					this.alias.isAvailable = true;
 					this.alias.successMessage = 'Alias is available.';

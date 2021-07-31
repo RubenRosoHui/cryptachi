@@ -100,6 +100,8 @@
 				}
 
 				password.isValid = !password.errorMessage;
+
+				this.validateConfirmPassword();
 			},
 			validateConfirmPassword() {
 				const password = this.form.fields.password;
@@ -116,7 +118,6 @@
 			},
 			validateForm() {
 				this.validatePassword();
-				this.validateConfirmPassword();
 
 				this.form.isValid = Object.keys(this.form.fields).every(field => this.form.fields[field].isValid === true);
 				this.form.message = this.form.isValid ? '' : 'Some fields have errors.';
