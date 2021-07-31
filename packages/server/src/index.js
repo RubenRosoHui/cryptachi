@@ -44,7 +44,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', needsWebToken, needsVerifiedAccount, userRoutes);
 app.use('/api/checkout', checkoutRoutes);
 
-// TODO: Add catch all route.
+// Catch-all route
+app.use((_, res, _1) => {
+  res.status(404).json({ message: 'Page Not Found.' });
+});
 
 app.use((error, req, res, next) => {
 	const status = error.statusCode || 500;
