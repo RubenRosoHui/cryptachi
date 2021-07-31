@@ -30,7 +30,7 @@
 				</div>
 				<div class="form-control" id="checkboxes">
 					<label for="create-alias-later" class="font-sm cyan bold checkbox-container">
-						<input id="create-alias-later" type="checkbox" name="createAliasLater" v-model="form.fields.createAliasLater.value" />
+						<input id="create-alias-later" type="checkbox" name="createAliasLater" v-model="form.fields.createAliasLater.value" @change="onAliasLaterCheckboxChange" />
 						<span class="checkbox">Create Alias Later</span>
 					</label>
 				</div>
@@ -111,8 +111,13 @@
 			onDomainChange(domain) {
 				this.form.fields.domain.value = domain;
 			},
-			async setAliasField(suggestion) {
-				this.$refs.searchAliasField.setAlias(suggestion);
+			onAliasLaterCheckboxChange() {
+				const createAliasLater = this.form.fields.createAliasLater.value;
+
+				if (createAliasLater) this.$refs.searchAliasField.setAlias('');
+			},
+			async setAliasField(value) {
+				this.$refs.searchAliasField.setAlias(value);
 				await this.$refs.searchAliasField.validateAlias();
 				this.$router.push('#signup-section');
 			},
