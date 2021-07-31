@@ -36,7 +36,14 @@ const router = createRouter({
     { path: '/', component: Home },
     { path: '/register', component: Register },
     { path: '/login', component: Login },
-    { path: '/reset-password', component: ResetPassword },
+    {
+      path: '/reset-password',
+      component: ResetPassword,
+      beforeEnter(to, _, next) {
+        to.query.email && to.query.token ? next() : next('/');
+      },
+      props: route => ({ token: route.query.token, email: route.query.email })
+    },
     { path: '/reset-password-link', component: ResetPasswordLink },
     { path: '/contact', component: Contact },
     { path: '/faq', component: TheFAQ },
