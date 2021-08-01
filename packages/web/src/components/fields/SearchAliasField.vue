@@ -3,49 +3,121 @@
 		<div class="textbox" :class="textboxStyles">
 			<div class="form-control ti-container">
 				<label class="hidden" for="check-alias">Check Alias</label>
-				<input id="check-alias" :value="alias" type="text" name="alias" @input="onAliasInput" :disabled="disable"/>
+				<input id="check-alias" :value="alias.value" type="text" name="alias" @input="onAliasInput" :disabled="disable"/>
 			</div>
 			<div class="form-control sel-container">
 				<label class="hidden" for="domains-dropdown">Select Domain</label>
-				<select id="domains-dropdown" name="domain" ref="domainsDropdown" @change="onDomainChange" :disabled="disable">
-					<option value="cryptachi.com" label=".cryptachi.com" selected />
-					<option value="test.com" label=".test.com" />
+				<select id="domains-dropdown" name="domain" ref="domainsDropdown" @change="onDomainChange" :disabled="disable" v-model="domain">
+					<option v-for="(domain, i) in availableDomains" :key="i" :value="domain" :label="'.' + domain" />
 				</select>
 			</div>
 		</div>
-		<div v-if="alias && !disable" class="message">
-			<p v-if="isAliasAvailable" class="success">Alias is available!</p>
-			<p v-else class="error">Alias is taken!</p>
+		<div v-if="!disable" class="message">
+			<p v-if="alias.successMessage && alias.value" class="success">{{ alias.successMessage }}</p>
+			<p v-else-if="alias.errorMessage" class="error">{{ alias.errorMessage }}</p>
 		</div>
 	</div>
 </template>
 
 <script>
+	import validator from 'validator';
+
 	export default {
 		name: 'SearchAliasField',
-		emits: ['aliasChange', 'domainChange'],
-		props: { disable: Boolean },
+		emits: ['aliasChange', 'domainChange', 'validate'],
+		props: {
+			disable: Boolean,
+			aliasRequired: { type: Boolean, default: true }
+		},
 		data: () => ({
-			isAliasAvailable: true,
 			domain: '',
-			alias: ''
+			alias: {
+				value: '',
+				errorMessage: '',
+				successMessage: '',
+				isValid: false,
+				isAvailable: true
+			},
+			// TODO: Fill with purchased domain/s from DNSimple
+			availableDomains: []
 		}),
+		beforeMount() {
+			if (process.env.NODE_ENV === 'development') {
+				this.availableDomains = ['cryptachi.com', 'cryptachitest.com'];
+			}
+		},
 		mounted() {
-			this.domain = this.$refs.domainsDropdown.value;
-			this.$emit('domainChange', this.$refs.domainsDropdown.value);
+			this.domain = this.availableDomains[0];
+			this.$emit('domainChange', this.domain);
 		},
 		methods: {
-			onAliasInput($event) {
-				this.alias = $event.target.value;
-				this.$emit('aliasChange', this.alias);
+			async onAliasInput($event) {
+				this.alias.value = $event.target.value;
+				await this.validateAlias();
+				this.$emit('aliasChange', this.alias.value);
 			},
-			onDomainChange($event) {
+			async onDomainChange($event) {
 				this.domain = $event.target.value;
+				await this.validateAlias();
 				this.$emit('domainChange', this.domain);
 			},
 			setAlias(alias) {
-				this.alias = alias;
-				this.$emit('aliasChange', this.alias);
+				this.alias.value = alias;
+				this.$emit('aliasChange', this.alias.value);
+			},
+			setDomain(domain) {
+				this.domain = domain;
+				this.$emit('domainChange', this.domain);
+			},
+			async validateAlias() {
+				const alias = this.alias;
+
+				if (this.aliasRequired && validator.isEmpty(alias.value)) {
+					alias.errorMessage = 'Alias is required.';
+					alias.successMessage = '';
+					alias.isValid = false;
+				}
+				else if (alias.value && !validator.isAlphanumeric(alias.value)) {
+					alias.errorMessage = 'Alias can only contain alphanumeric characters.';
+					alias.successMessage = '';
+					alias.isValid = false;
+				}
+				else if (alias.value && !(await this.checkAvailability())) {
+					alias.isValid = false;
+				}
+				else {
+					alias.errorMessage = '';
+					alias.isValid = true;
+				}
+
+				this.$emit('validate', { isValid: alias.isValid, errorMessage: alias.errorMessage });
+			},
+			async checkAvailability() {
+				// REVIEW: Make this more efficient by only running this check when
+				// the user has stopped typing. You could probably use setTimeout.
+
+				const domain = this.domain;
+				const alias = this.alias.value;
+
+				const query = `names=${alias}&domain=${domain}`;
+
+				const response = await fetch(`/api/aliases?${query}`, { method: 'GET' });
+
+				if (!response.ok) throw Error('Unable to check alias availability.');
+
+				const availableAliases = await response.json();
+
+				if (availableAliases.includes(alias.toLowerCase())) {
+					this.alias.errorMessage = '';
+					this.alias.isAvailable = true;
+					this.alias.successMessage = 'Alias is available.';
+					return true;
+				} else {
+					this.alias.successMessage = '';
+					this.alias.isAvailable = false;
+					this.alias.errorMessage = 'Alias is taken.';
+					return false;
+				}
 			}
 		},
 		computed: {
@@ -94,7 +166,7 @@
 	}
 	.message {
 		position: absolute;
-		right: 0;
+		left: 0;
 	}
 
 	input[type="text"] {

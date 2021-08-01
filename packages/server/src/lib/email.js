@@ -34,7 +34,7 @@ exports.sendPasswordReset = function (to, token) {
 }
 
 exports.sendAccountVerification = function (to, token) {
-  const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset/${token}`;
+  const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/confirm-email?email=${to}&token=${token}`;
 
 	return module.exports.sendEmail(
 		'mail@cryptachi.com',
@@ -52,7 +52,15 @@ exports.sendAccountVerification = function (to, token) {
 	);
 }
 
-exports.sendAliasExpiryWarning = function (to) {}
+exports.sendAliasExpiryWarning = function (to,expirationDate) {
+	return module.exports.sendEmail(
+		'mail@cryptachi.com',
+		to,
+		'Alias Expiring Soon! - Cryptachi.com',
+		`Your alias is gonna expire on ${expirationDate}
+		`
+	)
+}
 
 exports.sendAliasExpiry = function (to) {
 	return module.exports.sendEmail(
@@ -62,4 +70,23 @@ exports.sendAliasExpiry = function (to) {
 		`Your alias has expired!
 		`
 	)
+}
+
+exports.sendFeedback = function(to, contact) {
+  return module.exports.sendEmail(
+    'mail@cryptachi.com',
+    to,
+    'Feedback - Cryptachi.com',
+    `
+			<h1>Customer Feedback</h1>
+			<h2>Contact Details</h2>
+			<ul>
+				<li>Name: ${contact.name}</li>
+				<li>Email: ${contact.email}</li>
+				<li>Phone: ${contact.phone || 'N/A'}</li>
+			</ul>
+			<h2>Message</h2>
+			<p>${contact.message}</p>
+		`
+  );
 }

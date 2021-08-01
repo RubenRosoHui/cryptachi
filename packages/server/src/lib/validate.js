@@ -80,7 +80,7 @@ exports.password = function({ isStrong=false } = { isStrong:false }) {
 		.exists(existsOpts).withMessage('Password is required.')
     .isString().withMessage('Password must be a string.')
     .trim()
-		.isLength({ max: 30 }).withMessage('Password cannot exceed 30 characters');
+		.isLength({ max: 100 }).withMessage('Password cannot exceed 100 characters');
 
   if (isStrong) passwordValidator.isStrongPassword().withMessage('Weak Password. Must be a minimum of 8 characters long and contain 1 uppercase, 1 lowercase, 1 number, and 1 symbol.');
 
@@ -328,3 +328,21 @@ exports.paymentCurrency = () => body('payment.currency', value => `Not a valid c
   .isString()
   .toLowerCase()
   .isIn(['btc', 'xmr', 'eth'])
+
+exports.name = () => body('name')
+  .exists(existsOpts).withMessage('Name field required.')
+  .isString()
+  .trim()
+  .isAlpha('en-US', { ignore: ' ' }).withMessage('Name can only contain alphabetic characters.')
+  .isLength({ max: 30 }).withMessage('Name cannot exceed 30 characters.');
+
+exports.phone = () => body('phone', value => `Not a valid phone: ${value}`)
+  .optional({ checkFalsy: true })
+  .trim()
+  .isMobilePhone();
+
+exports.message = () => body('message')
+  .exists(existsOpts).withMessage('Message field required.')
+  .trim()
+  .isLength({ max: 800 }).withMessage('Message cannot exceed 800 characters.')
+  .escape();

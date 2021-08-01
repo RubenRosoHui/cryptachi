@@ -36,6 +36,7 @@ async function calculatePrice(plan, paymentCurrency) {
   const baseUrl = `https://pro-api.coinmarketcap.com/v1/tools/price-conversion`;
   const query = `?amount=${discountedPrice}&symbol=${currency}&convert=${paymentCurrency}`;
 
+  // TODO: Find a way to cache this request.
   const response = await fetch(baseUrl + query, {
     method: 'GET',
     headers: { 'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY }

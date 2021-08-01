@@ -41,10 +41,8 @@ exports.addRecord = async function (aliasObject, currency, recipientAddress, rec
 	await aliasObject.save();
 }
 exports.addAlias = async function (user, alias, domain) {
-	let expiry = new Date();
-	expiry.setDate(expiry.getDate());
-	expiry.setHours(5, 0, 0, 0);
-
+	//today + 30 days
+	let expiry = (Date.now() + (86400000 * 30));
 	// TODO: Remove validation checks. They belong to the validation step.
 	let aliasObject = await Alias.findOne({ alias: alias, domain: domain });
 	if (aliasObject) {

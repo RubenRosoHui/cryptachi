@@ -104,13 +104,18 @@ exports.getResetLink = async (req, res, next) => {
 	try {
 		const user = await User.findOne({ email: email });
 
-		const token = crypto.randomBytes(32).toString('hex');
-
-		user.resetToken = token;
-		user.resetTokenExpiration = Date.now() + 3600000; //in one hour
-
-		await user.save();
-		await EmailLib.sendAccountVerification(email, token);
+		let token;
+		//if a valid token currently exists
+		if(user.resetToken && Date.now() < user.resetTokenExpiration) {
+			token = user.resetToken;
+			await EmailLib.sendPasswordReset(email,token);
+		}
+		else {
+			token = crypto.randomBytes(32).toString('hex');
+			user.resetToken = token;
+			user.resetTokenExpiration = Date.now() + 3600000; //in one hour
+			await Promise.all([user.save(), EmailLib.sendPasswordReset(email, token)])
+		}
 
 		console.log(`reset token ${token}`);
 

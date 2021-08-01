@@ -8,8 +8,14 @@
 			<p class="title-4">Sign up now and get your <span class="yellow">free</span> crypto alias</p>
 		</div>
 		<form @submit.prevent="submitForm">
-			<search-alias-field class="search-box" @aliasChange="onAliasChange" @domainChange="onDomainChange" />
-			<button class="base-button signup-button" type="submit">SIGN UP</button>
+			<search-alias-field
+				class="search-box"
+				@aliasChange="onAliasChange"
+				@domainChange="onDomainChange"
+				@validate="onAliasValidate"
+				:aliasRequired="false"
+			/>
+			<button class="base-button signup-button" type="submit" :disabled="isSignupButtonDisabled">SIGN UP</button>
 		</form>
 	</header>
 </template>
@@ -21,20 +27,30 @@
 		components: { SearchAliasField },
 		name: 'HeaderSection',
 		data: () => ({
-			form: {
-				aliasField: { value: '' },
-				domainField: { value: '' }
-			}
+			alias: '',
+			domain: '',
+			isAliasValid: false,
+			isSignupButtonDisabled: false
 		}),
 		methods: {
 			onAliasChange(alias) {
-				this.form.aliasField.value = alias;
+				this.alias = alias;
 			},
 			onDomainChange(domain) {
-				this.form.domainField.value = domain;
+				this.domain = domain;
+			},
+			onAliasValidate({ isValid }) {
+				this.isAliasValid = isValid;
+				this.isSignupButtonDisabled = !isValid;
 			},
 			submitForm() {
-				console.log('Submitting form.');
+				this.$router.push({
+					path: '/register',
+					query: {
+						alias: this.alias || undefined,
+						domain: this.alias ? this.domain : undefined // Only assign domain if alias was also provided.
+					}
+				});
 			}
 		}
 	}

@@ -44,6 +44,7 @@
 	--surface-dark: #232e62;
 
 	--green-filter: invert(61%) sepia(41%) saturate(650%) hue-rotate(82deg) brightness(124%) contrast(96%);
+	--green-light-filter: invert(90%) sepia(14%) saturate(770%) hue-rotate(67deg) brightness(107%) contrast(98%);
 	--red-filter: invert(53%) sepia(85%) saturate(3936%) hue-rotate(330deg) brightness(105%) contrast(99%);
 	--yellow-filter: invert(84%) sepia(38%) saturate(411%) hue-rotate(17deg) brightness(103%) contrast(105%);
 	--cyan-filter: invert(77%) sepia(32%) saturate(839%) hue-rotate(169deg) brightness(110%) contrast(98%);
@@ -60,7 +61,10 @@
 	background-color: var(--green-dark);
 }
 .green-filter {
-	filter: invert(61%) sepia(41%) saturate(650%) hue-rotate(82deg) brightness(124%) contrast(96%);
+	filter: var(--green-filter);
+}
+.green-light-filter {
+	filter: var(--green-light-filter);
 }
 
 .white-light {
