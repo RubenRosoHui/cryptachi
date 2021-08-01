@@ -9,6 +9,7 @@ const cronLib = require('./cron/AliasExpiration.js');
 const cron = require('node-cron');
 
 // Routes
+const rootRoutes = require('./routes/root.js');
 const aliasRoutes = require('./routes/alias.js');
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js')
@@ -46,6 +47,7 @@ app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', needsWebToken, needsVerifiedAccount, userRoutes);
 app.use('/api/checkout', checkoutRoutes);
+app.use('/api', rootRoutes);
 
 // Catch-all route
 app.use((_, res, _1) => {
@@ -59,6 +61,7 @@ app.use((error, req, res, next) => {
 	res.status(status).json({message: message, error:{name}});
 });
 
+// Cron Jobs
 cron.schedule('0 18 * * *', cronLib.checkExpiringAliases)
 cron.schedule('* * * * *', cronLib.checkExpiredAliases)
 

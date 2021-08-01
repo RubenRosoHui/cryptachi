@@ -328,3 +328,21 @@ exports.paymentCurrency = () => body('payment.currency', value => `Not a valid c
   .isString()
   .toLowerCase()
   .isIn(['btc', 'xmr', 'eth'])
+
+exports.name = () => body('name')
+  .exists(existsOpts).withMessage('Name field required.')
+  .isString()
+  .trim()
+  .isAlpha('en-US', { ignore: ' ' }).withMessage('Name can only contain alphabetic characters.')
+  .isLength({ max: 30 }).withMessage('Name cannot exceed 30 characters.');
+
+exports.phone = () => body('phone', value => `Not a valid phone: ${value}`)
+  .optional({ checkFalsy: true })
+  .trim()
+  .isMobilePhone();
+
+exports.message = () => body('message')
+  .exists(existsOpts).withMessage('Message field required.')
+  .trim()
+  .isLength({ max: 800 }).withMessage('Message cannot exceed 800 characters.')
+  .escape();
