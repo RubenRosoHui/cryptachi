@@ -30,7 +30,7 @@
 				</div>
 				<div class="form-control" id="checkboxes">
 					<label for="create-alias-later" class="font-sm cyan bold checkbox-container">
-						<input id="create-alias-later" type="checkbox" name="createAliasLater" v-model="form.fields.createAliasLater.value" @change="onAliasLaterCheckboxChange" />
+						<input id="create-alias-later" type="checkbox" name="createAliasLater" v-model="form.fields.createAliasLater.value" />
 						<span class="checkbox">Create Alias Later</span>
 					</label>
 				</div>
@@ -48,7 +48,7 @@
 				<loading-spinner />
 				<p class="yellow bold margin-top-4">Loading suggestions. Please standby...</p>
 			</div>
-			<ul v-else-if="suggestions.length > 0" class="suggestions-list">
+			<ul v-else-if="suggestions.length > 0 && !form.fields.createAliasLater.value" class="suggestions-list">
 				<li v-for="(suggestion, i) in suggestions" :key="i" @click="setAliasField(suggestion)">{{ suggestion }}</li>
 			</ul>
 			<div v-else class="text-align-center margin-top-16">
@@ -110,14 +110,6 @@
 			},
 			onDomainChange(domain) {
 				this.form.fields.domain.value = domain;
-			},
-			onAliasLaterCheckboxChange() {
-				const createAliasLater = this.form.fields.createAliasLater.value;
-
-				if (createAliasLater) {
-					this.$refs.searchAliasField.setAlias('');
-					this.suggestions = [];
-				}
 			},
 			async setAliasField(value) {
 				this.$refs.searchAliasField.setAlias(value);
