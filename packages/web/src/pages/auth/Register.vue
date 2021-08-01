@@ -45,8 +45,8 @@
 			<h1>Suggestions</h1>
 			<p class="subtitle-2">Still making up your mind? Check out the ones below.</p>
 			<div v-if="isLoadingSuggestions" class="text-align-center margin-top-16">
-				<img src="../../assets/icons/svg/fi-rr-spinner-alt.svg" class="yellow-filter icon-100" />
-				<p class="yellow margin-top-4">Loading suggestions. Please standby...</p>
+				<loading-spinner />
+				<p class="yellow bold margin-top-4">Loading suggestions. Please standby...</p>
 			</div>
 			<ul v-else-if="suggestions.length > 0" class="suggestions-list">
 				<li v-for="(suggestion, i) in suggestions" :key="i" @click="setAliasField(suggestion)">{{ suggestion }}</li>
