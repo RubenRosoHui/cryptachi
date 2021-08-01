@@ -34,7 +34,7 @@ exports.sendPasswordReset = function (to, token) {
 }
 
 exports.sendAccountVerification = function (to, token) {
-  const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset/${token}`;
+  const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/confirm-email?token=${token}`;
 
 	return module.exports.sendEmail(
 		'mail@cryptachi.com',
