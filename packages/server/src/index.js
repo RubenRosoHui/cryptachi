@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+
+const User = require('./models/user.js');
 
 const cronLib = require('./cron/AliasExpiration.js');
 const cron = require('node-cron');
@@ -59,7 +62,27 @@ app.use((error, req, res, next) => {
 cron.schedule('0 18 * * *', cronLib.checkExpiringAliases)
 cron.schedule('* * * * *', cronLib.checkExpiredAliases)
 
+// MAIN
+// ------------------
 mongoose.connect(mongoUrl, mongoOptions).then(() => {
+  console.log('MongoDB connected successfully.');
+  return User.findOne({ roles: 'admin' });
+}).then(adminFound => {
+  if (!adminFound) {
+		bcrypt.hash(process.env.ADMIN_PASSWORD, 12).then(hashedPassword => {
+			const user = new User({
+				email: process.env.ADMIN_EMAIL,
+				password: hashedPassword,
+				roles: ['admin'],
+        isEmailConfirmed: true,
+        isEmailConfirmedToken: undefined
+			});
+			return user.save();
+		}).then(newUser => {
+			console.log(`Created initial admin user... Email: ${newUser.email}, Password: ${process.env.ADMIN_PASSWORD}`);
+		});
+  }
+
 	const port = process.env.PORT || 3000;
-	app.listen(port, () => console.log(`server is running on port ${port}`));
+	app.listen(port, () => console.log(`Server is running on port ${port}`));
 }).catch(error => console.log(error));
