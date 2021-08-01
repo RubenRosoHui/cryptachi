@@ -52,7 +52,7 @@
 				<li v-for="(suggestion, i) in suggestions" :key="i" @click="setAliasField(suggestion)">{{ suggestion }}</li>
 			</ul>
 			<div v-else class="text-align-center margin-top-16">
-				<img src="../../assets/icons/svg/fi-rr-asterisk.svg" class="red-filter icon-100" />
+				<img src="../../assets/icons/svg/fi-rr-ban.svg" class="red-filter icon-100" />
 				<p class="error margin-top-4">No suggestions to show.<br/>Start typing on the search box to get some suggestions.</p>
 			</div>
 		</div>
@@ -114,7 +114,10 @@
 			onAliasLaterCheckboxChange() {
 				const createAliasLater = this.form.fields.createAliasLater.value;
 
-				if (createAliasLater) this.$refs.searchAliasField.setAlias('');
+				if (createAliasLater) {
+					this.$refs.searchAliasField.setAlias('');
+					this.suggestions = [];
+				}
 			},
 			async setAliasField(value) {
 				this.$refs.searchAliasField.setAlias(value);
