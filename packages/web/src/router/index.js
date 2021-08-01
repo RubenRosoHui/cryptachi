@@ -16,6 +16,7 @@ import AccountOrders from '../pages/account/AccountOrders.vue';
 import Checkout from '../pages/checkout/Checkout.vue';
 import CheckoutDetails from '../pages/checkout/CheckoutDetails.vue';
 import CheckoutPayment from '../pages/checkout/CheckoutPayment.vue';
+import ConfirmEmail from '../pages/auth/ConfirmEmail';
 import NotFound from '../pages/error/NotFound.vue';
 
 const router = createRouter({
@@ -45,6 +46,14 @@ const router = createRouter({
       props: route => ({ token: route.query.token, email: route.query.email })
     },
     { path: '/reset-password-link', component: ResetPasswordLink },
+    {
+      path: '/confirm-email',
+      component: ConfirmEmail,
+      beforeEnter(to, _, next) {
+        to.query.email && to.query.token ? next() : next('/');
+      },
+      props: route => ({ token: route.query.token, email: route.query.email })
+    },
     { path: '/contact', component: Contact },
     { path: '/faq', component: TheFAQ },
     {
