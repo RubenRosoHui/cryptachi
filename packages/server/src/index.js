@@ -74,7 +74,7 @@ mongoose.connect(mongoUrl, mongoOptions).then(() => {
   if (!adminFound) {
 		bcrypt.hash(process.env.ADMIN_PASSWORD, 12).then(hashedPassword => {
 			const user = new User({
-				email: process.env.ADMIN_EMAIL,
+				email: process.env.ADMIN_EMAIL.toLowerCase(),
 				password: hashedPassword,
 				roles: ['admin'],
         isEmailConfirmed: true,
