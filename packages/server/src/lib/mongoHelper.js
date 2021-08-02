@@ -31,13 +31,13 @@ exports.deleteRecord = async function (aliasObject, currency) {
 	aliasObject.records = aliasObject.records.filter(record => record.currency != currency);//.push({currency:currency,recipientAddress:address});
 	await aliasObject.save();
 }
-exports.addRecord = async function (aliasObject, currency, recipientAddress, recipientName) {
+exports.addRecord = async function (aliasObject, currency, recipientAddress, recipientName, description) {
 
 	//DNSimple API code
 	const id = await dnsimpleLib.addRecord(aliasObject.alias, aliasObject.domain, currency, recipientAddress, recipientName);
   console.log(id); // 20 or 30
 	//Add record
-	aliasObject.records.push({ dnsimpleID: id, currency, recipientAddress, recipientName });
+	aliasObject.records.push({ dnsimpleID: id, currency, recipientAddress, recipientName, description });
 	await aliasObject.save();
 }
 exports.addAlias = async function (user, alias, domain) {

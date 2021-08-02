@@ -80,7 +80,7 @@ exports.deleteAlias = async (req, res, next) => {
 }
 
 exports.addRecord = async (req, res, next) => {
-	const { currency, domain, recipientAddress, recipientName } = req.body;
+	const { currency, domain, recipientAddress, recipientName, description } = req.body;
 	const { alias } = req.params;
 
 	try {
@@ -89,7 +89,7 @@ exports.addRecord = async (req, res, next) => {
 		// Is domain on the free plan and already has 1 record?
 		if (!aliasObject.paid && aliasObject.records.length >= 1) throw errorLib.unauthorizedAccessError("You Cannot add more records unless you upgrade this alias");
 			
-		await MongoLib.addRecord(aliasObject, currency, recipientAddress, recipientName);
+		await MongoLib.addRecord(aliasObject, currency, recipientAddress, recipientName, description);
 
 		return res.status(200).json({ message: "Alias record created successfully" });
 	}

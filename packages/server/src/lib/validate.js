@@ -346,3 +346,8 @@ exports.message = () => body('message')
   .trim()
   .isLength({ max: 800 }).withMessage('Message cannot exceed 800 characters.')
   .escape();
+
+exports.description = () => body('description')
+  .optional({ checkFalsy: true })
+  .trim()
+  .isLength({ max: 50 }).withMessage('Description cannot exceed 50 characters.');

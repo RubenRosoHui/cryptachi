@@ -62,6 +62,7 @@ exports.addRecord = [
   validate.currency(),
   validate.recipientAddress(),
   validate.recipientName(),
+  validate.description(),
   validate.checkValidationResults
 ];
 
