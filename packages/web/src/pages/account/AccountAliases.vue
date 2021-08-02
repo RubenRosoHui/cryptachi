@@ -235,6 +235,14 @@
 
 				const name = this.aliasForm.fields.aliasName;
 				const domain = this.aliasForm.fields.domain;
+				const aliasType = this.aliasForm.fields.type;
+
+				if (aliasType === 'upgraded') {
+					return this.$router.push({
+						path: '/checkout/details',
+						query: { alias: name, domain }
+					})
+				}
 
 				try {
 					const query = `domain=${domain}`;
