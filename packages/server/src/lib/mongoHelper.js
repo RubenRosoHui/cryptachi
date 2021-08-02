@@ -41,33 +41,17 @@ exports.addRecord = async function (aliasObject, currency, recipientAddress, rec
 	await aliasObject.save();
 }
 exports.addAlias = async function (user, alias, domain) {
-	//today + 30 days
-	let expiry = (Date.now() + (86400000 * 30));
-	// TODO: Remove validation checks. They belong to the validation step.
-	let aliasObject = await Alias.findOne({ alias: alias, domain: domain });
-	if (aliasObject) {
-		//alias exists, does it have a user?
-		if (aliasObject.user) {
-			throw errorLib.unauthorizedAccessError("Alias already exists");
-		}
-		else {
-			aliasObject.user = user;
-			aliasObject.domain = domain;
-			aliasObject.expiration = expiry
-			user.aliases.push(aliasObject);
+	const expiry = Date.now() + (86400000 * 30); // today + 30 days
 
-			return Promise.all([aliasObject.save(), user.save()]);
-		}
-	}
-	//alias does not exist, create it
-	else {
-		aliasObject = new Alias({
-			alias: alias,
-			user: user,
-			domain: domain,
-			expiration: expiry
-		});
-		user.aliases.push(aliasObject);
-		return Promise.all([aliasObject.save(),user.save()]);
-	}
+	const newAlias = await Alias.create({
+		alias: alias,
+		user: user._id,
+		domain: domain,
+		expiration: expiry
+	});
+
+	user.aliases.push(newAlias._id);
+  await user.save();
+
+	return newAlias;
 }

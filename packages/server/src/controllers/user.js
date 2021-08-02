@@ -51,12 +51,15 @@ exports.addFreeAlias = async (req, res, next) => {
     const hasFreeAlias = user.aliases.some(alias => alias.paid === false);
 		if (hasFreeAlias) throw errorLib.paymentRequiredError('Only one free alias per user.');
 
-		await MongoLib.addAlias(user,alias,domain)
+		const newAlias = await MongoLib.addAlias(user, alias, domain);
 
-		return res.status(200).json({ message: 'Alias created successfully.' });
+		res.status(200).json({
+      message: 'Alias created successfully.',
+      alias: newAlias._doc
+    });
 	}
 	catch (err) {
-		next(err);
+		next(errorLib.errorWrapper(err));
 	}
 }
 

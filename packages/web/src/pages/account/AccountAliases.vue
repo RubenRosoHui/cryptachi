@@ -79,76 +79,16 @@
 </template>
 
 <script>
+	import { handleResponse } from '../../lib/exception.js';
+
 	import AliasListItem from '../../components/lists/AliasListItem.vue';
 	import SearchAliasField from '../../components/fields/SearchAliasField.vue';
 
 	export default {
 		name: 'AccountAliases',
 		components: { AliasListItem, SearchAliasField },
-		beforeMount() {
-			// TODO: Fetch aliases from server.
-			this.aliases = [
-				{
-					name: 'foster',
-					domain: 'cryptachi.com',
-					paid: false,
-					expiration: new Date('August 4, 2021'),
-					records: [
-						{
-							currency: 'xmr',
-							recipientName: 'foster',
-							recipientAddress: '3rfYZI6WCZFy0ObAwNAO2arxzhj9yZ9R562ziooMotamakxbLpGsvwoOmXCEBw0tDOJLi1KGtytNUtRkYGoQ5uvte6nk8yT',
-							description: 'My monero alias'
-						}
-					]
-				},
-				{
-					name: 'matthew',
-					domain: 'cryptachi.com',
-					paid: true,
-					expiration: new Date('January 19, 2022'),
-					records: [
-						{
-							currency: 'xmr',
-							recipientName: 'matthew',
-							recipientAddress: '3rfYZI6WCZFy0ObAwNAO2arxzhj9yZ9R562ziooMotamakxbLpGsvwoOmXCEBw0tDOJLi1KGtytNUtRkYGoQ5uvte6nk8yT',
-							description: "Matthew's monero alias"
-						},
-						{
-							currency: 'btc',
-							recipientName: 'matthew',
-							recipientAddress: 'btcbbc',
-							description: "Matthew's bitcoin alias"
-						}
-					]
-				},
-				{
-					name: 'reallyreallyreallylongalias',
-					domain: 'cryptachi.com',
-					paid: true,
-					expiration: new Date('December 25, 2021'),
-					records: [
-						{
-							currency: 'xmr',
-							recipientName: 'matthew',
-							recipientAddress: '3rfYZI6WCZFy0ObAwNAO2arxzhj9yZ9R562ziooMotamakxbLpGsvwoOmXCEBw0tDOJLi1KGtytNUtRkYGoQ5uvte6nk8yT',
-							description: "monero alias"
-						},
-						{
-							currency: 'btc',
-							recipientName: 'matthew',
-							recipientAddress: 'bc1JJWJoLmglBLD690e5FTf9WNZdzCovyO6jSwkuoz',
-							description: "Matthew's bitcoin alias"
-						},
-						{
-							currency: 'eth',
-							recipientName: 'matthewreallyreallyreallyreallyreallyreallyreallyreallylongname',
-							recipientAddress: '0x23cb385f1511Ea6B1A2E5B58eCA573Fbc72Bb86E',
-							description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-						}
-					]
-				}
-			];
+		async beforeMount() {
+			await this.loadAliases();
 		},
 		data: () => ({
 			supportedCurrencies: ['xmr', 'btc', 'eth'],
@@ -264,28 +204,72 @@
 				};
 				this.$refs.confirmDialog.show = true;
 			},
-			deleteAlias({aliasName, domain}) {
+			async deleteAlias({aliasName, domain}) {
 				const confirmDialog = this.$refs.confirmDialog;
 				confirmDialog.title = 'Delete Alias';
-				confirmDialog.content = `You are about to delete ${aliasName}.${domain}.`;
-				confirmDialog.confirmCb = () => {
-					// TODO: Delete alias on the server side.
-					this.aliases = this.aliases.filter(alias => `${alias.name}.${alias.domain}` !== `${aliasName}.${domain}`);
-				};
+				confirmDialog.content = `You are about to delete ${aliasName}.${domain}. This action cannot be undone. Are you sure?`;
+
+				try {
+					confirmDialog.confirmCb = async () => {
+						const query = `domain=${domain}`
+						const response = await fetch(`/api/user/aliases/${aliasName}?${query}`, {
+							method: 'DELETE',
+							headers: { Authorization: this.$store.getters['jwt'] }
+						});
+
+						await handleResponse(response);
+						const jsonResponse = await response.json();
+
+						console.log(jsonResponse.message);
+
+						this.aliases = this.aliases.filter(alias => `${alias.name}.${alias.domain}` !== `${aliasName}.${domain}`);
+					};
+				} catch(err) {
+					console.log(err);
+				}
+
 				confirmDialog.show = true;
 			},
-			addAlias() {
+			async addAlias() {
 				this.aliasForm.isVisible = false;
 
-				// TODO: Add and check the server if alias is available.
+				const name = this.aliasForm.fields.aliasName;
+				const domain = this.aliasForm.fields.domain;
+
+				const query = `domain=${domain}`;
+				const response = await fetch(`/api/user/aliases/${name}?${query}`, {
+					method: 'POST',
+					headers: { Authorization: this.$store.getters['jwt'] }
+				});
+
+				if (!response.ok) throw 'Something went wrong.';
+
+				const jsonResponse = await response.json();
+				const newAlias = jsonResponse.alias;
 
 				this.aliases.push({
-					name: this.aliasForm.fields.aliasName,
-					domain: this.aliasForm.fields.domain,
-					paid: this.aliasForm.fields.type === 'free' ? false : true,
-					expiration: new Date(Date.now() + 2592000000), // 30 days from now.
-					records: []
+					name: newAlias.alias,
+					domain: newAlias.domain,
+					paid: newAlias.paid,
+					expiration: new Date(newAlias.expiration),
+					records: newAlias.records
 				});
+			},
+			async loadAliases() {
+				const response = await fetch('/api/user/aliases', {
+					headers: { 'Authorization': this.$store.getters['jwt'] }
+				});
+
+				await handleResponse(response);
+
+				const jsonResponse = await response.json();
+
+				this.aliases = jsonResponse.aliases.map(alias => ({
+					...alias,
+					id: alias._id,
+					name: alias.alias,
+					expiration: new Date(alias.expiration)
+				}));
 			}
 		}
 	}
