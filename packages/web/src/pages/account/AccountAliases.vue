@@ -236,24 +236,34 @@
 				const name = this.aliasForm.fields.aliasName;
 				const domain = this.aliasForm.fields.domain;
 
-				const query = `domain=${domain}`;
-				const response = await fetch(`/api/user/aliases/${name}?${query}`, {
-					method: 'POST',
-					headers: { Authorization: this.$store.getters['jwt'] }
-				});
+				try {
+					const query = `domain=${domain}`;
+					const response = await fetch(`/api/user/aliases/${name}?${query}`, {
+						method: 'POST',
+						headers: { Authorization: this.$store.getters['jwt'] }
+					});
 
-				if (!response.ok) throw 'Something went wrong.';
+					await handleResponse(response);
 
-				const jsonResponse = await response.json();
-				const newAlias = jsonResponse.alias;
+					const jsonResponse = await response.json();
+					const newAlias = jsonResponse.alias;
 
-				this.aliases.push({
-					name: newAlias.alias,
-					domain: newAlias.domain,
-					paid: newAlias.paid,
-					expiration: new Date(newAlias.expiration),
-					records: newAlias.records
-				});
+					this.aliases.push({
+						name: newAlias.alias,
+						domain: newAlias.domain,
+						paid: newAlias.paid,
+						expiration: new Date(newAlias.expiration),
+						records: newAlias.records
+					});
+				} catch(err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
+				}
 			},
 			async loadAliases() {
 				const response = await fetch('/api/user/aliases', {
