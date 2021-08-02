@@ -68,13 +68,11 @@
 <script>
 	export default {
 		name: 'CheckoutDetails',
-		mounted() {
-			this.alias = this.$route.query.alias;
-			this.domain = this.$route.query.domain;
+		props: {
+			alias: { type: String, required: true },
+			domain: { type: String, required: true }
 		},
 		data: () => ({
-			alias: '',
-			domain: '',
 			payment: 'xmr',
 			plan: '1'
 		}),
