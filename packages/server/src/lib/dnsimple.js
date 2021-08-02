@@ -4,7 +4,7 @@ const { sendEmail } = require("./email")
 //Create record in DNSimple and retrun the records ID
 exports.addRecord = async function (alias, domain, currency, recipientAddress, recipientName) {
 	//Override domain if zone has been specified in .env. This is due to DNSimples sandbox not allowing the registration of existing domains
-	if (process.env.DNSIMPLE_ZONE) domain = process.env.DNSIMPLE_ZONE
+	if (['development', 'staging'].includes(process.env.ACTUAL_ENV) && process.env.DNSIMPLE_ZONE) domain = process.env.DNSIMPLE_ZONE;
 
 	//add zone record
 	let id;
@@ -29,7 +29,7 @@ exports.addRecord = async function (alias, domain, currency, recipientAddress, r
 	return id;
 }
 exports.deleteRecord = async function (id, domain) {
-	if (process.env.DNSIMPLE_ZONE) domain = process.env.DNSIMPLE_ZONE;
+	if (['development', 'staging'].includes(process.env.ACTUAL_ENV) && process.env.DNSIMPLE_ZONE) domain = process.env.DNSIMPLE_ZONE;
 
 	await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${domain}/records/${id}`, {
 		headers: {
