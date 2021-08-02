@@ -43,15 +43,25 @@ exports.addRecord = async function (aliasObject, currency, recipientAddress, rec
 exports.addAlias = async function (user, alias, domain) {
 	const expiry = Date.now() + (86400000 * 30); // today + 30 days
 
-	const newAlias = await Alias.create({
-		alias: alias,
-		user: user._id,
-		domain: domain,
-		expiration: expiry
-	});
+  const aliasFound = await Alias.findOne({ alias: alias, domain: domain });
+
+  let newAlias;
+  if (aliasFound) {
+    newAlias = aliasFound;
+    newAlias.user = user._id;
+    newAlias.expiration = expiry;
+  } else {
+		newAlias = new Alias({
+			alias: alias,
+			user: user._id,
+			domain: domain,
+			expiration: expiry
+		});
+  }
 
 	user.aliases.push(newAlias._id);
-  await user.save();
+
+  await Promise.all([newAlias.save(), user.save()]);
 
 	return newAlias;
 }
