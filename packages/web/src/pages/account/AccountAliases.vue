@@ -130,6 +130,25 @@
 
 				this.recordForm.isVisible = true;
 			},
+			showAddRecordForm({ aliasName, domain, currencies }) {
+				if (currencies.length >= this.supportedCurrencies.length) {
+					const confirmDialog = this.$refs.confirmDialog;
+					confirmDialog.type = 'ok';
+					confirmDialog.title = 'Maximum Reached';
+					confirmDialog.content = 'You cannot add anymore records because you have used all available currencies.';
+					confirmDialog.show = true;
+				} else {
+					this.recordForm.mode = 'add';
+					this.recordForm.fields.aliasName = aliasName;
+					this.recordForm.fields.domain = domain;
+					this.recordForm.fields.recipientName.value = '';
+					this.recordForm.fields.recipientAddress.value = '';
+					this.recordForm.fields.description.value = '';
+					this.recordForm.availableCurrencies = this.supportedCurrencies.filter(sc => !currencies.includes(sc)).sort();
+					this.recordForm.fields.currency.value = this.recordForm.availableCurrencies[0];
+					this.recordForm.isVisible = true;
+				}
+			},
 			editRecord() {
 				const formFields = this.recordForm.fields;
 
@@ -155,26 +174,7 @@
 				}
 				this.recordForm.isVisible = false;
 			},
-			showAddRecordForm({ aliasName, domain, currencies }) {
-				if (currencies.length >= this.supportedCurrencies.length) {
-					const confirmDialog = this.$refs.confirmDialog;
-					confirmDialog.type = 'ok';
-					confirmDialog.title = 'Maximum Reached';
-					confirmDialog.content = 'You cannot add anymore records because you have used all available currencies.';
-					confirmDialog.show = true;
-				} else {
-					this.recordForm.mode = 'add';
-					this.recordForm.fields.aliasName = aliasName;
-					this.recordForm.fields.domain = domain;
-					this.recordForm.fields.recipientName.value = '';
-					this.recordForm.fields.recipientAddress.value = '';
-					this.recordForm.fields.description.value = '';
-					this.recordForm.availableCurrencies = this.supportedCurrencies.filter(sc => !currencies.includes(sc)).sort();
-					this.recordForm.fields.currency.value = this.recordForm.availableCurrencies[0];
-					this.recordForm.isVisible = true;
-				}
-			},
-			addRecord() {
+			async addRecord() {
 				this.recordForm.isVisible = false;
 
 				const formFields = this.recordForm.fields;
@@ -188,19 +188,57 @@
 
 				const alias = this.aliases.find(alias => alias.name === formFields.aliasName && alias.domain === formFields.domain);
 
-				// TODO: Add new alias record on the server side.
+				try {
+					const response = await fetch(`/api/user/aliases/${formFields.aliasName}/records`, {
+						method: 'POST',
+						headers: {
+							Authorization: this.$store.getters['jwt'],
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({ ...newRecord, domain: formFields.domain })
+					});
 
-				alias.records.push(newRecord);
+					await handleResponse(response);
+
+					alias.records.push(newRecord);
+				} catch(err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
+				}
 			},
 			deleteRecord({recordCurrency, aliasName, domain}) {
 				this.$refs.confirmDialog.title = 'Delete Record';
 				this.$refs.confirmDialog.content = `You are about to delete the ${recordCurrency.toUpperCase()} record of ${aliasName}.${domain}.`;
-				this.$refs.confirmDialog.confirmCb = () => {
-				const alias = this.aliases.find(alias => alias.name === aliasName && alias.domain === domain);
+				this.$refs.confirmDialog.confirmCb = async () => {
+					const alias = this.aliases.find(alias => alias.name === aliasName && alias.domain === domain);
 
-					// TODO: Delete alias record on the server side.
+					try {
+						const response = await fetch(`/api/user/aliases/${aliasName}/records`, {
+							method: 'DELETE',
+							headers: {
+								Authorization: this.$store.getters['jwt'],
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({ currency: recordCurrency, domain })
+						});
 
-					alias.records = alias.records.filter(record => record.currency !== recordCurrency);
+						await handleResponse(response);
+
+						alias.records = alias.records.filter(record => record.currency !== recordCurrency);
+					} catch(err) {
+						if (err instanceof Error && err.message) {
+							const confirmDialog = this.$refs.confirmDialog;
+							confirmDialog.title = 'Error';
+							confirmDialog.content = err.message;
+							confirmDialog.type = 'ok';
+							confirmDialog.show = true;
+						}
+					}
 				};
 				this.$refs.confirmDialog.show = true;
 			},
@@ -225,7 +263,13 @@
 						this.aliases = this.aliases.filter(alias => `${alias.name}.${alias.domain}` !== `${aliasName}.${domain}`);
 					};
 				} catch(err) {
-					console.log(err);
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
 				}
 
 				confirmDialog.show = true;
