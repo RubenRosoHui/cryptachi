@@ -40,3 +40,23 @@ exports.deleteRecord = async function (id, domain) {
 		method: 'DELETE'
 	})//.then(res => console.log(res))
 }
+exports.editRecord = async function(id, currency, domain, recipientAddress, recipientName) {
+	if (['development', 'staging'].includes(process.env.ACTUAL_ENV) && process.env.DNSIMPLE_ZONE) domain = process.env.DNSIMPLE_ZONE;
+
+  const response = await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${domain}/records/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${process.env.DNSIMPLE_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      content: `oa1:${currency} recipient_address=${recipientAddress}; recipient_name=${recipientName};`
+    })
+  });
+
+  if (!response.ok) throw Error('Failed to edit record.');
+
+  const jsonResponse = await response.json();
+
+  return jsonResponse;
+}

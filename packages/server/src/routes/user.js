@@ -14,6 +14,8 @@ router.delete('/aliases/:alias', validators.deleteAlias, controller.deleteAlias)
 
 router.post('/aliases/:alias/records', validators.addRecord , controller.addRecord);
 
+router.patch('/aliases/:alias/records', validators.editRecord , controller.editRecord);
+
 router.delete('/aliases/:alias/records', validators.deleteRecord , controller.deleteRecord);
 
 module.exports = router;

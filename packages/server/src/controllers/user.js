@@ -1,7 +1,7 @@
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
-const errorLib = require('../lib/error.js')
-const MongoLib = require('../lib/mongoHelper.js')
+const errorLib = require('../lib/error.js');
+const MongoLib = require('../lib/mongoHelper.js');
 
 exports.getAliases = async (req, res, next) => {
   try {
@@ -112,4 +112,30 @@ exports.deleteRecord = async (req, res, next) => {
 	catch (err) {
 		next(errorLib.errorWrapper(err));
 	}
+}
+
+exports.editRecord = async (req, res, next) => {
+  const dnsimpleLib = require('../lib/dnsimple.js');
+
+	const { currency, domain, recipientAddress, recipientName, description } = req.body;
+	const { alias } = req.params;
+
+  try {
+    const theAlias = await Alias.findOne({ alias, domain });
+
+    const record = theAlias.records.find(record => record.currency === currency);
+
+    record.recipientAddress = recipientAddress;
+    record.recipientName = recipientName;
+    record.description = description;
+
+		await dnsimpleLib.editRecord(record.dnsimpleID, currency, domain, recipientAddress, recipientName);
+
+    await theAlias.save();
+
+    // Return updated record.
+		res.status(200).json({ message: "Record updated successfully.", record })
+  } catch(err) {
+    next(errorLib.errorWrapper(err));
+  }
 }
