@@ -15,7 +15,7 @@
 					<img src="../../assets/icons/svg/fi-rr-trash.svg" title="Delete Alias" @click="deleteAlias" />
 				</li>
 				<li class="menu-control">
-					<button v-if="!alias.paid && alias.records.length > 0" class="text-button">UPGRADE</button>
+					<button v-if="!alias.paid && alias.records.length > 0" class="text-button" @click="onUpgradeClicked">UPGRADE</button>
 					<img v-else src="../../assets/icons/svg/fi-rr-plus.svg" title="Add Record" @click="addRecord" />
 				</li>
 				<li @click="toggleRecordsVisibility" class="menu-control" v-if="alias.records.length > 0">
@@ -59,7 +59,7 @@
 	export default {
 		name: 'AliasListItem',
 		props: ['alias'],
-		emits: ['editRecord', 'addRecord', 'deleteRecord', 'deleteAlias'],
+		emits: ['editRecord', 'addRecord', 'deleteRecord', 'deleteAlias', 'upgradeAlias'],
 		data: () => ({
 			isRecordsVisible: false
 		}),
@@ -113,6 +113,12 @@
 						return 1;
 					}
 					return 0;
+				});
+			},
+			onUpgradeClicked() {
+				this.$emit('upgradeAlias', {
+					alias: this.alias.name,
+					domain: this.alias.domain
 				});
 			}
 		}

@@ -63,6 +63,7 @@
 			@addRecord="showAddRecordForm"
 			@deleteRecord="deleteRecord"
 			@deleteAlias="deleteAlias"
+			@upgradeAlias="upgradeAlias"
 		/>
 	</ul>
 	<div id="empty-aliases" v-else>
@@ -335,6 +336,12 @@
 						confirmDialog.show = true;
 					}
 				}
+			},
+			upgradeAlias({ alias, domain }) {
+				this.$router.push({
+					path: '/checkout/details',
+					query: { alias, domain }
+				});
 			},
 			async loadAliases() {
 				const response = await fetch('/api/user/aliases', {
