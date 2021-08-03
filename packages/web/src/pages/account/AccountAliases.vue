@@ -53,7 +53,11 @@
 	</base-dialog>
 	<base-confirm ref="confirmDialog" />
 	<h1 class="hidden">Aliases</h1>
-	<ul id="aliases-list" v-if="aliases.length > 0">
+	<div class="text-align-center" v-if="isLoading">
+		<loading-spinner />
+		<p class="yellow bold margin-top-4">Loading aliases...</p>
+	</div>
+	<ul id="aliases-list" v-else-if="aliases.length > 0">
 		<alias-list-item
 			class="aliases-list-item"
 			v-for="(alias, i) in aliases"
@@ -89,9 +93,12 @@
 		name: 'AccountAliases',
 		components: { AliasListItem, SearchAliasField },
 		async beforeMount() {
+			this.isLoading = true;
 			await this.loadAliases();
+			this.isLoading = false;
 		},
 		data: () => ({
+			isLoading: false,
 			supportedCurrencies: ['xmr', 'btc', 'eth'],
 			aliases: [],
 			recordForm: {
