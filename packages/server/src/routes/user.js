@@ -4,7 +4,7 @@ const router = express.Router();
 const controller = require('../controllers/user.js')
 const validators = require('../validators/user.js');
 
-router.post('/aliases/:alias/renew', validators.renewAlias, controller.renewAlias);
+router.post('/aliases/:alias/renew', validators.renewAlias, controller.renewAlias); // TODO: Protect with captcha
 
 router.get('/aliases', controller.getAliases);
 

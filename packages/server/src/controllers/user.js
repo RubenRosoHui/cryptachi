@@ -21,18 +21,24 @@ exports.renewAlias = async (req, res, next) => {
   try {
     const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
 
+    const sevenDays = 604800000; // In milliseconds
     const now = new Date();
 
-    if (now > aliasObject.expiration) throw errorLib.badRequestError('Cannot renew an expired alias.');
+    if (now > aliasObject.expiration)
+      throw errorLib.badRequestError('Cannot renew an expired alias.');
+    else if ((aliasObject.expiration - now) > sevenDays)
+      throw errorLib.badRequestError('Cannot renew an alias with a remaining time of greater than 7 days.');
 
-		const remainingDays = aliasObject.expiration.getDate() - now.getDate();
-    aliasObject.expiration.setDate(now.getDate() + (30 - remainingDays));
+    const newExpiration = new Date(aliasObject.expiration.toISOString());
+    newExpiration.setDate(now.getDate() + 30);
+
+    aliasObject.expiration = newExpiration;
 
     await aliasObject.save();
 
     res.status(200).json({
       message: 'Alias renewed successfully.',
-      alias: { expiration: aliasObject.expiration.toString() }
+      alias: { expiration: aliasObject.expiration.toISOString() }
     });
   }
   catch(err) {

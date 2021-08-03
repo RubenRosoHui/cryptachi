@@ -68,6 +68,7 @@
 			@deleteRecord="deleteRecord"
 			@deleteAlias="deleteAlias"
 			@upgradeAlias="upgradeAlias"
+			@renewAlias="renewAlias"
 		/>
 	</ul>
 	<div id="empty-aliases" v-else>
@@ -335,6 +336,35 @@
 						records: newAlias.records
 					});
 				} catch(err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
+				}
+			},
+			async renewAlias({ alias, domain }) {
+				// TODO: This must be captcha protected.
+				try {
+					const response = await fetch(`/api/user/aliases/${alias}/renew`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: this.$store.getters['jwt']
+						},
+						body: JSON.stringify({ domain })
+					});
+
+					await handleResponse(response);
+
+					const jsonResponse = await response.json();
+					const newExpiration = jsonResponse.alias.expiration;
+
+					const theAlias = this.aliases.find(a => a.alias === alias && a.domain === domain);
+					theAlias.expiration = new Date(newExpiration);
+				} catch (err) {
 					if (err instanceof Error && err.message) {
 						const confirmDialog = this.$refs.confirmDialog;
 						confirmDialog.title = 'Error';
