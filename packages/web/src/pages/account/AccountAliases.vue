@@ -149,7 +149,8 @@
 					this.recordForm.isVisible = true;
 				}
 			},
-			editRecord() {
+			async editRecord() {
+				this.recordForm.isVisible = false;
 				const formFields = this.recordForm.fields;
 
 				const newRecord = {
@@ -162,17 +163,35 @@
 				const alias = this.aliases.find(alias => alias.name === formFields.aliasName && alias.domain === formFields.domain);
 				const record = alias.records.find(record => record.currency === formFields.currency.value);
 
-				// TODO: Update on the server side.
+				try {
+					const response = await fetch(`/api/user/aliases/${formFields.aliasName}/records`, {
+						method: 'PATCH',
+						headers: {
+							Authorization: this.$store.getters['jwt'],
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({ ...newRecord, domain: formFields.domain })
+					});
 
-				if (record) {
-					record.currency = newRecord.currency;
-					record.recipientName = newRecord.recipientName;
-					record.recipientAddress = newRecord.recipientAddress;
-					record.description = newRecord.description;
-				} else {
-					record.push(newRecord);
+					await handleResponse(response);
+
+					if (record) {
+						record.currency = newRecord.currency;
+						record.recipientName = newRecord.recipientName;
+						record.recipientAddress = newRecord.recipientAddress;
+						record.description = newRecord.description;
+					} else {
+						record.push(newRecord);
+					}
+				} catch(err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
 				}
-				this.recordForm.isVisible = false;
 			},
 			async addRecord() {
 				this.recordForm.isVisible = false;
