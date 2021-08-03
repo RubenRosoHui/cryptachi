@@ -154,7 +154,7 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
 
       const aliasFound = await Alias.findOne({ alias: value, domain: req[checkDomainValueIn].domain, user: req.user.id });
 
-      if (!aliasFound) throw errorLib.authenticationError('You do not own this alias. From validator.');
+      if (!aliasFound) throw errorLib.authenticationError('You do not own this alias.');
 
       return true;
     });
