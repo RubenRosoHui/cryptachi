@@ -7,6 +7,7 @@ const MongoLib = require('../lib/mongoHelper.js')
 const crypto = require('crypto');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const speakeasy = require('speakeasy');
 
 exports.register = async (req, res, next) => {
 	const { email, password, alias, domain } = req.body;
@@ -31,20 +32,20 @@ exports.register = async (req, res, next) => {
 
 		await user.save();
 
-    // No need to await
+		// No need to await
 		EmailLib.sendAccountVerification(email, token);
 
-    // TODO: Remove console log when production ready.
+		// TODO: Remove console log when production ready.
 		console.log(`activation token ${token}`);
 
 		res.status(201).json({
-      message: "User registered successfully.",
-      user: {
-        id: user._id,
-        email: user.email,
-        roles: user.roles
-      }
-    });
+			message: "User registered successfully.",
+			user: {
+				id: user._id,
+				email: user.email,
+				roles: user.roles
+			}
+		});
 	}
 	catch (err) {
 		next(ErrorLib.errorWrapper(err)); //takes it to the next error middleware
@@ -52,25 +53,44 @@ exports.register = async (req, res, next) => {
 }
 
 exports.login = async (req, res, next) => {
-	const { email, password } = req.body;
+	const { email, password, authCode } = req.body;
 
 	try {
-		const user = await User.findOne({email});
+		const user = await User.findOne({ email });
 
 		const isMatch = await bcrypt.compare(password, user.password);
-		if (!isMatch) throw ErrorLib.authenticationError("Invalid credentials.");
 
-    const payload = {
+		const payload = {
 			id: user.id,
 			email: user.email,
 			roles: user.roles,
-    };
+		};
 
-		jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, authorization) => {
+		if (!isMatch) throw ErrorLib.authenticationError("Invalid credentials.");
+		if (user.requireTwoFactor) {
+			if (authCode) {
+				const verified = speakeasy.totp.verify({
+					secret: user.twoFactorSecret,
+					encoding: 'base32',
+					token: authCode,
+				})
+				if (!verified) {
+					throw errorLib.authenticationError('You did not enter the correct Auth code')
+				}
+			}
+			else {
+				return res.status(200).json({
+					message: "Login Successfull but missing AuthCode",
+					user: payload
+				})
+			}
+		}
+
+		jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, async (err, authorization) => {
 			if (err) throw ErrorLib.serverError(err.message);
 
-			res.status(200).json({
-        message: "Logged in successfully.",
+			return res.status(200).json({
+				message: "Logged in successfully.",
 				jsonWebToken: authorization,
 				user: payload
 			});
@@ -87,7 +107,7 @@ exports.confirmEmail = async (req, res, next) => {
 		const user = await User.findOne({ email: email, isEmailConfirmedToken: token });
 
 		user.isEmailConfirmed = true;
-    user.isEmailConfirmedToken = null;
+		user.isEmailConfirmedToken = null;
 
 		await user.save();
 
@@ -106,9 +126,9 @@ exports.getResetLink = async (req, res, next) => {
 
 		let token;
 		//if a valid token currently exists
-		if(user.resetToken && Date.now() < user.resetTokenExpiration) {
+		if (user.resetToken && Date.now() < user.resetTokenExpiration) {
 			token = user.resetToken;
-			await EmailLib.sendPasswordReset(email,token);
+			await EmailLib.sendPasswordReset(email, token);
 		}
 		else {
 			token = crypto.randomBytes(32).toString('hex');
