@@ -1,6 +1,6 @@
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
-const ErrorLib = require('../lib/error.js')
+const errorLib = require('../lib/error.js')
 const EmailLib = require('../lib/email.js')
 const MongoLib = require('../lib/mongoHelper.js')
 
@@ -48,7 +48,7 @@ exports.register = async (req, res, next) => {
 		});
 	}
 	catch (err) {
-		next(ErrorLib.errorWrapper(err)); //takes it to the next error middleware
+		next(errorLib.errorWrapper(err)); //takes it to the next error middleware
 	}
 }
 
@@ -66,7 +66,7 @@ exports.login = async (req, res, next) => {
 			roles: user.roles,
 		};
 
-		if (!isMatch) throw ErrorLib.authenticationError("Invalid credentials.");
+		if (!isMatch) throw errorLib.authenticationError("Invalid credentials.");
 		if (user.requireTwoFactor) {
 			if (authCode) {
 				const verified = speakeasy.totp.verify({
@@ -87,7 +87,7 @@ exports.login = async (req, res, next) => {
 		}
 
 		jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, async (err, authorization) => {
-			if (err) throw ErrorLib.serverError(err.message);
+			if (err) throw errorLib.serverError(err.message);
 
 			return res.status(200).json({
 				message: "Logged in successfully.",
@@ -96,7 +96,7 @@ exports.login = async (req, res, next) => {
 			});
 		});
 	} catch (err) {
-		next(ErrorLib.errorWrapper(err));
+		next(errorLib.errorWrapper(err));
 	}
 }
 
@@ -114,7 +114,7 @@ exports.confirmEmail = async (req, res, next) => {
 		return res.status(200).json({ message: "Account Activated" });
 	}
 	catch (err) {
-		next(ErrorLib.errorWrapper(err));
+		next(errorLib.errorWrapper(err));
 	}
 }
 
@@ -141,7 +141,7 @@ exports.getResetLink = async (req, res, next) => {
 
 		return res.status(200).json({ message: "Email sent" });
 	} catch (err) {
-		next(ErrorLib.errorWrapper(err));
+		next(errorLib.errorWrapper(err));
 	}
 
 }
@@ -163,6 +163,6 @@ exports.postResetPassword = async (req, res, next) => {
 		return res.status(200).json({ message: "Password Reset" });
 	}
 	catch (err) {
-		next(ErrorLib.errorWrapper(err));
+		next(errorLib.errorWrapper(err));
 	}
 }
