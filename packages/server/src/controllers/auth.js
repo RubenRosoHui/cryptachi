@@ -75,14 +75,11 @@ exports.login = async (req, res, next) => {
 					token: authCode,
 				})
 				if (!verified) {
-					throw errorLib.authenticationError('You did not enter the correct Auth code')
+					throw errorLib.badRequestError('You did not enter the correct Auth code');
 				}
 			}
 			else {
-				return res.status(200).json({
-					message: "Login Successfull but missing AuthCode",
-					user: payload
-				})
+				return errorLib.authenticationError('OTP is required');
 			}
 		}
 
