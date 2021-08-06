@@ -90,3 +90,19 @@ exports.sendFeedback = function(to, contact) {
 		`
   );
 }
+
+exports.sendPasswordChangeNotification = function(to) {
+  const supportLink = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/contact`;
+
+  module.exports.sendEmail(
+    'mail@cryptachi.com',
+    to,
+    'Account Password Changed - Cryptachi.com',
+    `
+			<html>
+				<p>You are being notified that your account password was changed.</p>
+				<p>If you did not ask for a password change, please <a href="${supportLink}">contact support</a> right away.</p>
+			</html>
+		`
+  );
+}

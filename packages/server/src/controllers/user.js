@@ -1,10 +1,12 @@
+const { authenticator } = require('otplib');
 const bcrypt = require('bcryptjs');
 
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
+
+const emailLib = require('../lib/email.js');
 const errorLib = require('../lib/error.js');
 const MongoLib = require('../lib/mongoHelper.js');
-const { authenticator } = require('otplib');
 
 exports.getAliases = async (req, res, next) => {
 	try {
@@ -203,11 +205,15 @@ exports.changePassword = async (req, res, next) => {
 
     await user.save();
 
+    // No need to await.
+    emailLib.sendPasswordChangeNotification(user.email);
+
 		res.status(200).json({ message: 'Password changed successfully.' });
   } catch(err) {
     next(errorLib.errorWrapper(err));
   }
 }
+
 //user confirms their 2fa by sending the current auth code on their phone
 exports.enableTwoFactorAuth = async (req, res, next) => {
 
