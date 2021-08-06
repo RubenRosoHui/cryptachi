@@ -83,7 +83,7 @@ exports.login = async (req, res, next) => {
 			}
 		}
 
-		jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, async (err, authorization) => {
+		jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, authorization) => {
 			if (err) throw errorLib.serverError(err.message);
 
 			return res.status(200).json({
