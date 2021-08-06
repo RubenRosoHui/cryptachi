@@ -7,7 +7,7 @@ const MongoLib = require('../lib/mongoHelper.js')
 const crypto = require('crypto');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const speakeasy = require('speakeasy');
+const { authenticator } = require('otplib');
 
 exports.register = async (req, res, next) => {
 	const { email, password, alias, domain } = req.body;
@@ -69,17 +69,13 @@ exports.login = async (req, res, next) => {
 		if (!isMatch) throw errorLib.authenticationError("Invalid credentials.");
 		if (user.requireTwoFactor) {
 			if (authCode) {
-				const verified = speakeasy.totp.verify({
-					secret: user.twoFactorSecret,
-					encoding: 'base32',
-					token: authCode,
-				})
+				const verified = authenticator.check(authCode,user.twoFactorSecret);
 				if (!verified) {
 					throw errorLib.badRequestError('You did not enter the correct Auth code');
 				}
 			}
 			else {
-				return errorLib.authenticationError('OTP is required');
+				throw errorLib.authenticationError('OTP is required');
 			}
 		}
 
