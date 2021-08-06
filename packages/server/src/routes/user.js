@@ -18,6 +18,15 @@ router.patch('/aliases/:alias/records', validators.editRecord , controller.editR
 
 router.delete('/aliases/:alias/records', validators.deleteRecord , controller.deleteRecord);
 
+<<<<<<< HEAD
 router.post('/change-password', validators.changePassword, controller.changePassword)
+=======
+router.get('/2fa', controller.retrieveTwoFactorAuthSecret);
+
+router.post('/2fa', controller.enableTwoFactorAuth);
+
+router.delete('/2fa', controller.disableTwoFactorAuth);
+
+>>>>>>> 2f443b66fd596a2b65469c83da265d614dd8fa92
 
 module.exports = router;
