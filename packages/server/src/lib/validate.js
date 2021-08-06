@@ -90,6 +90,7 @@ exports.password = function({ isStrong=false } = { isStrong:false }) {
 }
 
 exports.confirmPassword = () => body('confirmPassword')
+  .exists(existsOpts).withMessage('Confirm Password is required.')
   .custom((value, { req }) => {
     if (value !== req.body.password) throw "Passwords don't match";
     return true;
