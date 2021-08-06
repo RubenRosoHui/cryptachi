@@ -18,4 +18,6 @@ router.patch('/aliases/:alias/records', validators.editRecord , controller.editR
 
 router.delete('/aliases/:alias/records', validators.deleteRecord , controller.deleteRecord);
 
+router.post('/change-password', validators.changePassword, controller.changePassword)
+
 module.exports = router;

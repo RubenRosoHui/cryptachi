@@ -1,5 +1,7 @@
 const { check, body, param, query, oneOf, validationResult } = require('express-validator');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
+
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js')
@@ -351,3 +353,19 @@ exports.description = () => body('description')
   .optional({ checkFalsy: true })
   .trim()
   .isLength({ max: 50 }).withMessage('Description cannot exceed 50 characters.');
+
+exports.oldPassword = () => body('oldPassword')
+  .exists(existsOpts).withMessage('Old password is required.')
+  .trim()
+  .isLength({ max: 100 }).withMessage('Old password cannot exceed 100 characters.')
+  .bail()
+  .custom(async (value, {req}) => {
+    const user = await User.findById(req.user.id);
+
+    if (!user) throw { type: 'notFoundError', msg: 'User not found.' };
+
+    const passwordsMatch = await bcrypt.compare(value, user.password);
+    if (!passwordsMatch) throw { type: 'unprocessableEntityError', msg: 'Old password is invalid.' };
+
+    return true;
+  });

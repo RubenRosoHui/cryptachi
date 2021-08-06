@@ -108,3 +108,10 @@ exports.editRecord = [
   validate.description(),
   validate.checkValidationResults
 ];
+
+exports.changePassword = [
+  validate.oldPassword(),
+  validate.password(),
+  validate.confirmPassword(),
+  validate.checkValidationResults
+]

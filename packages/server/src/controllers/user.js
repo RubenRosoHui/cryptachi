@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js');
@@ -141,6 +143,23 @@ exports.editRecord = async (req, res, next) => {
 
     // Return updated record.
 		res.status(200).json({ message: "Record updated successfully.", record })
+  } catch(err) {
+    next(errorLib.errorWrapper(err));
+  }
+}
+
+exports.changePassword = async (req, res, next) => {
+  const password = req.body.password;
+
+  try {
+    const user = await User.findById(req.user.id);
+
+		const salt = await bcrypt.genSalt(10);
+		user.password = await bcrypt.hash(password, salt);
+
+    await user.save();
+
+		res.status(200).json({ message: 'Password changed successfully.' });
   } catch(err) {
     next(errorLib.errorWrapper(err));
   }
