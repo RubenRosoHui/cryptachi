@@ -2,7 +2,7 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js');
 const MongoLib = require('../lib/mongoHelper.js');
-const speakeasy = require('speakeasy');
+const { authenticator } = require('otplib');
 
 exports.getAliases = async (req, res, next) => {
 	try {
@@ -155,19 +155,13 @@ exports.retrieveTwoFactorAuthSecret = async (req, res, next) => {
 		//if two factor is already enabled
 		if (user.requireTwoFactor) throw errorLib.unauthorizedAccessError('You cannot view the secret for 2FA');
 
-		let key;
-		let otpauthurl;
+		const secret = authenticator.generateSecret();
+		const otpauthurl = authenticator.keyuri(user.email,'Cryptachi',secret);
 
-		const secret = speakeasy.generateSecret({
-			name: 'Cryptachi',
-			length: 20
-		});
-		user.twoFactorSecret = secret.base32;
+		user.twoFactorSecret = secret;
 		await user.save();
-		key = secret.base32;
-		otpauthurl = secret.otpauth_url;
 
-		res.status(200).json({ message: `Key generated successfully`, key, otpauthurl })
+		res.status(200).json({ message: `Key generated successfully`, secret, otpauthurl })
 	} catch (err) {
 		next(errorLib.errorWrapper(err));
 	}
@@ -179,20 +173,17 @@ exports.disableTwoFactorAuth = async (req, res, next) => {
 		const user = await User.findById(req.user.id);
 
 		if (!user.requireTwoFactor) throw errorLib.unauthorizedAccessError("2FA is already disabled!")
-
-		const verified = speakeasy.totp.verify({
-			secret: user.twoFactorSecret,
-			encoding: 'base32',
-			token: authCode,
-		})
-		if (verified) {
+		
+		const verified = authenticator.check(authCode,user.twoFactorSecret);
+		if(verified){
 			user.requireTwoFactor = false;
 			user.twoFactorSecret = null;
 			await user.save();
 		}
-		else {
+		else{
 			throw errorLib.authenticationError('You did not enter the correct Auth code')
 		}
+
 		res.status(200).json({ message: "2FA disabled successfully" })
 	} catch (err) {
 		next(errorLib.errorWrapper(err));
@@ -209,11 +200,8 @@ exports.enableTwoFactorAuth = async (req, res, next) => {
 		if (user.requireTwoFactor) throw errorLib.unauthorizedAccessError("You've already enabled 2FA")
 		if (!user.twoFactorSecret) throw errorLib.unauthorizedAccessError("You cannot activate 2FA at this time")
 
-		const verified = speakeasy.totp.verify({
-			secret: user.twoFactorSecret,
-			encoding: 'base32',
-			token: authCode,
-		})
+		const verified = authenticator.check(authCode,user.twoFactorSecret);
+
 		if (verified) {
 			user.requireTwoFactor = true;
 			await user.save();
