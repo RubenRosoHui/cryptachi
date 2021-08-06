@@ -192,7 +192,6 @@ exports.disableTwoFactorAuth = async (req, res, next) => {
 	}
 }
 
-<<<<<<< HEAD
 exports.changePassword = async (req, res, next) => {
   const password = req.body.password;
 
@@ -209,7 +208,6 @@ exports.changePassword = async (req, res, next) => {
     next(errorLib.errorWrapper(err));
   }
 }
-=======
 //user confirms their 2fa by sending the current auth code on their phone
 exports.enableTwoFactorAuth = async (req, res, next) => {
 
@@ -235,4 +233,3 @@ exports.enableTwoFactorAuth = async (req, res, next) => {
 	}
 
 }
->>>>>>> 2f443b66fd596a2b65469c83da265d614dd8fa92
