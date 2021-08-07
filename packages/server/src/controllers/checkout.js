@@ -8,44 +8,44 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 
 const paidPlans = {
-  oneYear: {
-    price: 6,
-    currency: 'usd',
-    percentDiscount: 0, //default discount
+	oneYear: {
+		price: 6,
+		currency: 'usd',
+		percentDiscount: 0, //default discount
 		specialDiscount: 0 //special discount, applied after default discount
-  },
-  twoYear: {
-    price: 12,
-    currency: 'usd',
-    percentDiscount: 5,
+	},
+	twoYear: {
+		price: 12,
+		currency: 'usd',
+		percentDiscount: 5,
 		specialDiscount: 0
-  },
-  threeYear: {
-    price: 18,
-    currency: 'usd',
-    percentDiscount: 10,
+	},
+	threeYear: {
+		price: 18,
+		currency: 'usd',
+		percentDiscount: 10,
 		specialDiscount: 0
-  },
-  fourYear: {
-    price: 24,
-    currency: 'usd',
-    percentDiscount: 15,
+	},
+	fourYear: {
+		price: 24,
+		currency: 'usd',
+		percentDiscount: 15,
 		specialDiscount: 0
-  },
-  fiveYear: {
-    price: 30,
-    currency: 'usd',
-    percentDiscount: 20,
+	},
+	fiveYear: {
+		price: 30,
+		currency: 'usd',
+		percentDiscount: 20,
 		specialDiscount: 0
-  }
+	}
 }
 
-exports.createInvoice = async (req,res,next) => {
-		// https://www.npmjs.com/package/btcpay
+exports.createInvoice = async (req, res, next) => {
+	// https://www.npmjs.com/package/btcpay
 	// On the server set up an access token and run the below script
 	// /node -e "const btcpay=require('btcpay'); new btcpay.BTCPayClient('https://testnet.demo.btcpayserver.org', btcpay.crypto.load_keypair(Buffer.from('PRIVATE KEY', 'hex'))).pair_client('CLIENT KEY').then(console.log).catch(console.error)"
 
-  const { alias,domain, email, plan } = req.body;
+	const { alias, domain, email, plan } = req.body;
 
 	//TODO: Validators (doesEmailExist? doesUserOwnAlias? doesPlanExist? ToLowerCase)
 
@@ -55,17 +55,17 @@ exports.createInvoice = async (req,res,next) => {
 	const BTCPAY_URL = process.env.BTCPAY_URL;
 	const BTCPAY_KEY = process.env.BTCPAY_KEY;
 	//const MERCHANT = 'Bq2YhaoF81Tz4rhMdky9yxQTy3s9j3WLeB38b3wgSSwR'
-	const keypair = btcpay.crypto.load_keypair(new Buffer.from(BTCPAY_KEY,'hex'))
-	const client = new btcpay.BTCPayClient(BTCPAY_URL, keypair,{merchant: 'Cryptachi'})
+	const keypair = btcpay.crypto.load_keypair(new Buffer.from(BTCPAY_KEY, 'hex'))
+	const client = new btcpay.BTCPayClient(BTCPAY_URL, keypair, { merchant: 'Cryptachi' })
 
 	const chosenPlan = paidPlans[plan];
 	//default price
-	const normalPrice = (chosenPlan.price - (chosenPlan.price *(chosenPlan.percentDiscount / 100)))
+	const normalPrice = (chosenPlan.price - (chosenPlan.price * (chosenPlan.percentDiscount / 100)))
 	//price after special discount if any
 	const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)))
 
 	//const btcPayInvoice = await client.create_invoice({price: price, currency: 'USD',itemCode: aliasObject._id})
-	const btcPayInvoice = await client.create_invoice({price: 0.5, currency: 'USD',redirectUrl: "http://localhost:8080/"})//,itemCode: aliasObject._id})
+	const btcPayInvoice = await client.create_invoice({ price: 0.5, currency: 'USD', redirectUrl: "http://localhost:8080/" })//,itemCode: aliasObject._id})
 
 	const invoice = new Invoice({
 		url: btcPayInvoice.url,
@@ -77,33 +77,33 @@ exports.createInvoice = async (req,res,next) => {
 	await invoice.save();
 
 	res.status(200).json({
-		message:'Invoice created successfully',
+		message: 'Invoice created successfully',
 		url: btcPayInvoice.url,
 	})
 }
-exports.invoiceInvalid = async (req,res,next) => {
-	const { invoiceId,type } = req.body;
-	console.log('invoice Invalid',req.body,req.headers)
-	const invoice = await Invoice.findOne({invoiceId:invoiceId})
+exports.invoiceInvalid = async (req, res, next) => {
+	const { invoiceId, type } = req.body;
+	console.log('invoice Invalid', req.body, req.headers)
+	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
 	invoice.state = type;
 	await invoice.save();
 
-	res.status(200).json({message:'success'});
+	res.status(200).json({ message: 'success' });
 }
-exports.invoiceExpired = async (req,res,next) => {
-	const { invoiceId,type } = req.body;
-	console.log('invoice Invalid',req.body,req.headers)
-	const invoice = await Invoice.findOne({invoiceId:invoiceId})
+exports.invoiceExpired = async (req, res, next) => {
+	const { invoiceId, type } = req.body;
+	console.log('invoice Invalid', req.body, req.headers)
+	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
 	invoice.state = type;
 	await invoice.save();
 
-	res.status(200).json({message:'success'});
+	res.status(200).json({ message: 'success' });
 }
-exports.invoiceProcessing = async (req,res,next) => {
-	const { invoiceId,type } = req.body;
-	const invoice = await Invoice.findOne({invoiceId:invoiceId})
+exports.invoiceProcessing = async (req, res, next) => {
+	const { invoiceId, type } = req.body;
+	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
 	invoice.state = type;
 	await invoice.save();
@@ -113,26 +113,26 @@ exports.invoiceProcessing = async (req,res,next) => {
 	//TODO: Move this to InvoiceSettled for release
 	//retrieve alias, make it a paid based on the invoice data
 
-  // TODO: Send receipt when fully confirmed.
+	// TODO: Send receipt when fully confirmed.
 
 
 	//console.log('invoice processing',req.body,req.headers)
-	res.status(200).json({message:'success'});
+	res.status(200).json({ message: 'success' });
 }
-exports.invoiceSettled = async (req,res,next) => {
+exports.invoiceSettled = async (req, res, next) => {
 	//console.log('invoice settled',req.body,req.headers)
-	const { invoiceId,type } = req.body;
-	const invoice = await Invoice.findOne({invoiceId:invoiceId})
+	const { invoiceId, type } = req.body;
+	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
 	invoice.state = type;
 	await invoice.save();
 
 
 	//TODO: create a validator that compares the btcpay-sig to the HMAC256 of the body's bytes (current code below will always fail)
-	// console.log(req.headers['btcpay-sig'])
-	// console.log(crypto.createHmac('sha256','2DNzs94DU6oqcqBaJKYQVqWCbS59').update(Buffer.from(JSON.stringify(req.body))).digest('hex'))
+	//console.log(req.headers['btcpay-sig'])
+	//console.log(crypto.createHmac('sha256', '2DNzs94DU6oqcqBaJKYQVqWCbS59').update(Buffer.from(JSON.stringify(req.body))).digest('base64'))
 
 
 
-	res.status(200).json({message:'success'});
+	res.status(200).json({ message: 'success' });
 }
