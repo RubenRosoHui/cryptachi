@@ -1,78 +1,138 @@
-const Purchase = require('../models/purchase.js');
 const fetch = require('node-fetch');
+const btcpay = require('btcpay');
+const crypto = require('crypto')
+
+//const Purchase = require('../models/purchase.js');
+const Invoice = require('../models/invoice.js');
+const User = require('../models/user.js');
+const Alias = require('../models/alias.js');
 
 const paidPlans = {
   oneYear: {
-    price: 600,
+    price: 6,
     currency: 'usd',
-    percentDiscount: 0,
+    percentDiscount: 0, //default discount
+		specialDiscount: 0 //special discount, applied after default discount
   },
   twoYear: {
-    price: 1200,
+    price: 12,
     currency: 'usd',
-    percentDiscount: 5
+    percentDiscount: 5,
+		specialDiscount: 0
   },
   threeYear: {
-    price: 1800,
+    price: 18,
     currency: 'usd',
-    percentDiscount: 10
+    percentDiscount: 10,
+		specialDiscount: 0
   },
   fourYear: {
-    price: 2400,
+    price: 24,
     currency: 'usd',
-    percentDiscount: 15
+    percentDiscount: 15,
+		specialDiscount: 0
   },
   fiveYear: {
-    price: 3000,
+    price: 30,
     currency: 'usd',
-    percentDiscount: 20
+    percentDiscount: 20,
+		specialDiscount: 0
   }
 }
 
-async function calculatePrice(plan, paymentCurrency) {
-  const { price, currency, percentDiscount } = paidPlans[plan];
-  const discountedPrice = Math.round(price - price*(percentDiscount/100)) / 100;
+exports.createInvoice = async (req,res,next) => {
+		// https://www.npmjs.com/package/btcpay
+	// On the server set up an access token and run the below script
+	// /node -e "const btcpay=require('btcpay'); new btcpay.BTCPayClient('https://testnet.demo.btcpayserver.org', btcpay.crypto.load_keypair(Buffer.from('PRIVATE KEY', 'hex'))).pair_client('CLIENT KEY').then(console.log).catch(console.error)"
 
-  const baseUrl = `https://pro-api.coinmarketcap.com/v1/tools/price-conversion`;
-  const query = `?amount=${discountedPrice}&symbol=${currency}&convert=${paymentCurrency}`;
+  const { alias,domain, email, plan } = req.body;
 
-  // TODO: Find a way to cache this request.
-  const response = await fetch(baseUrl + query, {
-    method: 'GET',
-    headers: { 'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY }
-  });
+	//TODO: Validators (doesEmailExist? doesUserOwnAlias? doesPlanExist? ToLowerCase)
 
-  const jsonResponse = await response.json();
+	const userObject = await User.findOne({ email: email })
+	const aliasObject = await Alias.findOne({ alias: alias, domain: domain })
 
-  return jsonResponse.data.quote[paymentCurrency.toUpperCase()].price;
+	const BTCPAY_URL = process.env.BTCPAY_URL;
+	const BTCPAY_KEY = process.env.BTCPAY_KEY;
+	//const MERCHANT = 'Bq2YhaoF81Tz4rhMdky9yxQTy3s9j3WLeB38b3wgSSwR'
+	const keypair = btcpay.crypto.load_keypair(new Buffer.from(BTCPAY_KEY,'hex'))
+	const client = new btcpay.BTCPayClient(BTCPAY_URL, keypair,{merchant: 'Cryptachi'})
+
+	const chosenPlan = paidPlans[plan];
+	//default price
+	const normalPrice = (chosenPlan.price - (chosenPlan.price *(chosenPlan.percentDiscount / 100)))
+	//price after special discount if any
+	const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)))
+
+	//const btcPayInvoice = await client.create_invoice({price: price, currency: 'USD',itemCode: aliasObject._id})
+	const btcPayInvoice = await client.create_invoice({price: 0.5, currency: 'USD',redirectUrl: "http://localhost:8080/"})//,itemCode: aliasObject._id})
+
+	const invoice = new Invoice({
+		url: btcPayInvoice.url,
+		invoiceId: btcPayInvoice.id,
+		user: userObject._id,
+		alias: aliasObject._id,
+		//payment: 
+	});
+	await invoice.save();
+
+	res.status(200).json({
+		message:'Invoice created successfully',
+		url: btcPayInvoice.url,
+	})
 }
+exports.invoiceInvalid = async (req,res,next) => {
+	const { invoiceId,type } = req.body;
+	console.log('invoice Invalid',req.body,req.headers)
+	const invoice = await Invoice.findOne({invoiceId:invoiceId})
 
-exports.postPaymentIntent = async (req, res, next) => {
-  const { alias, domain, plan, payment } = req.body;
+	invoice.state = type;
+	await invoice.save();
 
-  // TODO: Double check the price
-	const calculatedPrice = await calculatePrice(plan, payment.currency);
-  console.log('Price from client: ', payment.price);
-  console.log('Calculated price: ', calculatedPrice);
-
-  // TODO: Request a payment intent from the gateway
-	const paymentIntent = {
-    id: 12345,
-    status: 'awaiting-transaction',
-    address: 'btcaddress'
-  };
-
-  res.status(200).json({
-    message: 'Payment Intent successfully created.',
-    paymentIntent
-  });
+	res.status(200).json({message:'success'});
 }
+exports.invoiceExpired = async (req,res,next) => {
+	const { invoiceId,type } = req.body;
+	console.log('invoice Invalid',req.body,req.headers)
+	const invoice = await Invoice.findOne({invoiceId:invoiceId})
 
-// NOTE: This route is only accessible to the payment gateway.
-exports.postPurchase = (req, res, next) => {
-	// TODO: Create the purchase.
+	invoice.state = type;
+	await invoice.save();
 
-  // TODO: Send updates via websocket.
+	res.status(200).json({message:'success'});
+}
+exports.invoiceProcessing = async (req,res,next) => {
+	const { invoiceId,type } = req.body;
+	const invoice = await Invoice.findOne({invoiceId:invoiceId})
+
+	invoice.state = type;
+	await invoice.save();
+
+	console.log(`invoice ${invoice.invoiceId} Processing`)
+
+	//TODO: Move this to InvoiceSettled for release
+	//retrieve alias, make it a paid based on the invoice data
 
   // TODO: Send receipt when fully confirmed.
+
+
+	//console.log('invoice processing',req.body,req.headers)
+	res.status(200).json({message:'success'});
+}
+exports.invoiceSettled = async (req,res,next) => {
+	//console.log('invoice settled',req.body,req.headers)
+	const { invoiceId,type } = req.body;
+	const invoice = await Invoice.findOne({invoiceId:invoiceId})
+
+	invoice.state = type;
+	await invoice.save();
+
+
+	//TODO: create a validator that compares the btcpay-sig to the HMAC256 of the body's bytes (current code below will always fail)
+	// console.log(req.headers['btcpay-sig'])
+	// console.log(crypto.createHmac('sha256','2DNzs94DU6oqcqBaJKYQVqWCbS59').update(Buffer.from(JSON.stringify(req.body))).digest('hex'))
+
+
+
+	res.status(200).json({message:'success'});
 }

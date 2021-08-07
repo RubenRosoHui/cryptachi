@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+/*
 const PurchaseSchema = mongoose.Schema({
   paymentIntentId: { type: String, required: true },
 	user: { type: mongoose.Schema.Types.ObjectID, ref: 'User' },
@@ -17,3 +18,4 @@ const PurchaseSchema = mongoose.Schema({
 }, {timestamps: true});
 
 module.exports = mongoose.model('Purchase', PurchaseSchema);
+*/
