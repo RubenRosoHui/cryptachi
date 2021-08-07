@@ -6,14 +6,10 @@ const InvoiceSchema = mongoose.Schema({
 	user: { type: mongoose.Schema.Types.ObjectID, ref: 'User', required: true }, //required: true },
 	alias: { type: mongoose.Schema.Types.ObjectID, ref: 'Alias', required: true }, //required: true },
 	state: {type: String},
-	payment: {
-		amount: Number,
-		unit: String,
-		currency: String,
-	},
 	plan: {
 		duration: Number,
-		unit: String
+		name: String,
+		price: Number
 	}
 }, { timestamps: true });
 

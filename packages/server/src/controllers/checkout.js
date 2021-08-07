@@ -12,31 +12,36 @@ const paidPlans = {
 		price: 6,
 		currency: 'usd',
 		percentDiscount: 0, //default discount
-		specialDiscount: 0 //special discount, applied after default discount
+		specialDiscount: 0, //special discount, applied after default discount
+		length: 365
 	},
 	twoYear: {
 		price: 12,
 		currency: 'usd',
 		percentDiscount: 5,
-		specialDiscount: 0
+		specialDiscount: 0,
+		length: 730
 	},
 	threeYear: {
 		price: 18,
 		currency: 'usd',
 		percentDiscount: 10,
-		specialDiscount: 0
+		specialDiscount: 0,
+		length: 1095
 	},
 	fourYear: {
 		price: 24,
 		currency: 'usd',
 		percentDiscount: 15,
-		specialDiscount: 0
+		specialDiscount: 0,
+		length: 1460
 	},
 	fiveYear: {
 		price: 30,
 		currency: 'usd',
 		percentDiscount: 20,
-		specialDiscount: 0
+		specialDiscount: 0,
+		length: 1825
 	}
 }
 
@@ -64,15 +69,16 @@ exports.createInvoice = async (req, res, next) => {
 	//price after special discount if any
 	const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)))
 
+	//TODO: switch price back for release
 	//const btcPayInvoice = await client.create_invoice({price: price, currency: 'USD',itemCode: aliasObject._id})
-	const btcPayInvoice = await client.create_invoice({ price: 0.5, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/` })//,itemCode: aliasObject._id})
+	const btcPayInvoice = await client.create_invoice({ price: 0.5, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/` })
 
 	const invoice = new Invoice({
 		url: btcPayInvoice.url,
 		invoiceId: btcPayInvoice.id,
 		user: userObject._id,
 		alias: aliasObject._id,
-		//payment: 
+		plan: { name: plan, duration: chosenPlan.length, price: price }
 	});
 	await invoice.save();
 
@@ -106,12 +112,20 @@ exports.invoiceProcessing = async (req, res, next) => {
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
 	invoice.state = type;
-	await invoice.save();
+	//await invoice.save();
 
 	console.log(`invoice ${invoice.invoiceId} Processing`)
 
 	//TODO: Move this to InvoiceSettled for release
+
 	//retrieve alias, make it a paid based on the invoice data
+	const aliasObject = await Alias.findById(invoice.alias);
+
+	aliasObject.expiration = Date.now() + (86400000 * invoice.plan.duration);
+	aliasObject.paid = true;
+
+	await aliasObject.save();
+	await invoice.save();
 
 	// TODO: Send receipt when fully confirmed.
 
