@@ -65,7 +65,7 @@ exports.createInvoice = async (req, res, next) => {
 	const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)))
 
 	//const btcPayInvoice = await client.create_invoice({price: price, currency: 'USD',itemCode: aliasObject._id})
-	const btcPayInvoice = await client.create_invoice({ price: 0.5, currency: 'USD', redirectUrl: "http://localhost:8080/" })//,itemCode: aliasObject._id})
+	const btcPayInvoice = await client.create_invoice({ price: 0.5, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/` })//,itemCode: aliasObject._id})
 
 	const invoice = new Invoice({
 		url: btcPayInvoice.url,
