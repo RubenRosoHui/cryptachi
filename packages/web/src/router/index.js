@@ -73,7 +73,15 @@ const router = createRouter({
       redirect: '/checkout/details',
       meta: { needsUserInfo: true },
       children: [
-        { path: 'details', component: CheckoutDetails, name: 'CheckoutDetails' },
+        {
+          path: 'details',
+          component: CheckoutDetails,
+          name: 'CheckoutDetails',
+          beforeEnter: (to, _, next) => {
+            to.query.alias && to.query.domain ? next() : next('/');
+          },
+          props: route => ({ alias: route.query.alias, domain: route.query.domain })
+        },
         { path: 'payment', component: CheckoutPayment }
       ]
     },

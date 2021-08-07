@@ -53,7 +53,11 @@
 	</base-dialog>
 	<base-confirm ref="confirmDialog" />
 	<h1 class="hidden">Aliases</h1>
-	<ul id="aliases-list" v-if="aliases.length > 0">
+	<div class="text-align-center" v-if="isLoading">
+		<loading-spinner />
+		<p class="yellow bold margin-top-4">Loading aliases...</p>
+	</div>
+	<ul id="aliases-list" v-else-if="aliases.length > 0">
 		<alias-list-item
 			class="aliases-list-item"
 			v-for="(alias, i) in aliases"
@@ -63,6 +67,8 @@
 			@addRecord="showAddRecordForm"
 			@deleteRecord="deleteRecord"
 			@deleteAlias="deleteAlias"
+			@upgradeAlias="upgradeAlias"
+			@renewAlias="renewAlias"
 		/>
 	</ul>
 	<div id="empty-aliases" v-else>
@@ -79,78 +85,21 @@
 </template>
 
 <script>
+	import { handleResponse } from '../../lib/exception.js';
+
 	import AliasListItem from '../../components/lists/AliasListItem.vue';
 	import SearchAliasField from '../../components/fields/SearchAliasField.vue';
 
 	export default {
 		name: 'AccountAliases',
 		components: { AliasListItem, SearchAliasField },
-		beforeMount() {
-			// TODO: Fetch aliases from server.
-			this.aliases = [
-				{
-					name: 'foster',
-					domain: 'cryptachi.com',
-					paid: false,
-					expiration: new Date('August 4, 2021'),
-					records: [
-						{
-							currency: 'xmr',
-							recipientName: 'foster',
-							recipientAddress: '3rfYZI6WCZFy0ObAwNAO2arxzhj9yZ9R562ziooMotamakxbLpGsvwoOmXCEBw0tDOJLi1KGtytNUtRkYGoQ5uvte6nk8yT',
-							description: 'My monero alias'
-						}
-					]
-				},
-				{
-					name: 'matthew',
-					domain: 'cryptachi.com',
-					paid: true,
-					expiration: new Date('January 19, 2022'),
-					records: [
-						{
-							currency: 'xmr',
-							recipientName: 'matthew',
-							recipientAddress: '3rfYZI6WCZFy0ObAwNAO2arxzhj9yZ9R562ziooMotamakxbLpGsvwoOmXCEBw0tDOJLi1KGtytNUtRkYGoQ5uvte6nk8yT',
-							description: "Matthew's monero alias"
-						},
-						{
-							currency: 'btc',
-							recipientName: 'matthew',
-							recipientAddress: 'btcbbc',
-							description: "Matthew's bitcoin alias"
-						}
-					]
-				},
-				{
-					name: 'reallyreallyreallylongalias',
-					domain: 'cryptachi.com',
-					paid: true,
-					expiration: new Date('December 25, 2021'),
-					records: [
-						{
-							currency: 'xmr',
-							recipientName: 'matthew',
-							recipientAddress: '3rfYZI6WCZFy0ObAwNAO2arxzhj9yZ9R562ziooMotamakxbLpGsvwoOmXCEBw0tDOJLi1KGtytNUtRkYGoQ5uvte6nk8yT',
-							description: "monero alias"
-						},
-						{
-							currency: 'btc',
-							recipientName: 'matthew',
-							recipientAddress: 'bc1JJWJoLmglBLD690e5FTf9WNZdzCovyO6jSwkuoz',
-							description: "Matthew's bitcoin alias"
-						},
-						{
-							currency: 'eth',
-							recipientName: 'matthewreallyreallyreallyreallyreallyreallyreallyreallylongname',
-							recipientAddress: '0x23cb385f1511Ea6B1A2E5B58eCA573Fbc72Bb86E',
-							description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-						}
-					]
-				}
-			];
+		async beforeMount() {
+			this.isLoading = true;
+			await this.loadAliases();
+			this.isLoading = false;
 		},
 		data: () => ({
+			isLoading: false,
 			supportedCurrencies: ['xmr', 'btc', 'eth'],
 			aliases: [],
 			recordForm: {
@@ -190,31 +139,6 @@
 
 				this.recordForm.isVisible = true;
 			},
-			editRecord() {
-				const formFields = this.recordForm.fields;
-
-				const newRecord = {
-					currency: formFields.currency.value,
-					recipientName: formFields.recipientName.value,
-					recipientAddress: formFields.recipientAddress.value,
-					description: formFields.description.value
-				};
-
-				const alias = this.aliases.find(alias => alias.name === formFields.aliasName && alias.domain === formFields.domain);
-				const record = alias.records.find(record => record.currency === formFields.currency.value);
-
-				// TODO: Update on the server side.
-
-				if (record) {
-					record.currency = newRecord.currency;
-					record.recipientName = newRecord.recipientName;
-					record.recipientAddress = newRecord.recipientAddress;
-					record.description = newRecord.description;
-				} else {
-					record.push(newRecord);
-				}
-				this.recordForm.isVisible = false;
-			},
 			showAddRecordForm({ aliasName, domain, currencies }) {
 				if (currencies.length >= this.supportedCurrencies.length) {
 					const confirmDialog = this.$refs.confirmDialog;
@@ -234,7 +158,51 @@
 					this.recordForm.isVisible = true;
 				}
 			},
-			addRecord() {
+			async editRecord() {
+				this.recordForm.isVisible = false;
+				const formFields = this.recordForm.fields;
+
+				const newRecord = {
+					currency: formFields.currency.value,
+					recipientName: formFields.recipientName.value,
+					recipientAddress: formFields.recipientAddress.value,
+					description: formFields.description.value
+				};
+
+				const alias = this.aliases.find(alias => alias.name === formFields.aliasName && alias.domain === formFields.domain);
+				const record = alias.records.find(record => record.currency === formFields.currency.value);
+
+				try {
+					const response = await fetch(`/api/user/aliases/${formFields.aliasName}/records`, {
+						method: 'PATCH',
+						headers: {
+							Authorization: this.$store.getters['jwt'],
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({ ...newRecord, domain: formFields.domain })
+					});
+
+					await handleResponse(response);
+
+					if (record) {
+						record.currency = newRecord.currency;
+						record.recipientName = newRecord.recipientName;
+						record.recipientAddress = newRecord.recipientAddress;
+						record.description = newRecord.description;
+					} else {
+						record.push(newRecord);
+					}
+				} catch(err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
+				}
+			},
+			async addRecord() {
 				this.recordForm.isVisible = false;
 
 				const formFields = this.recordForm.fields;
@@ -248,44 +216,185 @@
 
 				const alias = this.aliases.find(alias => alias.name === formFields.aliasName && alias.domain === formFields.domain);
 
-				// TODO: Add new alias record on the server side.
+				try {
+					const response = await fetch(`/api/user/aliases/${formFields.aliasName}/records`, {
+						method: 'POST',
+						headers: {
+							Authorization: this.$store.getters['jwt'],
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({ ...newRecord, domain: formFields.domain })
+					});
 
-				alias.records.push(newRecord);
+					await handleResponse(response);
+
+					alias.records.push(newRecord);
+				} catch(err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
+				}
 			},
 			deleteRecord({recordCurrency, aliasName, domain}) {
 				this.$refs.confirmDialog.title = 'Delete Record';
 				this.$refs.confirmDialog.content = `You are about to delete the ${recordCurrency.toUpperCase()} record of ${aliasName}.${domain}.`;
-				this.$refs.confirmDialog.confirmCb = () => {
-				const alias = this.aliases.find(alias => alias.name === aliasName && alias.domain === domain);
+				this.$refs.confirmDialog.confirmCb = async () => {
+					const alias = this.aliases.find(alias => alias.name === aliasName && alias.domain === domain);
 
-					// TODO: Delete alias record on the server side.
+					try {
+						const response = await fetch(`/api/user/aliases/${aliasName}/records`, {
+							method: 'DELETE',
+							headers: {
+								Authorization: this.$store.getters['jwt'],
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({ currency: recordCurrency, domain })
+						});
 
-					alias.records = alias.records.filter(record => record.currency !== recordCurrency);
+						await handleResponse(response);
+
+						alias.records = alias.records.filter(record => record.currency !== recordCurrency);
+					} catch(err) {
+						if (err instanceof Error && err.message) {
+							const confirmDialog = this.$refs.confirmDialog;
+							confirmDialog.title = 'Error';
+							confirmDialog.content = err.message;
+							confirmDialog.type = 'ok';
+							confirmDialog.show = true;
+						}
+					}
 				};
 				this.$refs.confirmDialog.show = true;
 			},
-			deleteAlias({aliasName, domain}) {
+			async deleteAlias({aliasName, domain}) {
 				const confirmDialog = this.$refs.confirmDialog;
 				confirmDialog.title = 'Delete Alias';
-				confirmDialog.content = `You are about to delete ${aliasName}.${domain}.`;
-				confirmDialog.confirmCb = () => {
-					// TODO: Delete alias on the server side.
-					this.aliases = this.aliases.filter(alias => `${alias.name}.${alias.domain}` !== `${aliasName}.${domain}`);
-				};
+				confirmDialog.content = `You are about to delete ${aliasName}.${domain}. This action cannot be undone. Are you sure?`;
+
+				try {
+					confirmDialog.confirmCb = async () => {
+						const query = `domain=${domain}`
+						const response = await fetch(`/api/user/aliases/${aliasName}?${query}`, {
+							method: 'DELETE',
+							headers: { Authorization: this.$store.getters['jwt'] }
+						});
+
+						await handleResponse(response);
+						const jsonResponse = await response.json();
+
+						console.log(jsonResponse.message);
+
+						this.aliases = this.aliases.filter(alias => `${alias.name}.${alias.domain}` !== `${aliasName}.${domain}`);
+					};
+				} catch(err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
+				}
+
 				confirmDialog.show = true;
 			},
-			addAlias() {
+			async addAlias() {
 				this.aliasForm.isVisible = false;
 
-				// TODO: Add and check the server if alias is available.
+				const name = this.aliasForm.fields.aliasName;
+				const domain = this.aliasForm.fields.domain;
+				const aliasType = this.aliasForm.fields.type;
 
-				this.aliases.push({
-					name: this.aliasForm.fields.aliasName,
-					domain: this.aliasForm.fields.domain,
-					paid: this.aliasForm.fields.type === 'free' ? false : true,
-					expiration: new Date(Date.now() + 2592000000), // 30 days from now.
-					records: []
+				if (aliasType === 'upgraded') {
+					return this.$router.push({
+						path: '/checkout/details',
+						query: { alias: name, domain }
+					})
+				}
+
+				try {
+					const query = `domain=${domain}`;
+					const response = await fetch(`/api/user/aliases/${name}?${query}`, {
+						method: 'POST',
+						headers: { Authorization: this.$store.getters['jwt'] }
+					});
+
+					await handleResponse(response);
+
+					const jsonResponse = await response.json();
+					const newAlias = jsonResponse.alias;
+
+					this.aliases.push({
+						name: newAlias.alias,
+						domain: newAlias.domain,
+						paid: newAlias.paid,
+						expiration: new Date(newAlias.expiration),
+						records: newAlias.records
+					});
+				} catch(err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
+				}
+			},
+			async renewAlias({ alias, domain }) {
+				// TODO: This must be captcha protected.
+				try {
+					const response = await fetch(`/api/user/aliases/${alias}/renew`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: this.$store.getters['jwt']
+						},
+						body: JSON.stringify({ domain })
+					});
+
+					await handleResponse(response);
+
+					const jsonResponse = await response.json();
+					const newExpiration = jsonResponse.alias.expiration;
+
+					const theAlias = this.aliases.find(a => a.alias === alias && a.domain === domain);
+					theAlias.expiration = new Date(newExpiration);
+				} catch (err) {
+					if (err instanceof Error && err.message) {
+						const confirmDialog = this.$refs.confirmDialog;
+						confirmDialog.title = 'Error';
+						confirmDialog.content = err.message;
+						confirmDialog.type = 'ok';
+						confirmDialog.show = true;
+					}
+				}
+			},
+			upgradeAlias({ alias, domain }) {
+				this.$router.push({
+					path: '/checkout/details',
+					query: { alias, domain }
 				});
+			},
+			async loadAliases() {
+				const response = await fetch('/api/user/aliases', {
+					headers: { 'Authorization': this.$store.getters['jwt'] }
+				});
+
+				await handleResponse(response);
+
+				const jsonResponse = await response.json();
+
+				this.aliases = jsonResponse.aliases.map(alias => ({
+					...alias,
+					id: alias._id,
+					name: alias.alias,
+					expiration: new Date(alias.expiration)
+				}));
 			}
 		}
 	}

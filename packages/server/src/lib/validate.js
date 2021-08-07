@@ -1,5 +1,7 @@
 const { check, body, param, query, oneOf, validationResult } = require('express-validator');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
+
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js')
@@ -88,6 +90,7 @@ exports.password = function({ isStrong=false } = { isStrong:false }) {
 }
 
 exports.confirmPassword = () => body('confirmPassword')
+  .exists(existsOpts).withMessage('Confirm Password is required.')
   .custom((value, { req }) => {
     if (value !== req.body.password) throw "Passwords don't match";
     return true;
@@ -154,7 +157,7 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
 
       const aliasFound = await Alias.findOne({ alias: value, domain: req[checkDomainValueIn].domain, user: req.user.id });
 
-      if (!aliasFound) throw errorLib.authenticationError('You do not own this alias. From validator.');
+      if (!aliasFound) throw errorLib.authenticationError('You do not own this alias.');
 
       return true;
     });
@@ -346,3 +349,24 @@ exports.message = () => body('message')
   .trim()
   .isLength({ max: 800 }).withMessage('Message cannot exceed 800 characters.')
   .escape();
+
+exports.description = () => body('description')
+  .optional({ checkFalsy: true })
+  .trim()
+  .isLength({ max: 50 }).withMessage('Description cannot exceed 50 characters.');
+
+exports.oldPassword = () => body('oldPassword')
+  .exists(existsOpts).withMessage('Old password is required.')
+  .trim()
+  .isLength({ max: 100 }).withMessage('Old password cannot exceed 100 characters.')
+  .bail()
+  .custom(async (value, {req}) => {
+    const user = await User.findById(req.user.id);
+
+    if (!user) throw { type: 'notFoundError', msg: 'User not found.' };
+
+    const passwordsMatch = await bcrypt.compare(value, user.password);
+    if (!passwordsMatch) throw { type: 'unprocessableEntityError', msg: 'Old password is invalid.' };
+
+    return true;
+  });

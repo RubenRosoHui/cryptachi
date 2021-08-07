@@ -31,43 +31,37 @@ exports.deleteRecord = async function (aliasObject, currency) {
 	aliasObject.records = aliasObject.records.filter(record => record.currency != currency);//.push({currency:currency,recipientAddress:address});
 	await aliasObject.save();
 }
-exports.addRecord = async function (aliasObject, currency, recipientAddress, recipientName) {
+exports.addRecord = async function (aliasObject, currency, recipientAddress, recipientName, description) {
 
 	//DNSimple API code
 	const id = await dnsimpleLib.addRecord(aliasObject.alias, aliasObject.domain, currency, recipientAddress, recipientName);
   console.log(id); // 20 or 30
 	//Add record
-	aliasObject.records.push({ dnsimpleID: id, currency, recipientAddress, recipientName });
+	aliasObject.records.push({ dnsimpleID: id, currency, recipientAddress, recipientName, description });
 	await aliasObject.save();
 }
 exports.addAlias = async function (user, alias, domain) {
-	//today + 30 days
-	let expiry = (Date.now() + (86400000 * 30));
-	// TODO: Remove validation checks. They belong to the validation step.
-	let aliasObject = await Alias.findOne({ alias: alias, domain: domain });
-	if (aliasObject) {
-		//alias exists, does it have a user?
-		if (aliasObject.user) {
-			throw errorLib.unauthorizedAccessError("Alias already exists");
-		}
-		else {
-			aliasObject.user = user;
-			aliasObject.domain = domain;
-			aliasObject.expiration = expiry
-			user.aliases.push(aliasObject);
+	const expiry = Date.now() + (86400000 * 30); // today + 30 days
 
-			return Promise.all([aliasObject.save(), user.save()]);
-		}
-	}
-	//alias does not exist, create it
-	else {
-		aliasObject = new Alias({
+  const aliasFound = await Alias.findOne({ alias: alias, domain: domain });
+
+  let newAlias;
+  if (aliasFound) {
+    newAlias = aliasFound;
+    newAlias.user = user._id;
+    newAlias.expiration = expiry;
+  } else {
+		newAlias = new Alias({
 			alias: alias,
-			user: user,
+			user: user._id,
 			domain: domain,
 			expiration: expiry
 		});
-		user.aliases.push(aliasObject);
-		return Promise.all([aliasObject.save(),user.save()]);
-	}
+  }
+
+	user.aliases.push(newAlias._id);
+
+  await Promise.all([newAlias.save(), user.save()]);
+
+	return newAlias;
 }

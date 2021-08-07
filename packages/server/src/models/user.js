@@ -8,6 +8,8 @@ const UserSchema = mongoose.Schema({
 	resetTokenExpiration: Date,
 	isEmailConfirmed: { type: Boolean, default: false },
 	isEmailConfirmedToken: String,
+	requireTwoFactor: { type: Boolean, default: false },
+	twoFactorSecret: String,
 	aliases: [
 		{
 			type: mongoose.Schema.Types.ObjectId,

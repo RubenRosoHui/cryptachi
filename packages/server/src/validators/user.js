@@ -62,6 +62,7 @@ exports.addRecord = [
   validate.currency(),
   validate.recipientAddress(),
   validate.recipientName(),
+  validate.description(),
   validate.checkValidationResults
 ];
 
@@ -84,3 +85,33 @@ exports.deleteRecord = [
   }),
   validate.checkValidationResults
 ];
+
+exports.editRecord = [
+  validate.alias({
+    checkValueIn: 'param',
+    checkDomainValueIn: 'body',
+    allowTaken: true,
+    allowExisting: true,
+    mustExist: true,
+    checkOwnership: true
+  }),
+  validate.domain({
+    checkValueIn: 'body',
+    checkAliasValueIn: 'params'
+  }),
+  validate.currency({
+    allowExisting: true,
+    mustExist: true
+  }),
+  validate.recipientAddress(),
+  validate.recipientName(),
+  validate.description(),
+  validate.checkValidationResults
+];
+
+exports.changePassword = [
+  validate.oldPassword(),
+  validate.password(),
+  validate.confirmPassword(),
+  validate.checkValidationResults
+]
