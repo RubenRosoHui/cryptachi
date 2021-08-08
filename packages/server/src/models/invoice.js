@@ -5,7 +5,7 @@ const InvoiceSchema = mongoose.Schema({
 	invoiceId: String,
 	user: { type: mongoose.Schema.Types.ObjectID, ref: 'User', required: true }, //required: true },
 	alias: { type: mongoose.Schema.Types.ObjectID, ref: 'Alias', required: true }, //required: true },
-	state: {type: String},
+	state: { type: String, default: "InvoiceCreated" },
 	plan: {
 		duration: Number,
 		name: String,
