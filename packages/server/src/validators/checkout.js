@@ -1,6 +1,7 @@
 const validate = require('../lib/validate.js');
 const { check, body, param, query, oneOf,header, validationResult } = require('express-validator');
 const crypto = require('crypto')
+const errorLib = require('../lib/error.js')
 
 exports.webhooks = [
 	header('btcpay-sig').custom((signature, {req}) => {
@@ -14,8 +15,8 @@ exports.webhooks = [
 			throw errorLib.authenticationError('You do not have permission to access this route');
 		}
 		return true;
-	})
-
+	}),
+  validate.checkValidationResults
 ]
 
 exports.postPaymentIntent = [
