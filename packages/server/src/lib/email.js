@@ -109,3 +109,30 @@ exports.sendPasswordChangeNotification = function(to) {
 		`
   );
 }
+
+exports.sendProcessingConfirmation = function(to) {
+
+  module.exports.sendEmail(
+    'mail@cryptachi.com',
+    to,
+    'Purchase Confirmation - Cryptachi.com',
+    `
+			<html>
+				<p>We have received you payment, we will let you know once confirmed</p>
+			</html>
+		`
+  );
+}
+exports.sendPurchaseConfirmation = function(to) {
+
+  module.exports.sendEmail(
+    'mail@cryptachi.com',
+    to,
+    'Purchase Confirmation - Cryptachi.com',
+    `
+			<html>
+				<p>Thank you, your purchase is now available</p>
+			</html>
+		`
+  );
+}
