@@ -87,6 +87,7 @@ exports.createInvoice = async (req, res, next) => {
 		url: btcPayInvoice.url,
 	})
 }
+
 exports.invoiceInvalid = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	console.log('invoice Invalid', req.body, req.headers)
@@ -97,9 +98,9 @@ exports.invoiceInvalid = async (req, res, next) => {
 
 	res.status(200).json({ message: 'success' });
 }
-exports.invoiceExpired = async (req, res, next) => {
+const invoiceExpired = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
-	console.log('invoice Invalid', req.body, req.headers)
+	console.log('invoice Expired', req.body, req.headers)
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
 	invoice.state = type;
@@ -107,7 +108,7 @@ exports.invoiceExpired = async (req, res, next) => {
 
 	res.status(200).json({ message: 'success' });
 }
-exports.invoiceProcessing = async (req, res, next) => {
+const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
@@ -133,7 +134,7 @@ exports.invoiceProcessing = async (req, res, next) => {
 	//console.log('invoice processing',req.body,req.headers)
 	res.status(200).json({ message: 'success' });
 }
-exports.invoiceSettled = async (req, res, next) => {
+const invoiceSettled = async (req, res, next) => {
 	//console.log('invoice settled',req.body,req.headers)
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
@@ -149,4 +150,43 @@ exports.invoiceSettled = async (req, res, next) => {
 
 
 	res.status(200).json({ message: 'success' });
+}
+
+const invoiceCreated = async (req, res, next) => {
+	const { invoiceId } = req.body;
+	console.log(req.body);
+	res.status(200).json({ message: 'success' });
+}
+
+exports.test = async (req, res, next) => {
+	const { invoiceId, type } = req.body;
+	console.log('test')
+	switch (type) {
+		case 'InvoiceCreated':
+			console.log('InvoiceCreated');
+			invoiceCreated(req, res, next);
+			break;
+		case 'InvoiceReceivedPayment':
+			console.log('InvoiceReceivedPayment');
+
+			res.status(200).json({ message: 'success' });
+			break;
+		case 'InvoiceProcessing':
+			console.log('InvoiceProcessing');
+			invoiceProcessing(req, res, next);
+			break;
+		case 'InvoiceSettled':
+			console.log('InvoiceSettled');
+			invoiceSettled(req, res, next);
+			break;
+		case 'InvoiceExpired':
+			console.log('InvoiceExpired');
+			invoiceExpired(req, res, next);
+			break;
+		default:
+			console.log(type)
+			console.log('no selection')
+			res.status(200).json({ message: 'success' });
+			break;
+	}
 }
