@@ -88,15 +88,13 @@ exports.createInvoice = async (req, res, next) => {
 	})
 }
 
-exports.invoiceInvalid = async (req, res, next) => {
+const invoiceInvalid = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	console.log('invoice Invalid', req.body, req.headers)
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
 	invoice.state = type;
 	await invoice.save();
-
-	res.status(200).json({ message: 'success' });
 }
 const invoiceExpired = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
@@ -105,8 +103,6 @@ const invoiceExpired = async (req, res, next) => {
 
 	invoice.state = type;
 	await invoice.save();
-
-	res.status(200).json({ message: 'success' });
 }
 const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
@@ -130,30 +126,23 @@ const invoiceProcessing = async (req, res, next) => {
 
 	// TODO: Send receipt when fully confirmed.
 
-
-	//console.log('invoice processing',req.body,req.headers)
-	res.status(200).json({ message: 'success' });
 }
 const invoiceSettled = async (req, res, next) => {
-	//console.log('invoice settled',req.body,req.headers)
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
 	invoice.state = type;
 	await invoice.save();
 
-	res.status(200).json({ message: 'success' });
 }
 
 const invoiceCreated = async (req, res, next) => {
 	const { invoiceId } = req.body;
 	console.log(req.body);
-	res.status(200).json({ message: 'success' });
 }
 
 exports.webhooks = async (req, res, next) => {
-	const { invoiceId, type } = req.body;
-	console.log('test')
+	const { type } = req.body;
 	switch (type) {
 		case 'InvoiceCreated':
 			console.log('InvoiceCreated');
@@ -162,7 +151,6 @@ exports.webhooks = async (req, res, next) => {
 		case 'InvoiceReceivedPayment':
 			console.log('InvoiceReceivedPayment');
 
-			res.status(200).json({ message: 'success' });
 			break;
 		case 'InvoiceProcessing':
 			console.log('InvoiceProcessing');
@@ -179,7 +167,7 @@ exports.webhooks = async (req, res, next) => {
 		default:
 			console.log(type)
 			console.log('no selection')
-			res.status(200).json({ message: 'success' });
 			break;
 	}
+	res.status(200).json({ message: 'success' });
 }
