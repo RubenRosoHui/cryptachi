@@ -31,6 +31,7 @@ exports.checkExpiredAliases = async (req, res, next) => {
 	//find all expired, send email and delete
 	let expiredAliases = await Alias.find({ expiration: { $lte: expiry/*Date.now()*/ } }, async (err, aliases) => {
 
+		//TODO: prevent alias from expiring at this moment if there is currently an active invoice
 		aliases.map(async (alias) => {
 			let user = await User.findById(alias.user);
 			emailLib.sendAliasExpiry(user.email);

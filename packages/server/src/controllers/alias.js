@@ -11,6 +11,7 @@ exports.queryAliases = async (req, res, next) => {
 		//find all currently taken domains
 		let aliases = names.split(',');
 
+		//TODO: aliases with an active invoice should not show up here
 		const records = await Alias.find({ alias: aliases, domain: domain, user: { "$ne": null } }).select('alias -_id');
 
 		const takenAliases = records.map(r => r.alias);

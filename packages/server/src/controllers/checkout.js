@@ -5,6 +5,7 @@ const crypto = require('crypto')
 const Invoice = require('../models/invoice.js');
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
+const errorLib = require('../lib/error.js')
 
 const paidPlans = {
 	oneYear: {
@@ -51,39 +52,81 @@ exports.createInvoice = async (req, res, next) => {
 
 	const { alias, domain, email, plan } = req.body;
 
+	try {
+		const userObject = await User.findOne({ email: email })
+		let aliasObject = await Alias.findOne({ alias: alias, domain: domain }).populate("invoice")
 
-	const userObject = await User.findOne({ email: email })
-	const aliasObject = await Alias.findOne({ alias: alias, domain: domain })
+		if (aliasObject) {
+			//does user or nobody own this alias?
+			if (aliasObject.user && !aliasObject.user.equals(userObject._id)) {
+			//if (!aliasObject.user || aliasObject.user.equals(userObject._id)) {
+				throw errorLib.badRequestError('alias is owned by someone already')
+			}
+		}
+		else {
+			//create the alias as no one has it
+			//do not assign user however
+			console.log('create alias')
+			aliasObject = new Alias({
+				alias: alias,
+				domain: domain,
+			});
+		}
 
-	const BTCPAY_URL = process.env.BTCPAY_URL;
-	const BTCPAY_KEY = process.env.BTCPAY_KEY;
-	//const MERCHANT = 'Bq2YhaoF81Tz4rhMdky9yxQTy3s9j3WLeB38b3wgSSwR'
-	const keypair = btcpay.crypto.load_keypair(new Buffer.from(BTCPAY_KEY, 'hex'))
-	const client = new btcpay.BTCPayClient(BTCPAY_URL, keypair, { merchant: 'Cryptachi' })
+		const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'))
+		const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' })
 
-	const chosenPlan = paidPlans[plan];
-	//default price
-	const normalPrice = (chosenPlan.price - (chosenPlan.price * (chosenPlan.percentDiscount / 100)))
-	//price after special discount if any
-	const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)))
+		const chosenPlan = paidPlans[plan];
+		//does plan exist?
+		if (!chosenPlan) throw errorLib.badRequestError('Plan does not exist');
 
-	//TODO: switch price back for release
-	//const btcPayInvoice = await client.create_invoice({price: price, currency: 'USD',itemCode: aliasObject._id})
-	const btcPayInvoice = await client.create_invoice({ price: 0.5, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/` })
+		//does alias currently have an active invoice?
+		//redirect to that invoice
+		if (aliasObject.invoice) //throw errorLib.conflictError('There is currently an invoice active for this alias')
+		{
+			return res.status(200).json({
+				message: 'Invoice Already exists, redirecting',
+				url: aliasObject.invoice.url,
+			})
+		}
 
-	const invoice = new Invoice({
-		url: btcPayInvoice.url,
-		invoiceId: btcPayInvoice.id,
-		user: userObject._id,
-		alias: aliasObject._id,
-		plan: { name: plan, duration: chosenPlan.length, price: price }
-	});
-	await invoice.save();
+		//default price
+		const normalPrice = (chosenPlan.price - (chosenPlan.price * (chosenPlan.percentDiscount / 100)))
+		//price after special discount if any
+		const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)))
 
-	res.status(200).json({
-		message: 'Invoice created successfully',
-		url: btcPayInvoice.url,
-	})
+		const btcPayInvoice = await client.create_invoice({ price: price, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/` })
+
+		const invoice = new Invoice({
+			url: btcPayInvoice.url,
+			invoiceId: btcPayInvoice.id,
+			user: userObject._id,
+			alias: aliasObject._id,
+			plan: { name: plan, duration: chosenPlan.length, price: price }
+		});
+		aliasObject.invoice = invoice._id;
+		userObject.invoices.push(invoice._id);
+
+		//TODO: we need to account for the possibility of a user upgrading a few minutes before free alias expires
+		//perhaps if expiration is less than 24 hours away then set it to 24 hours?
+		//this also introduces a problem of being able to keep a subscription going by creatingg invoices though
+		// THIS --> //PERHAPs is there an active invoice for this domain at the moment?
+		//PERHAPS a limit on how many invoices per alias a day
+		//PERHAPS if invoice expires, revert expiration back to what it was
+
+		//TODO: Figure out how to allow paid domains to be renewed
+		//send reminder within last month and allow them to renew?
+
+		Promise.all([invoice.save(), userObject.save(), aliasObject.save()])
+
+		res.status(200).json({
+			message: 'Invoice created successfully',
+			url: btcPayInvoice.url,
+		})
+	}
+	catch (err) {
+		next(err);
+	}
 }
 
 const invoiceInvalid = async (req, res, next) => {
@@ -97,41 +140,51 @@ const invoiceInvalid = async (req, res, next) => {
 const invoiceExpired = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	console.log('invoice Expired', req.body, req.headers)
-	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
+	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("alias")
+	const aliasObject = await Alias.findById(invoice.alias);
+
+	aliasObject.invoice = null;
 
 	invoice.state = type;
 	await invoice.save();
+	await aliasObject.save();
 }
 const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
-	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
+	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("alias")
 
 	invoice.state = type;
-	//await invoice.save();
+	await invoice.save();
 
 	console.log(`invoice ${invoice.invoiceId} Processing`)
 
-	//TODO: Move this to InvoiceSettled for release
-
-	//retrieve alias, make it a paid based on the invoice data
-	const aliasObject = await Alias.findById(invoice.alias);
-
-	aliasObject.expiration = Date.now() + (86400000 * invoice.plan.duration);
-	aliasObject.paid = true;
-
-	await aliasObject.save();
-	await invoice.save();
-
-	// TODO: Send receipt when fully confirmed.
+	// TODO: Send receipt letting user know their order is pending
 
 }
 const invoiceSettled = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
+	const aliasObject = await Alias.findById(invoice.alias);
+
+	aliasObject.invoice = null;
+	//if its a paid domain already, expiry shouldnt be based on current date but rather expiration date of their previous plan
+	aliasObject.expiration = Date.now() + (86400000 * invoice.plan.duration);
+	aliasObject.paid = true;
+
+	//if alias doesnt have user, assign it
+	if(!aliasObject.user){
+		const userObject = await User.findById(invoice.user);
+		aliasObject.user = invoice.user;
+		userObject.aliases.push(aliasObject._id)
+
+		await userObject.save();
+	}
+
+	//TODO: Let user know their order is ready
 
 	invoice.state = type;
+	await aliasObject.save();
 	await invoice.save();
-
 }
 
 const invoiceCreated = async (req, res, next) => {
@@ -146,21 +199,26 @@ exports.webhooks = async (req, res, next) => {
 			console.log('InvoiceCreated');
 			invoiceCreated(req, res, next);
 			break;
-		case 'InvoiceReceivedPayment':
-			console.log('InvoiceReceivedPayment');
 
+		//Check if payment occured afterExpiration,
+		//then see if it is possible to allow the
+		//transaction to go through anyways
+		case 'InvoiceReceivedPayment':
+			console.log(req.body);
 			break;
 		case 'InvoiceProcessing':
-			console.log('InvoiceProcessing');
 			invoiceProcessing(req, res, next);
 			break;
 		case 'InvoiceSettled':
-			console.log('InvoiceSettled');
 			invoiceSettled(req, res, next);
 			break;
+		//Gets called when payment doesnt go through or payment is double spent 
 		case 'InvoiceExpired':
-			console.log('InvoiceExpired');
 			invoiceExpired(req, res, next);
+			break;
+		//invoice is invalid, undo any changes weve made to the user
+		case 'InvoiceInvalid':
+			invoiceInvalid(req, res, next);
 			break;
 		default:
 			console.log(type)
