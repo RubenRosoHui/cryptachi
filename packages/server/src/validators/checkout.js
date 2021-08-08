@@ -4,6 +4,8 @@ const crypto = require('crypto')
 const errorLib = require('../lib/error.js')
 
 exports.webhooks = [
+	//TODO: Validators (doesEmailExist? doesUserOwnAlias? doesPlanExist? ToLowerCase)
+
 	header('btcpay-sig').custom((signature, {req}) => {
 
 		const hmac = crypto.createHmac('sha256',process.env.WEBHOOK_SECRET)

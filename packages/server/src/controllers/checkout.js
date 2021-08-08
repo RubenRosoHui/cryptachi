@@ -2,7 +2,6 @@ const fetch = require('node-fetch');
 const btcpay = require('btcpay');
 const crypto = require('crypto')
 
-//const Purchase = require('../models/purchase.js');
 const Invoice = require('../models/invoice.js');
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
@@ -52,7 +51,6 @@ exports.createInvoice = async (req, res, next) => {
 
 	const { alias, domain, email, plan } = req.body;
 
-	//TODO: Validators (doesEmailExist? doesUserOwnAlias? doesPlanExist? ToLowerCase)
 
 	const userObject = await User.findOne({ email: email })
 	const aliasObject = await Alias.findOne({ alias: alias, domain: domain })
