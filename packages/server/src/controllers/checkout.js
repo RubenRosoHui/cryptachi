@@ -142,13 +142,6 @@ const invoiceSettled = async (req, res, next) => {
 	invoice.state = type;
 	await invoice.save();
 
-
-	//TODO: create a validator that compares the btcpay-sig to the HMAC256 of the body's bytes (current code below will always fail)
-	//console.log(req.headers['btcpay-sig'])
-	//console.log(crypto.createHmac('sha256', '2DNzs94DU6oqcqBaJKYQVqWCbS59').update(Buffer.from(JSON.stringify(req.body))).digest('base64'))
-
-
-
 	res.status(200).json({ message: 'success' });
 }
 
@@ -158,7 +151,7 @@ const invoiceCreated = async (req, res, next) => {
 	res.status(200).json({ message: 'success' });
 }
 
-exports.test = async (req, res, next) => {
+exports.webhooks = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	console.log('test')
 	switch (type) {

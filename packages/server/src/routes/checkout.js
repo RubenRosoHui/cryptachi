@@ -6,6 +6,6 @@ const validator = require('../validators/checkout.js');
 
 router.post('/create-invoice', controller.createInvoice)
 
-router.post('/webhooks/test', validator.webhooks, controller.test)
+router.post('/webhooks', validator.webhooks, controller.webhooks)
 
 module.exports = router;
