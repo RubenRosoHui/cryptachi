@@ -6,6 +6,7 @@ const Invoice = require('../models/invoice.js');
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js')
+const emailLib = require('../lib/email.js')
 
 const paidPlans = {
 	oneYear: {
@@ -59,7 +60,7 @@ exports.createInvoice = async (req, res, next) => {
 		if (aliasObject) {
 			//does user or nobody own this alias?
 			if (aliasObject.user && !aliasObject.user.equals(userObject._id)) {
-			//if (!aliasObject.user || aliasObject.user.equals(userObject._id)) {
+				//if (!aliasObject.user || aliasObject.user.equals(userObject._id)) {
 				throw errorLib.badRequestError('alias is owned by someone already')
 			}
 		}
@@ -84,6 +85,11 @@ exports.createInvoice = async (req, res, next) => {
 		//redirect to that invoice
 		if (aliasObject.invoice) //throw errorLib.conflictError('There is currently an invoice active for this alias')
 		{
+			//prevent possibility of user receiving a different users invoice
+			if (!aliasObject.invoice.user.equals(userObject._id)) {
+				throw errorLib.conflictError('someone is currently buying this!')
+			}
+
 			return res.status(200).json({
 				message: 'Invoice Already exists, redirecting',
 				url: aliasObject.invoice.url,
@@ -106,13 +112,6 @@ exports.createInvoice = async (req, res, next) => {
 		});
 		aliasObject.invoice = invoice._id;
 		userObject.invoices.push(invoice._id);
-
-		//TODO: we need to account for the possibility of a user upgrading a few minutes before free alias expires
-		//perhaps if expiration is less than 24 hours away then set it to 24 hours?
-		//this also introduces a problem of being able to keep a subscription going by creatingg invoices though
-		// THIS --> //PERHAPs is there an active invoice for this domain at the moment?
-		//PERHAPS a limit on how many invoices per alias a day
-		//PERHAPS if invoice expires, revert expiration back to what it was
 
 		//TODO: Figure out how to allow paid domains to be renewed
 		//send reminder within last month and allow them to renew?
@@ -151,40 +150,38 @@ const invoiceExpired = async (req, res, next) => {
 }
 const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
-	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("alias")
+	console.log('invoice Processing', req.body, req.headers)
+	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("user")
 
 	invoice.state = type;
 	await invoice.save();
 
-	console.log(`invoice ${invoice.invoiceId} Processing`)
-
-	// TODO: Send receipt letting user know their order is pending
-
+	emailLib.sendProcessingConfirmation(invoice.user.email)
 }
 const invoiceSettled = async (req, res, next) => {
+	console.log('invoiceSettled')
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 	const aliasObject = await Alias.findById(invoice.alias);
+	const userObject = await User.findById(invoice.user);
 
 	aliasObject.invoice = null;
-	//if its a paid domain already, expiry shouldnt be based on current date but rather expiration date of their previous plan
+	//TODO: if its a paid domain already, expiry shouldnt be based on current date but rather expiration date of their previous plan
 	aliasObject.expiration = Date.now() + (86400000 * invoice.plan.duration);
 	aliasObject.paid = true;
 
 	//if alias doesnt have user, assign it
-	if(!aliasObject.user){
-		const userObject = await User.findById(invoice.user);
+	if (!aliasObject.user) {
 		aliasObject.user = invoice.user;
 		userObject.aliases.push(aliasObject._id)
-
-		await userObject.save();
 	}
 
-	//TODO: Let user know their order is ready
+	emailLib.sendPurchaseConfirmation(userObject.email)
 
 	invoice.state = type;
-	await aliasObject.save();
-	await invoice.save();
+
+	Promise.all([aliasObject.save(), invoice.save(), userObject.save()]);
+
 }
 
 const invoiceCreated = async (req, res, next) => {
@@ -200,7 +197,7 @@ exports.webhooks = async (req, res, next) => {
 			invoiceCreated(req, res, next);
 			break;
 
-		//Check if payment occured afterExpiration,
+		//REVIEW: Check if payment occured afterExpiration,
 		//then see if it is possible to allow the
 		//transaction to go through anyways
 		case 'InvoiceReceivedPayment':
@@ -216,7 +213,7 @@ exports.webhooks = async (req, res, next) => {
 		case 'InvoiceExpired':
 			invoiceExpired(req, res, next);
 			break;
-		//invoice is invalid, undo any changes weve made to the user
+		//invoice is invalid, seems to only be called if BTCpay server admin intervenes
 		case 'InvoiceInvalid':
 			invoiceInvalid(req, res, next);
 			break;

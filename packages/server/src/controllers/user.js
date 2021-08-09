@@ -80,9 +80,7 @@ exports.deleteAlias = async (req, res, next) => {
 
 	try {
 		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: req.user.id });
-
-		//TODO: ALIAS should not be deletable if there is an active invoice
-
+		
 		await MongoLib.deleteAlias(aliasObject);
 
 		return res.status(200).json({ message: "Alias deleted successfully" });
