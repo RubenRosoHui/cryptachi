@@ -63,6 +63,11 @@ exports.createInvoice = async (req, res, next) => {
 				//if (!aliasObject.user || aliasObject.user.equals(userObject._id)) {
 				throw errorLib.badRequestError('alias is owned by someone already')
 			}
+			if(aliasObject.paid){
+				if(Date.now() < aliasObject.expiration.valueOf() - (86400000 * 60)){
+					throw errorLib.conflictError('you cannot renew yet')
+				}
+			}
 		}
 		else {
 			//create the alias as no one has it
@@ -112,9 +117,6 @@ exports.createInvoice = async (req, res, next) => {
 		});
 		aliasObject.invoice = invoice._id;
 		userObject.invoices.push(invoice._id);
-
-		//TODO: Figure out how to allow paid domains to be renewed
-		//send reminder within last month and allow them to renew?
 
 		Promise.all([invoice.save(), userObject.save(), aliasObject.save()])
 
@@ -166,10 +168,14 @@ const invoiceSettled = async (req, res, next) => {
 	const userObject = await User.findById(invoice.user);
 
 	aliasObject.invoice = null;
-	//TODO: if its a paid domain already, expiry shouldnt be based on current date but rather expiration date of their previous plan
-	aliasObject.expiration = Date.now() + (86400000 * invoice.plan.duration);
-	aliasObject.paid = true;
 
+	if (aliasObject.paid) {
+		aliasObject.expiration = aliasObject.expiration.valueOf() + (86400000 * invoice.plan.duration);//aliasObject.expiration + (86400000 * invoice.plan.duration);
+	}
+	else {
+		aliasObject.expiration = Date.now() + (86400000 * invoice.plan.duration);
+		aliasObject.paid = true;
+	}
 	//if alias doesnt have user, assign it
 	if (!aliasObject.user) {
 		aliasObject.user = invoice.user;
