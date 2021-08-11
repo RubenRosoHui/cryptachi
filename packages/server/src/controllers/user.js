@@ -19,6 +19,19 @@ exports.getAliases = async (req, res, next) => {
 	}
 }
 
+exports.getInvoices = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.user.id).populate("invoices")
+		const invoices = user.invoices
+		const validInvoices = invoices.filter(invoice => invoice.state == 'InvoiceSettled' || invoice.state == 'InvoiceProcessing');
+
+		res.status(200).json(validInvoices);//validInvoices);
+	}
+	catch (err) {
+		next(errorLib.errorWrapper(err));
+	}
+}
+
 exports.renewAlias = async (req, res, next) => {
 	const alias = req.params.alias;
 	const domain = req.body.domain;
@@ -80,7 +93,7 @@ exports.deleteAlias = async (req, res, next) => {
 
 	try {
 		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: req.user.id });
-		
+
 		await MongoLib.deleteAlias(aliasObject);
 
 		return res.status(200).json({ message: "Alias deleted successfully" });
@@ -99,7 +112,7 @@ exports.addRecord = async (req, res, next) => {
 
 		// Is domain on the free plan and already has 1 record?
 		if (!aliasObject.paid && aliasObject.records.length >= 1) throw errorLib.unauthorizedAccessError("You Cannot add more records unless you upgrade this alias");
-		
+
 		await MongoLib.addRecord(aliasObject, currency, recipientAddress, recipientName, description);
 
 		return res.status(200).json({ message: "Alias record created successfully" });
@@ -160,7 +173,7 @@ exports.retrieveTwoFactorAuthSecret = async (req, res, next) => {
 		if (user.requireTwoFactor) throw errorLib.unauthorizedAccessError('You cannot view the secret for 2FA');
 
 		const secret = authenticator.generateSecret();
-		const otpauthurl = authenticator.keyuri(user.email,'Cryptachi',secret);
+		const otpauthurl = authenticator.keyuri(user.email, 'Cryptachi', secret);
 
 		user.twoFactorSecret = secret;
 		await user.save();
@@ -177,14 +190,14 @@ exports.disableTwoFactorAuth = async (req, res, next) => {
 		const user = await User.findById(req.user.id);
 
 		if (!user.requireTwoFactor) throw errorLib.unauthorizedAccessError("2FA is already disabled!")
-		
-		const verified = authenticator.check(authCode,user.twoFactorSecret);
-		if(verified){
+
+		const verified = authenticator.check(authCode, user.twoFactorSecret);
+		if (verified) {
 			user.requireTwoFactor = false;
 			user.twoFactorSecret = null;
 			await user.save();
 		}
-		else{
+		else {
 			throw errorLib.authenticationError('You did not enter the correct Auth code')
 		}
 
@@ -195,23 +208,23 @@ exports.disableTwoFactorAuth = async (req, res, next) => {
 }
 
 exports.changePassword = async (req, res, next) => {
-  const password = req.body.password;
+	const password = req.body.password;
 
-  try {
-    const user = await User.findById(req.user.id);
+	try {
+		const user = await User.findById(req.user.id);
 
 		const salt = await bcrypt.genSalt(10);
 		user.password = await bcrypt.hash(password, salt);
 
-    await user.save();
+		await user.save();
 
-    // No need to await.
-    emailLib.sendPasswordChangeNotification(user.email);
+		// No need to await.
+		emailLib.sendPasswordChangeNotification(user.email);
 
 		res.status(200).json({ message: 'Password changed successfully.' });
-  } catch(err) {
-    next(errorLib.errorWrapper(err));
-  }
+	} catch (err) {
+		next(errorLib.errorWrapper(err));
+	}
 }
 
 //user confirms their 2fa by sending the current auth code on their phone
@@ -224,7 +237,7 @@ exports.enableTwoFactorAuth = async (req, res, next) => {
 		if (user.requireTwoFactor) throw errorLib.unauthorizedAccessError("You've already enabled 2FA")
 		if (!user.twoFactorSecret) throw errorLib.unauthorizedAccessError("You cannot activate 2FA at this time")
 
-		const verified = authenticator.check(authCode,user.twoFactorSecret);
+		const verified = authenticator.check(authCode, user.twoFactorSecret);
 
 		if (verified) {
 			user.requireTwoFactor = true;
