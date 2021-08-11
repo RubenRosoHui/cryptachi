@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
+const Invoice = require('../models/invoice.js')
 
 const emailLib = require('../lib/email.js');
 const errorLib = require('../lib/error.js');
@@ -21,11 +22,24 @@ exports.getAliases = async (req, res, next) => {
 
 exports.getInvoices = async (req, res, next) => {
 	try {
-		const user = await User.findById(req.user.id).populate("invoices")
-		const invoices = user.invoices
-		const validInvoices = invoices.filter(invoice => invoice.state == 'InvoiceSettled' || invoice.state == 'InvoiceProcessing');
+		const userObject = await User.findById(req.user.id)
 
-		res.status(200).json(validInvoices);//validInvoices);
+		const invoices = await Invoice.find({ _id: userObject.invoices }).populate('alias')
+
+		const mappedInvoices = []
+		invoices.map(invoice => {
+			mappedInvoices.push({
+				plan: invoice.plan,
+				state: invoice.state,
+				invoiceId: invoice.invoiceId,
+				alias: `${invoice.alias.alias}.${invoice.alias.domain}`,
+				date: invoice.createdAt
+			})
+		})
+
+		const filteredInvoices = mappedInvoices.filter(invoice => invoice.state == 'InvoiceSettled' || invoice.state == 'InvoiceProcessing');
+
+		res.status(200).json(filteredInvoices);
 	}
 	catch (err) {
 		next(errorLib.errorWrapper(err));
@@ -218,7 +232,6 @@ exports.changePassword = async (req, res, next) => {
 
 		await user.save();
 
-		// No need to await.
 		emailLib.sendPasswordChangeNotification(user.email);
 
 		res.status(200).json({ message: 'Password changed successfully.' });

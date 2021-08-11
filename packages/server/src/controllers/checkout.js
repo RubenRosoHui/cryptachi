@@ -215,7 +215,6 @@ exports.webhooks = async (req, res, next) => {
 	const { type } = req.body;
 
 	try {
-
 		console.log(type, req.body);
 		switch (type) {
 			case 'InvoiceCreated':
