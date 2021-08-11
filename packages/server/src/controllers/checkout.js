@@ -126,17 +126,38 @@ exports.createInvoice = async (req, res, next) => {
 	}
 }
 
+const validateInvoice = (invoice, invalidStates = []) => {
+	if (!invoice) {
+		console.log('This invoice was created improperly')
+		throw errorLib.badRequestError('This invoice was created improperly')
+	}
+	if (invalidStates.includes(invoice.state)) {
+		console.log('The invoice has already received this information')
+		throw errorLib.badRequestError('The invoice has already received this information')
+	}
+}
+
 const invoiceInvalid = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId });
 
+	validateInvoice(invoice, ['InvoiceInvalid'])
+
+	const aliasObject = await Alias.findById(invoice.alias);
+
+	aliasObject.invoice = null;
+
 	invoice.state = type;
-	await invoice.save();
+	await invoice.save(); 
+	await aliasObject.save();
 }
 
 const invoiceExpired = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("alias");
+
+	validateInvoice(invoice, ['InvoiceSettled', 'InvoiceInvalid'])
+
 	const aliasObject = await Alias.findById(invoice.alias);
 
 	aliasObject.invoice = null;
@@ -150,6 +171,8 @@ const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("user");
 
+	validateInvoice(invoice, ['InvoiceSettled', 'InvoiceInvalid', 'InvoiceExpired'])
+
 	invoice.state = type;
 	await invoice.save();
 
@@ -159,7 +182,10 @@ const invoiceProcessing = async (req, res, next) => {
 const invoiceSettled = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId });
-	//TODO: if invoice already settled, abort
+
+	//if invoice already settled, abort
+	validateInvoice(invoice, ['InvoiceSettled'])
+
 	const aliasObject = await Alias.findById(invoice.alias);
 	const userObject = await User.findById(invoice.user);
 
@@ -183,40 +209,41 @@ const invoiceSettled = async (req, res, next) => {
 	invoice.state = type;
 
 	Promise.all([aliasObject.save(), invoice.save(), userObject.save()]);
-
-}
-
-const invoiceCreated = async (req, res, next) => {
-	const { invoiceId } = req.body;
 }
 
 exports.webhooks = async (req, res, next) => {
 	const { type } = req.body;
-	console.log(type, req.body);
-	switch (type) {
-		case 'InvoiceCreated':
-			invoiceCreated(req, res, next);
-			break;
-		case 'InvoiceReceivedPayment':
-			break;
-		case 'InvoiceProcessing':
-			invoiceProcessing(req, res, next);
-			break;
-		case 'InvoiceSettled':
-			invoiceSettled(req, res, next);
-			break;
-		//Gets called when payment doesnt go through or payment is double spent 
-		case 'InvoiceExpired':
-			invoiceExpired(req, res, next);
-			break;
-		//invoice is invalid, seems to only be called if BTCpay server admin intervenes
-		case 'InvoiceInvalid':
-			invoiceInvalid(req, res, next);
-			break;
-		default:
-			console.log(type)
-			console.log('no selection')
-			break;
+
+	try {
+
+		console.log(type, req.body);
+		switch (type) {
+			case 'InvoiceCreated':
+				break;
+			case 'InvoiceReceivedPayment':
+				break;
+			case 'InvoiceProcessing':
+				await invoiceProcessing(req, res, next);
+				break;
+			case 'InvoiceSettled':
+				await invoiceSettled(req, res, next);
+				break;
+			//Gets called when payment doesnt go through or payment is double spent 
+			case 'InvoiceExpired':
+				await invoiceExpired(req, res, next);
+				break;
+			//invoice is invalid, seems to only be called if BTCpay server admin intervenes
+			case 'InvoiceInvalid':
+				await invoiceInvalid(req, res, next);
+				break;
+			default:
+				console.log(type)
+				console.log('no selection')
+				break;
+		}
+		res.status(200).json({ message: 'success' });
 	}
-	res.status(200).json({ message: 'success' });
+	catch (err) {
+		next(err);
+	}
 }
