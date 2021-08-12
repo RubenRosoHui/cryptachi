@@ -9,7 +9,7 @@ const InvoiceSchema = mongoose.Schema({
 	plan: {
 		duration: Number,
 		name: String,
-		price: Number
+		price: Number//TODO: amount currency unit
 	}
 }, { timestamps: true });
 

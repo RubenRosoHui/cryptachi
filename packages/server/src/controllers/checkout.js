@@ -56,20 +56,7 @@ exports.createInvoice = async (req, res, next) => {
 		const userObject = await User.findOne({ email: email });
 		let aliasObject = await Alias.findOne({ alias: alias, domain: domain }).populate("invoice");
 
-		if (aliasObject) {
-			//does user or nobody own this alias?
-			if (aliasObject.user && !aliasObject.user.equals(userObject._id)) {
-				//if (!aliasObject.user || aliasObject.user.equals(userObject._id)) {
-				throw errorLib.badRequestError('alias is owned by someone already');
-			}
-			if (aliasObject.paid) {
-				if (Date.now() < aliasObject.expiration.valueOf() - (86400000 * 60)) {
-					throw errorLib.conflictError('you cannot renew yet');
-				}
-			}
-		}
-		else {
-			//create the alias as no one has it
+		if(!aliasObject){
 			aliasObject = new Alias({
 				alias: alias,
 				domain: domain,
@@ -80,17 +67,10 @@ exports.createInvoice = async (req, res, next) => {
 		const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
 
 		const chosenPlan = paidPlans[plan];
-		//does plan exist?
-		if (!chosenPlan) throw errorLib.badRequestError('Plan does not exist');
 
 		//does alias currently have an active invoice?
 		//redirect to that invoice
 		if (aliasObject.invoice) {
-			//prevent possibility of user receiving a different users invoice
-			if (!aliasObject.invoice.user.equals(userObject._id)) {
-				throw errorLib.conflictError('someone is currently buying this!');
-			}
-
 			return res.status(200).json({
 				message: 'Invoice Already exists, redirecting',
 				url: aliasObject.invoice.url,

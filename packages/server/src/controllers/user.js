@@ -49,7 +49,7 @@ exports.getInvoices = async (req, res, next) => {
 exports.renewAlias = async (req, res, next) => {
 	const alias = req.params.alias;
 	const domain = req.body.domain;
-
+	//TODO: check if free otherwise go away
 	try {
 		const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
 
