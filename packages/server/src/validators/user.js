@@ -3,14 +3,14 @@ const validate = require('../lib/validate.js');
 exports.renewAlias = [
   validate.alias({
     checkValueIn: 'param',
-    checkDomainValueIn: 'body',
+    checkDomainValueIn: 'query',
     allowExisting: true,
     allowTaken: true,
     mustExist: true,
     checkOwnership: true
   }),
   validate.domain({
-    checkValueIn: 'body',
+    checkValueIn: 'query',
     checkAliasValueIn: 'params'
   }),
   validate.checkValidationResults

@@ -47,9 +47,8 @@ exports.getInvoices = async (req, res, next) => {
 }
 //TODO: domain should be in query like others, 
 exports.renewAlias = async (req, res, next) => {
-	const alias = req.params.alias;
-	const domain = req.body.domain;
-
+	const { alias } = req.params;
+	const { domain } = req.query;
 	try {
 		const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
 
