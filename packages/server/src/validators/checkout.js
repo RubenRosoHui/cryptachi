@@ -64,9 +64,10 @@ exports.webhooks = [
 	body('invoiceId').custom(async (invoiceId, { req }) => {
 
 		//list of states that cannot preceed the state specified on the request
+		// "invoiceProcessing cannot come after Settled,Invalid,etc"
 		const invalidConditions = {
-			InvoiceProcessing: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired'],
-			InvoiceExpired: ['InvoiceSettled','InvoiceInvalid'],
+			InvoiceProcessing: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired','InvoiceProcessing'],
+			InvoiceExpired: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired'],
 			InvoiceInvalid: ['InvoiceSettled','InvoiceInvalid'],
 			InvoiceSettled: ['InvoiceSettled','InvoiceInvalid']
 		}
