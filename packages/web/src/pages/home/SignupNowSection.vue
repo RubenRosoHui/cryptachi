@@ -2,13 +2,18 @@
 	<div class="section-container">
 		<h1>Still on the fence?</h1>
 		<p class="title-4">Signing up comes with a free alias</p>
-		<button class="base-button">SIGN UP</button>
+		<button class="base-button" @click="register">SIGN UP</button>
 	</div>
 </template>
 
 <script>
 	export default {
-		name: 'SignupNowSection'
+		name: 'SignupNowSection',
+		methods: {
+			register() {
+				this.$router.push('/register');
+			}
+		}
 	}
 </script>
 
