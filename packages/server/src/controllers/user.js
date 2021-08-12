@@ -194,7 +194,9 @@ exports.retrieveTwoFactorAuthSecret = async (req, res, next) => {
 		const secret = authenticator.generateSecret();
 		const otpauthurl = authenticator.keyuri(user.email, 'Cryptachi', secret);
 
+    // REVIEW: The 2FA secret should probably be hashed like the password field.
 		user.twoFactorSecret = secret;
+
 		await user.save();
 
 		res.status(200).json({ message: 'Key generated successfully', secret, otpauthurl })
