@@ -81,7 +81,7 @@ exports.createInvoice = async (req, res, next) => {
 		const normalPrice = (chosenPlan.price - (chosenPlan.price * (chosenPlan.percentDiscount / 100)));
 		//price after special discount if any
 		const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)));
-
+		//TODO: try sending more data like email, alias, etc and see if it shows up in BTCPAY server
 		const btcPayInvoice = await client.create_invoice({ price: price, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/` });
 
 		const invoice = new Invoice({
@@ -106,22 +106,9 @@ exports.createInvoice = async (req, res, next) => {
 	}
 }
 
-const validateInvoice = (invoice, invalidStates = []) => {
-	if (!invoice) {
-		console.log('This invoice was created improperly')
-		throw errorLib.badRequestError('This invoice was created improperly')
-	}
-	if (invalidStates.includes(invoice.state)) {
-		console.log('The invoice has already received this information')
-		throw errorLib.badRequestError('The invoice has already received this information')
-	}
-}
-
 const invoiceInvalid = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId });
-
-	validateInvoice(invoice, ['InvoiceInvalid'])
 
 	const aliasObject = await Alias.findById(invoice.alias);
 
@@ -136,8 +123,6 @@ const invoiceExpired = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("alias");
 
-	validateInvoice(invoice, ['InvoiceSettled', 'InvoiceInvalid'])
-
 	const aliasObject = await Alias.findById(invoice.alias);
 
 	aliasObject.invoice = null;
@@ -151,8 +136,6 @@ const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("user");
 
-	validateInvoice(invoice, ['InvoiceSettled', 'InvoiceInvalid', 'InvoiceExpired'])
-
 	invoice.state = type;
 	await invoice.save();
 
@@ -162,9 +145,6 @@ const invoiceProcessing = async (req, res, next) => {
 const invoiceSettled = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId });
-
-	//if invoice already settled, abort
-	validateInvoice(invoice, ['InvoiceSettled'])
 
 	const aliasObject = await Alias.findById(invoice.alias);
 	const userObject = await User.findById(invoice.user);

@@ -45,7 +45,7 @@ exports.getInvoices = async (req, res, next) => {
 		next(errorLib.errorWrapper(err));
 	}
 }
-//TODO: domain should be in query like others, 
+
 exports.renewAlias = async (req, res, next) => {
 	const { alias } = req.params;
 	const { domain } = req.query;
