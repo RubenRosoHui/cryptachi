@@ -22,9 +22,9 @@ router.post('/change-password', validators.changePassword, controller.changePass
 
 router.get('/2fa', controller.retrieveTwoFactorAuthSecret);
 
-router.post('/2fa', controller.enableTwoFactorAuth);
+router.patch('/2fa/enable', controller.enableTwoFactorAuth);
 
-router.delete('/2fa', controller.disableTwoFactorAuth);
+router.patch('/2fa/disable', controller.disableTwoFactorAuth);
 
 router.get('/invoices', controller.getInvoices);
 
