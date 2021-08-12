@@ -188,7 +188,8 @@ exports.retrieveTwoFactorAuthSecret = async (req, res, next) => {
 		const user = await User.findById(req.user.id);
 
 		//if two factor is already enabled
-		if (user.requireTwoFactor) throw errorLib.unauthorizedAccessError('You cannot view the secret for 2FA');
+		if (user.requireTwoFactor)
+      throw errorLib.unauthorizedAccessError("Cannot generate another secret because 2FA is enabled for this account.");
 
 		const secret = authenticator.generateSecret();
 		const otpauthurl = authenticator.keyuri(user.email, 'Cryptachi', secret);
@@ -196,7 +197,7 @@ exports.retrieveTwoFactorAuthSecret = async (req, res, next) => {
 		user.twoFactorSecret = secret;
 		await user.save();
 
-		res.status(200).json({ message: `Key generated successfully`, secret, otpauthurl })
+		res.status(200).json({ message: 'Key generated successfully', secret, otpauthurl })
 	} catch (err) {
 		next(errorLib.errorWrapper(err));
 	}
