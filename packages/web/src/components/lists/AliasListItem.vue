@@ -11,7 +11,7 @@
 				<span class="tag free" v-if="!alias.paid">FREE</span>
 			</div>
 			<menu>
-				<li class="menu-control delete-alias">
+				<li class="menu-control delete-alias" v-if="!alias.paid">
 					<img src="../../assets/icons/svg/fi-rr-trash.svg" title="Delete Alias" @click="deleteAlias" />
 				</li>
 				<li class="menu-control">

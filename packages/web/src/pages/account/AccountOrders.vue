@@ -4,6 +4,7 @@
 			<tr>
 				<th>Date</th>
 				<th>Order ID</th>
+				<th>Status</th>
 				<th>Alias</th>
 				<th>Plan</th>
 				<th>Payment</th>
@@ -13,6 +14,7 @@
 			<tr v-for="purchase in purchases" :key="purchase.id">
 				<td>{{ formatDate(purchase.createdAt) }}</td>
 				<td>{{ purchase.id }}</td>
+				<td>{{ purchase.status }}</td>
 				<td><span class="yellow">{{ purchase.alias.name }}</span>.{{ purchase.alias.domain }}</td>
 				<td>{{ `${purchase.plan.duration.amount} ${purchase.plan.duration.unit}` }}</td>
 				<td>{{ `${purchase.payment.value} ${purchase.payment.currency.toUpperCase()}` }}</td>
@@ -30,6 +32,7 @@
 			purchases: [
 				{
 					id: 'abcdefghijklmnopqrstuvwxyz1',
+					status: 'Processing',
 					createdAt: new Date,
 					alias: {
 						name: 'payme',
@@ -48,6 +51,7 @@
 				},
 				{
 					id: 'abcdefghijklmnopqrstuvwxyz2',
+					status: 'Created',
 					createdAt: new Date,
 					alias: {
 						name: 'payme2',
@@ -66,6 +70,7 @@
 				},
 				{
 					id: 'abcdefghijklmnopqrstuvwxyz3',
+					status: 'Settled',
 					createdAt: new Date,
 					alias: {
 						name: 'payme3',
@@ -85,6 +90,7 @@
 				{
 					id: 'abcdefghijklmnopqrstuvwxyz4',
 					createdAt: new Date,
+					status: 'Expired',
 					alias: {
 						name: 'payme4',
 						domain: 'cryptachi.com'
