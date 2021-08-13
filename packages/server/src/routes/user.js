@@ -28,4 +28,6 @@ router.patch('/2fa/disable', controller.disableTwoFactorAuth);
 
 router.get('/invoices', controller.getInvoices);
 
+router.get('/', controller.getUser);
+
 module.exports = router;

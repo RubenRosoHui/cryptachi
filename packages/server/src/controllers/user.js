@@ -271,3 +271,19 @@ exports.enableTwoFactorAuth = async (req, res, next) => {
 	}
 
 }
+
+exports.getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+      message: 'User info gathered successfully.',
+      user: {
+        isEmailConfirmed: user.isEmailConfirmed,
+        requireTwoFactor: user.requireTwoFactor
+      }
+    });
+  } catch(err) {
+    next(errorLib.errorWrapper(err));
+  }
+}
