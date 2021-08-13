@@ -26,24 +26,7 @@
 			<form-message v-else-if="changePasswordForm.successMessage" :message="changePasswordForm.successMessage" type="success" class="text-align-right" />
 		</div>
 		<div class="activate-2fa-container">
-			<header>
-				<h1>Activate 2FA</h1>
-			</header>
-			<p class="margin-top-2 margin-bottom-2">
-				Two factor authentication is currently
-				<span v-if="twoFactorAuthenticationEnabled" class="success">enabled</span>
-				<span v-else class="error">disabled</span>
-				on this account.
-				To deactivate it, you must provide an OTP from your authenticator app.
-				You can use the the one-time paper key that was given to you when 2FA was activated.
-				If you lost your paper key, <router-link to="/contact">contact Cryptachi support</router-link>
-				and we will get the 2FA deactivation process started.
-			</p>
-			<p class="yellow bold">Upon successfully deactivating 2FA, all sessions for your user will be cleared requiring you to login again.</p>
-			<div class="buttons-container margin-top-4 text-align-right">
-				<button v-if="twoFactorAuthenticationEnabled" class="base-button">Deactivate</button>
-				<button v-else class="base-button">Activate</button>
-			</div>
+			<component :is="authenticationComponent" @changeAuthComponent="onChangeAuthComponent" />
 		</div>
 	</div>
 </template>
@@ -52,10 +35,14 @@
 	import validator from 'validator';
 	import { handleResponse } from '../../lib/exception.js';
 
+	import Authenticator from './2fa/Authenticator.vue';
+	import EnableAuth from './2fa/EnableAuth.vue';
+
 	let changePasswordFormMessageTimeoutID;
 
 	export default {
 		name: 'AccountSecurity',
+		components: { Authenticator, EnableAuth },
 		data: () => ({
 			changePasswordForm: {
 				fields: {
@@ -67,7 +54,7 @@
 				errorMessage: '',
 				successMessage: ''
 			},
-			twoFactorAuthenticationEnabled: false
+			authenticationComponent: 'Authenticator'
 		}),
 		methods: {
 			async submitChangePasswordForm() {
@@ -172,6 +159,9 @@
 				const errorMessage = this.changePasswordForm.isValid ? '' : 'Some fields have errors.';
 
 				this.setChangePasswordFormMessage('error', errorMessage);
+			},
+			onChangeAuthComponent(component) {
+				this.authenticationComponent = component;
 			}
 		}
 	}
@@ -187,6 +177,9 @@
 	}
 	.activate-2fa-container {
 		padding-top: var(--spacing-4);
+	}
+	.outer-container {
+		width: 100%;
 	}
 
 	@media (min-width: 600px) and (max-width: 900px) {
