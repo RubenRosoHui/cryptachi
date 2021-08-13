@@ -35,14 +35,15 @@
 	import validator from 'validator';
 	import { handleResponse } from '../../lib/exception.js';
 
-	import Authenticator from './2fa/Authenticator.vue';
+	import ManageAuth from './2fa/ManageAuth.vue';
 	import EnableAuth from './2fa/EnableAuth.vue';
+	import DisableAuth from './2fa/DisableAuth.vue';
 
 	let changePasswordFormMessageTimeoutID;
 
 	export default {
 		name: 'AccountSecurity',
-		components: { Authenticator, EnableAuth },
+		components: { ManageAuth, EnableAuth, DisableAuth },
 		data: () => ({
 			changePasswordForm: {
 				fields: {
@@ -54,7 +55,7 @@
 				errorMessage: '',
 				successMessage: ''
 			},
-			authenticationComponent: 'Authenticator'
+			authenticationComponent: 'ManageAuth'
 		}),
 		methods: {
 			async submitChangePasswordForm() {

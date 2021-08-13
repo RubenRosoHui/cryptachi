@@ -95,7 +95,7 @@
 
 					await response.json();
 
-					this.$emit('changeAuthComponent', 'Authenticator');
+					this.$emit('changeAuthComponent', 'ManageAuth');
 				} catch(err) {
 					if (err instanceof Error && err.message) {
 						this.authCode.errorMessage = err.message;
