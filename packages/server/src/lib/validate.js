@@ -288,8 +288,8 @@ exports.recipientAddress = () => body('recipientAddress', value => `Invalid reci
   .isLength({ Max: 150 }).withMessage('Recipient Address cannot be longer than 150 characters.');
 
 exports.recipientName = () => body('recipientName', value => `Invalid recipient name: ${value}`)
-  .exists(existsOpts).withMessage('Recipient name required.')
-  .isString()
+  .optional()
+	.isString()
   .trim()
   .isLength({ Max: 50 }).withMessage('Recipient Address cannot be longer than 50 characters.');
 
@@ -351,7 +351,7 @@ exports.message = () => body('message')
   .escape();
 
 exports.description = () => body('description')
-  .optional({ checkFalsy: true })
+  .optional()
   .trim()
   .isLength({ max: 50 }).withMessage('Description cannot exceed 50 characters.');
 

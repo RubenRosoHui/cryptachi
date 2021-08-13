@@ -52,7 +52,7 @@ exports.renewAlias = async (req, res, next) => {
 	try {
 		const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
 
-		if(aliasObject.paid) throw errorLib.conflictError('You cannot renew a paid alias')
+		if (aliasObject.paid) throw errorLib.conflictError('You cannot renew a paid alias')
 
 		const sevenDays = 604800000; // In milliseconds
 		const now = new Date();
@@ -109,7 +109,7 @@ exports.deleteAlias = async (req, res, next) => {
 	try {
 		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: req.user.id });
 
-		if(aliasObject.paid) throw errorLib.conflictError('You cannot delete a paid alias')
+		if (aliasObject.paid) throw errorLib.conflictError('You cannot delete a paid alias')
 
 		await MongoLib.deleteAlias(aliasObject);
 
@@ -170,7 +170,7 @@ exports.editRecord = async (req, res, next) => {
 		record.recipientName = recipientName;
 		record.description = description;
 
-		await dnsimpleLib.editRecord(record.dnsimpleID, currency, domain, recipientAddress, recipientName);
+		await dnsimpleLib.editRecord(record.dnsimpleID, currency, domain, recipientAddress, recipientName, description);
 
 		await theAlias.save();
 
