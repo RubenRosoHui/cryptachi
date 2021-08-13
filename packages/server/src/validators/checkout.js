@@ -77,7 +77,7 @@ exports.webhooks = [
 			console.log('This invoice was created improperly')
 			throw errorLib.badRequestError('This invoice was created improperly')
 		}
-		if (invalidConditions[req.body.type].includes(invoice.state)) {//invalidStates.includes(invoice.state)) {
+		if (invalidConditions[req.body.type] && invalidConditions[req.body.type].includes(invoice.state)) {//invalidStates.includes(invoice.state)) {
 			console.log('Invalid state sent to webhook')
 			throw errorLib.badRequestError('The invoice has already received this information')
 		}
