@@ -190,13 +190,19 @@ exports.retrieveTwoFactorAuthSecret = async (req, res, next) => {
 		if (user.requireTwoFactor)
       throw errorLib.unauthorizedAccessError("Cannot generate another secret because 2FA is enabled for this account.");
 
-		const secret = authenticator.generateSecret();
+    let secret;
+    if (user.twoFactorSecret) {
+      secret = user.twoFactorSecret;
+    }
+    else {
+			secret = authenticator.generateSecret();
+			user.twoFactorSecret = secret;
+
+			// REVIEW: The 2FA secret should probably be hashed like the password field.
+			await user.save();
+    }
+
 		const otpauthurl = authenticator.keyuri(user.email, 'Cryptachi', secret);
-
-    // REVIEW: The 2FA secret should probably be hashed like the password field.
-		user.twoFactorSecret = secret;
-
-		await user.save();
 
 		res.status(200).json({ message: 'Key generated successfully', secret, otpauthurl })
 	} catch (err) {
