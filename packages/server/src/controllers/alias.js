@@ -13,7 +13,6 @@ exports.queryAliases = async (req, res, next) => {
 
 		
 		const records = await Alias.find({ alias: aliases, domain: domain, user: { "$ne": null } }).select('alias -_id');
-		//REVIEW: aliases with an active invoice now do not show up here
 		const invoiceRecords = await Alias.find({ alias: aliases, domain: domain, invoice: { "$ne": null } }).select('alias -_id');
 
 		const takenAliases = records.map(r => r.alias);
