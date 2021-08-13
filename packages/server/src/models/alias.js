@@ -4,8 +4,10 @@ const AliasSchema = mongoose.Schema({
 	alias: { type: String },
 	domain: { type: String },
 	paid: { type: Boolean, default: false },
-	user: { type: mongoose.Schema.Types.ObjectID, ref: 'User' },
-	expiration: Date,
+	user: { type: mongoose.Schema.Types.ObjectID, ref: 'User', default: null },
+	expiration: { type: Date, default: null },
+	//reference to the currently active invoice
+	invoice: { type: mongoose.Schema.Types.ObjectID, ref: 'Invoice', default: null },
 	records: [
 		{
 			_id: false,

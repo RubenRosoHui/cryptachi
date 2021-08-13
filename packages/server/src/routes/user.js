@@ -26,4 +26,6 @@ router.post('/2fa', controller.enableTwoFactorAuth);
 
 router.delete('/2fa', controller.disableTwoFactorAuth);
 
+router.get('/invoices', controller.getInvoices);
+
 module.exports = router;

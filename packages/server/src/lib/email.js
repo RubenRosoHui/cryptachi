@@ -15,7 +15,8 @@ exports.sendEmail = function (from, to, subject, text) {
 }
 
 exports.sendPasswordReset = function (to, token) {
-  const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset-password?token=${token}&email=${to}`;
+	// const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/reset-password?token=${token}&email=${to}`;
+	const link = `${process.env.WEB_URL}/reset-password?token=${token}&email=${to}`;
 
 	return module.exports.sendEmail(
 		'mail@cryptachi.com',
@@ -30,11 +31,12 @@ exports.sendPasswordReset = function (to, token) {
 				<span style="text-decoration: underline;">${link}</span>
 			</p>
 		`
-  );
+	);
 }
 
 exports.sendAccountVerification = function (to, token) {
-  const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/confirm-email?email=${to}&token=${token}`;
+	//const link = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/confirm-email?email=${to}&token=${token}`;
+	const link = `${process.env.WEB_URL}/confirm-email?email=${to}&token=${token}`;
 
 	return module.exports.sendEmail(
 		'mail@cryptachi.com',
@@ -52,7 +54,7 @@ exports.sendAccountVerification = function (to, token) {
 	);
 }
 
-exports.sendAliasExpiryWarning = function (to,expirationDate) {
+exports.sendAliasExpiryWarning = function (to, expirationDate) {
 	return module.exports.sendEmail(
 		'mail@cryptachi.com',
 		to,
@@ -72,12 +74,12 @@ exports.sendAliasExpiry = function (to) {
 	)
 }
 
-exports.sendFeedback = function(to, contact) {
-  return module.exports.sendEmail(
-    'mail@cryptachi.com',
-    to,
-    'Feedback - Cryptachi.com',
-    `
+exports.sendFeedback = function (to, contact) {
+	return module.exports.sendEmail(
+		'mail@cryptachi.com',
+		to,
+		'Feedback - Cryptachi.com',
+		`
 			<h1>Customer Feedback</h1>
 			<h2>Contact Details</h2>
 			<ul>
@@ -88,21 +90,61 @@ exports.sendFeedback = function(to, contact) {
 			<h2>Message</h2>
 			<p>${contact.message}</p>
 		`
-  );
+	);
 }
 
-exports.sendPasswordChangeNotification = function(to) {
-  const supportLink = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/contact`;
+exports.sendPasswordChangeNotification = function (to) {
+	//const supportLink = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/contact`;
+	const supportLink = `${process.env.WEB_URL}/contact`;
 
-  module.exports.sendEmail(
-    'mail@cryptachi.com',
-    to,
-    'Account Password Changed - Cryptachi.com',
-    `
+	module.exports.sendEmail(
+		'mail@cryptachi.com',
+		to,
+		'Account Password Changed - Cryptachi.com',
+		`
 			<html>
 				<p>You are being notified that your account password was changed.</p>
 				<p>If you did not ask for a password change, please <a href="${supportLink}">contact support</a> right away.</p>
 			</html>
 		`
-  );
+	);
+}
+
+exports.sendInvoicePaymentPage = function (to, url) {
+	module.exports.sendEmail(
+		'mail@cryptachi.com',
+		to,
+		'Purchase Confirmation - Cryptachi.com',
+		`
+			<html>
+				<p>e</p>
+			</html>
+		`
+	);
+}
+exports.sendProcessingConfirmation = function (to) {
+
+	module.exports.sendEmail(
+		'mail@cryptachi.com',
+		to,
+		'Purchase Confirmation - Cryptachi.com',
+		`
+			<html>
+				<p>We have received you payment, we will let you know once confirmed</p>
+			</html>
+		`
+	);
+}
+exports.sendPurchaseConfirmation = function (to) {
+
+	module.exports.sendEmail(
+		'mail@cryptachi.com',
+		to,
+		'Purchase Confirmation - Cryptachi.com',
+		`
+			<html>
+				<p>Thank you, your purchase is now available</p>
+			</html>
+		`
+	);
 }

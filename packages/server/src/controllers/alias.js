@@ -11,11 +11,14 @@ exports.queryAliases = async (req, res, next) => {
 		//find all currently taken domains
 		let aliases = names.split(',');
 
+		
 		const records = await Alias.find({ alias: aliases, domain: domain, user: { "$ne": null } }).select('alias -_id');
+		const invoiceRecords = await Alias.find({ alias: aliases, domain: domain, invoice: { "$ne": null } }).select('alias -_id');
 
 		const takenAliases = records.map(r => r.alias);
+		const invoiceAliases = invoiceRecords.map(r => r.alias);
 
-		const availableAliases = aliases.filter(alias => !takenAliases.includes(alias));
+		const availableAliases = aliases.filter(alias => !takenAliases.includes(alias) && !invoiceAliases.includes(alias));
 
 		return res.status(200).json(availableAliases);
 	}

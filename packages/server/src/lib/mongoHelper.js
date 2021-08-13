@@ -7,7 +7,6 @@ exports.deleteAlias = async function (aliasObject) {
 	const user = await User.findById(aliasObject.user).populate("aliases");
 
   // Delete the alias from DNSimple
-  // REVIEW: Resource intensive. Is there a way to do a batch delete?
 	await aliasObject.records.forEach(record => {
 		dnsimpleLib.deleteRecord(record.dnsimpleID,aliasObject.domain);
 	});

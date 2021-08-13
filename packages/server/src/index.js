@@ -41,7 +41,13 @@ else {
 }
 
 // Middlewares
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+	verify: function(req, res, buf) {
+		if (req.url.includes('/webhooks')){
+			req.rawbody = buf;
+		}
+}
+}));
 
 app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);
