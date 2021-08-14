@@ -299,3 +299,17 @@ exports.getUser = async (req, res, next) => {
 		next(errorLib.errorWrapper(err));
 	}
 }
+
+exports.resendEmailConfirmation = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (user.isEmailConfirmed) throw errorLib.badRequestError('Email is already confirmed.');
+
+    await emailLib.sendAccountVerification(user.email, user.isEmailConfirmedToken);
+
+    res.status(200).json({ message: `Email confirmation has been successfully sent to ${user.email}` });
+  } catch(err) {
+    next(errorLib.errorWrapper(err));
+  }
+}

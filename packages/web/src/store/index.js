@@ -32,9 +32,7 @@ export default createStore({
         body: JSON.stringify({ email, password, confirmPassword, alias, domain })
       });
 
-      await handleResponse(response);
-
-      const jsonResponse = await response.json();
+      const jsonResponse = await handleResponse(response);
 
       context.commit('user', jsonResponse.user);
       localStorage.setItem('user', JSON.stringify(jsonResponse.user));
@@ -50,9 +48,7 @@ export default createStore({
         body: JSON.stringify({ email, password })
       });
 
-      await handleResponse(response);
-
-      const jsonResponse = await response.json();
+      const jsonResponse = await handleResponse(response);
 
       context.commit('jwt', jsonResponse.jsonWebToken);
       context.commit('user', jsonResponse.user);
@@ -65,6 +61,20 @@ export default createStore({
       context.commit('user', null);
       localStorage.removeItem('jwt');
       localStorage.removeItem('user');
+    },
+    async fetchUserMeta(context) {
+      // Fetches the user meta data from the server.
+      const response = await fetch('/api/user', {
+        headers: { Authorization: context.getters['jwt'] }
+      });
+
+      const jsonResponse = await handleResponse(response);
+
+      const user = context.getters['user'];
+
+      const equippedUser = Object.assign(user, jsonResponse.user);
+
+      context.commit('user', equippedUser);
     }
   },
   getters: {

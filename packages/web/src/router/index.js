@@ -17,6 +17,7 @@ import Checkout from '../pages/checkout/Checkout.vue';
 import CheckoutDetails from '../pages/checkout/CheckoutDetails.vue';
 import CheckoutPayment from '../pages/checkout/CheckoutPayment.vue';
 import ConfirmEmail from '../pages/auth/ConfirmEmail';
+import EmailUnconfirmed from '../pages/error/EmailUnconfirmed';
 import NotFound from '../pages/error/NotFound.vue';
 
 const router = createRouter({
@@ -60,6 +61,10 @@ const router = createRouter({
       path: '/account',
       component: Account,
       redirect: '/account/aliases',
+      async beforeEnter(_, _2, next) {
+        await store.dispatch('fetchUserMeta');
+        store.getters.user.isEmailConfirmed ? next() : next('/email-unconfirmed');
+      },
       meta: { needsAuth: true },
       children: [
         { path: 'aliases', component: AccountAliases },
@@ -85,6 +90,7 @@ const router = createRouter({
         { path: 'payment', component: CheckoutPayment }
       ]
     },
+    { path: '/email-unconfirmed', component: EmailUnconfirmed },
 		{ path: '/:catchAll(.*)', component: NotFound }
   ]
 });

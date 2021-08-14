@@ -15,7 +15,7 @@ const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js')
 const checkoutRoutes = require('./routes/checkout.js')
 
-const { needsWebToken, needsVerifiedAccount } = require('./middlewares/auth.js')
+const { needsWebToken } = require('./middlewares/auth.js')
 
 const app = express();
 
@@ -51,13 +51,31 @@ app.use(bodyParser.json({
 
 app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/user', needsWebToken, needsVerifiedAccount, userRoutes);
+app.use('/api/user', needsWebToken, userRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api', rootRoutes);
 
 // Catch-all route
 app.use((_, res, _1) => {
   res.status(404).json({ message: 'Page Not Found.' });
+});
+
+// Handles invalid sandbox domains.
+// This error is thrown when sending email via mailgun
+// which is not included in your sandbox domain's recipient list.
+app.use((error, req, res, next) => {
+  if (
+    error.statusCode === 400
+		&& error.message === 'Sandbox subdomains are for test purposes only. Please add your own domain or add the address to authorized recipients in Account Settings.'
+  ) {
+    console.error(`${new Date().toISOString()} ERROR: ${error.message}`);
+		const status = 500;
+		const name = 'Internal Server Error';
+		const message = "The server has encountered an error."
+		return res.status(status).json({message: message, error:{name}});
+  }
+
+  next(error);
 });
 
 app.use((error, req, res, next) => {
