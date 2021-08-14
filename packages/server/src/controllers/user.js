@@ -13,7 +13,10 @@ exports.getAliases = async (req, res, next) => {
 	try {
 		const aliases = await User.findById(req.user.id).populate("aliases").select('-_id aliases');
 
-		res.status(200).json(aliases);
+		res.status(200).json({
+			message: 'user aliases retrieved successfully',
+			aliases: aliases
+		});
 	}
 	catch (err) {
 		next(errorLib.errorWrapper(err));
@@ -39,7 +42,10 @@ exports.getInvoices = async (req, res, next) => {
 
 		const filteredInvoices = mappedInvoices.filter(invoice => invoice.state == 'InvoiceSettled' || invoice.state == 'InvoiceProcessing');
 
-		res.status(200).json(filteredInvoices);
+		res.status(200).json({
+			message: 'user invoices retrieved successfully',
+			invoices: filteredInvoices
+		});
 	}
 	catch (err) {
 		next(errorLib.errorWrapper(err));
@@ -188,19 +194,19 @@ exports.retrieveTwoFactorAuthSecret = async (req, res, next) => {
 
 		//if two factor is already enabled
 		if (user.requireTwoFactor)
-      throw errorLib.unauthorizedAccessError("Cannot generate another secret because 2FA is enabled for this account.");
+			throw errorLib.unauthorizedAccessError("Cannot generate another secret because 2FA is enabled for this account.");
 
-    let secret;
-    if (user.twoFactorSecret) {
-      secret = user.twoFactorSecret;
-    }
-    else {
+		let secret;
+		if (user.twoFactorSecret) {
+			secret = user.twoFactorSecret;
+		}
+		else {
 			secret = authenticator.generateSecret();
 			user.twoFactorSecret = secret;
 
 			// REVIEW: The 2FA secret should probably be hashed like the password field.
 			await user.save();
-    }
+		}
 
 		const otpauthurl = authenticator.keyuri(user.email, 'Cryptachi', secret);
 
@@ -279,17 +285,17 @@ exports.enableTwoFactorAuth = async (req, res, next) => {
 }
 
 exports.getUser = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id);
+	try {
+		const user = await User.findById(req.user.id);
 
-    res.status(200).json({
-      message: 'User info gathered successfully.',
-      user: {
-        isEmailConfirmed: user.isEmailConfirmed,
-        requireTwoFactor: user.requireTwoFactor
-      }
-    });
-  } catch(err) {
-    next(errorLib.errorWrapper(err));
-  }
+		res.status(200).json({
+			message: 'User info gathered successfully.',
+			user: {
+				isEmailConfirmed: user.isEmailConfirmed,
+				requireTwoFactor: user.requireTwoFactor
+			}
+		});
+	} catch (err) {
+		next(errorLib.errorWrapper(err));
+	}
 }
