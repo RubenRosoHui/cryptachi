@@ -15,7 +15,7 @@ exports.getAliases = async (req, res, next) => {
 
 		res.status(200).json({
 			message: 'user aliases retrieved successfully',
-			aliases: aliases
+			aliases: aliases.aliases
 		});
 	}
 	catch (err) {
