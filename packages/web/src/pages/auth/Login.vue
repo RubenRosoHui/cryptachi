@@ -80,10 +80,18 @@
 
 					this.$router.push('/account');
 				} catch(err) {
-					if (err instanceof Error) {
-						this.form.isValid = false;
-						this.form.message = err.message;
+					if (err.message === 'OTP is required' && err.name === 'AuthenticationError') {
+						return this.$router.push({
+							name: 'TwoFactor',
+							params: {
+								email: this.form.fields.email.value,
+								password: this.form.fields.password.value
+							}
+						});
 					}
+
+					this.form.isValid = false;
+					this.form.message = err.message;
 				}
 			}
 		}

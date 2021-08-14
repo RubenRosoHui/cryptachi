@@ -40,12 +40,12 @@ export default createStore({
       return jsonResponse.user;
     },
     async login(context, creds) {
-      const { email, password } = creds;
+      const { email, password, authCode } = creds;
 
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, authCode })
       });
 
       const jsonResponse = await handleResponse(response);

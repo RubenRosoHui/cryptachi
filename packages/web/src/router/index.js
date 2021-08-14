@@ -5,6 +5,7 @@ import store from '../store/index.js';
 import Home from '../pages/home/Home.vue';
 import Register from '../pages/auth/Register.vue';
 import Login from '../pages/auth/Login.vue';
+import TwoFactor from '../pages/auth/TwoFactor.vue';
 import ResetPassword from '../pages/auth/ResetPassword.vue';
 import ResetPasswordLink from '../pages/auth/ResetPasswordLink.vue';
 import Contact from '../pages/contact/Contact.vue';
@@ -38,6 +39,15 @@ const router = createRouter({
     { path: '/', component: Home },
     { path: '/register', component: Register },
     { path: '/login', component: Login },
+    {
+      path: '/two-factor',
+      name: 'TwoFactor',
+      component: TwoFactor,
+      beforeEnter(to, _, next) {
+        to.params.email && to.params.password ? next() : next('/login');
+      },
+      props: route => ({ email: route.params.email, password: route.params.password })
+    },
     {
       path: '/reset-password',
       component: ResetPassword,
