@@ -283,8 +283,7 @@
 							headers: { Authorization: this.$store.getters['jwt'] }
 						});
 
-						await handleResponse(response);
-						const jsonResponse = await response.json();
+						const jsonResponse = await handleResponse(response);
 
 						console.log(jsonResponse.message);
 
@@ -323,9 +322,7 @@
 						headers: { Authorization: this.$store.getters['jwt'] }
 					});
 
-					await handleResponse(response);
-
-					const jsonResponse = await response.json();
+					const jsonResponse = await handleResponse(response);
 					const newAlias = jsonResponse.alias;
 
 					this.aliases.push({
@@ -357,9 +354,7 @@
 						body: JSON.stringify({ domain })
 					});
 
-					await handleResponse(response);
-
-					const jsonResponse = await response.json();
+					const jsonResponse = await handleResponse(response);
 					const newExpiration = jsonResponse.alias.expiration;
 
 					const theAlias = this.aliases.find(a => a.alias === alias && a.domain === domain);
@@ -385,9 +380,7 @@
 					headers: { 'Authorization': this.$store.getters['jwt'] }
 				});
 
-				await handleResponse(response);
-
-				const jsonResponse = await response.json();
+				const jsonResponse = await handleResponse(response);
 
 				this.aliases = jsonResponse.aliases.map(alias => ({
 					...alias,

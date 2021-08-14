@@ -71,9 +71,7 @@
 					headers: { Authorization: this.$store.getters['jwt'] }
 				});
 
-				await handleResponse(response);
-
-				const jsonResponse = await response.json();
+				const jsonResponse = await handleResponse(response);
 
 				this.otp.secret = jsonResponse.secret;
 				this.otp.url = jsonResponse.otpauthurl;
@@ -92,8 +90,6 @@
 					});
 
 					await handleResponse(response);
-
-					await response.json();
 
 					this.$emit('changeAuthComponent', 'ManageAuth');
 				} catch(err) {

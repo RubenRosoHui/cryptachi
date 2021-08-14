@@ -164,9 +164,7 @@
 						})
 					});
 
-					await handleResponse(response);
-
-					const jsonResponse = await response.json();
+					const jsonResponse = await handleResponse(response);
 
 					this.clearForm();
 					formMessage.value = jsonResponse.message;
