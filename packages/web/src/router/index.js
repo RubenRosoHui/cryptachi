@@ -14,9 +14,7 @@ import Account from '../pages/account/Account.vue';
 import AccountAliases from '../pages/account/AccountAliases.vue';
 import AccountSecurity from '../pages/account/AccountSecurity.vue';
 import AccountOrders from '../pages/account/AccountOrders.vue';
-import Checkout from '../pages/checkout/Checkout.vue';
 import CheckoutDetails from '../pages/checkout/CheckoutDetails.vue';
-import CheckoutPayment from '../pages/checkout/CheckoutPayment.vue';
 import ConfirmEmail from '../pages/auth/ConfirmEmail';
 import EmailUnconfirmed from '../pages/error/EmailUnconfirmed';
 import NotFound from '../pages/error/NotFound.vue';
@@ -83,22 +81,13 @@ const router = createRouter({
       ]
     },
     {
-      path: '/checkout',
-      component: Checkout,
-      redirect: '/checkout/details',
-      meta: { needsUserInfo: true },
-      children: [
-        {
-          path: 'details',
-          component: CheckoutDetails,
-          name: 'CheckoutDetails',
-          beforeEnter: (to, _, next) => {
-            to.query.alias && to.query.domain ? next() : next('/');
-          },
-          props: route => ({ alias: route.query.alias, domain: route.query.domain })
-        },
-        { path: 'payment', component: CheckoutPayment }
-      ]
+      path: '/checkout-details',
+      component: CheckoutDetails,
+      name: 'CheckoutDetails',
+      beforeEnter: (to, _, next) => {
+        to.query.alias && to.query.domain ? next() : next('/');
+      },
+      props: route => ({ alias: route.query.alias, domain: route.query.domain })
     },
     { path: '/email-unconfirmed', component: EmailUnconfirmed },
 		{ path: '/:catchAll(.*)', component: NotFound }

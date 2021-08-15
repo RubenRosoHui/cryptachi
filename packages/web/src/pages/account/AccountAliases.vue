@@ -39,15 +39,9 @@
 					@domainChange="domain => aliasForm.fields.domain = domain"
 				/>
 			</div>
-			<div class="form-control alias-select-type">
-				<label for="alias-type">Type</label>
-				<select id="alias-type" name="type" v-model="aliasForm.fields.type">
-					<option value="upgraded">Upgraded</option>
-					<option value="free">Free</option>
-				</select>
-			</div>
 			<div class="form-control text-align-right form-buttons">
-				<button type="submit" class="base-button">Add</button>
+				<button type="submit" class="base-button purchase-alias">Purchase Alias</button>
+				<button type="submit" class="base-button margin-left-4">Add Free Alias</button>
 			</div>
 		</form>
 	</base-dialog>
@@ -285,8 +279,6 @@
 
 						const jsonResponse = await handleResponse(response);
 
-						console.log(jsonResponse.message);
-
 						this.aliases = this.aliases.filter(alias => `${alias.name}.${alias.domain}` !== `${aliasName}.${domain}`);
 					};
 				} catch(err) {
@@ -301,16 +293,16 @@
 
 				confirmDialog.show = true;
 			},
-			async addAlias() {
+			async addAlias($event) {
 				this.aliasForm.isVisible = false;
 
 				const name = this.aliasForm.fields.aliasName;
 				const domain = this.aliasForm.fields.domain;
-				const aliasType = this.aliasForm.fields.type;
+				const aliasType = $event.submitter.textContent;
 
-				if (aliasType === 'upgraded') {
+				if (aliasType === 'Purchase Alias') {
 					return this.$router.push({
-						path: '/checkout/details',
+						path: '/checkout-details',
 						query: { alias: name, domain }
 					})
 				}
@@ -371,7 +363,7 @@
 			},
 			upgradeAlias({ alias, domain }) {
 				this.$router.push({
-					path: '/checkout/details',
+					path: '/checkout-details',
 					query: { alias, domain }
 				});
 			},
@@ -429,6 +421,10 @@
 	}
 	button.add-alias img {
 		width: var(--icon-md);
+	}
+
+	button.purchase-alias {
+		background-color: var(--yellow);
 	}
 
 	#empty-aliases {
