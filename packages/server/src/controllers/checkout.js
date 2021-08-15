@@ -56,7 +56,7 @@ exports.createInvoice = async (req, res, next) => {
 		const userObject = await User.findOne({ email: email });
 		let aliasObject = await Alias.findOne({ alias: alias, domain: domain }).populate("invoice");
 
-		if(!aliasObject){
+		if (!aliasObject) {
 			aliasObject = new Alias({
 				alias: alias,
 				domain: domain,
@@ -82,8 +82,8 @@ exports.createInvoice = async (req, res, next) => {
 		//price after special discount if any
 		const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)));
 		//TODO: try sending more data like email, alias, etc and see if it shows up in BTCPAY server
-		const btcPayInvoice = await client.create_invoice({ price: price, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/` });
-
+		const btcPayInvoice = await client.create_invoice({ price: price, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/`, expirationTime: Date.now() + 90000 });
+		console.log(btcPayInvoice)
 		const invoice = new Invoice({
 			url: btcPayInvoice.url,
 			invoiceId: btcPayInvoice.id,
@@ -115,7 +115,7 @@ const invoiceInvalid = async (req, res, next) => {
 	aliasObject.invoice = null;
 
 	invoice.state = type;
-	await invoice.save(); 
+	await invoice.save();
 	await aliasObject.save();
 }
 
@@ -127,6 +127,24 @@ const invoiceExpired = async (req, res, next) => {
 
 	aliasObject.invoice = null;
 
+	const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
+	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
+	const btcPayInvoice = await client.get_invoice(invoiceId)
+
+	let partiallyPaid = false;
+	invoice.payments = [];
+	btcPayInvoice.cryptoInfo.forEach(coin => {
+		if (Number(coin.cryptoPaid) > 0) {
+			partiallyPaid = true;
+
+			invoice.payments.push({
+				currency: coin.cryptoCode,
+				paid: coin.cryptoPaid
+			})
+		}
+	})
+	invoice.partiallyPaid = partiallyPaid;
+
 	invoice.state = type;
 	await invoice.save();
 	await aliasObject.save();
@@ -135,6 +153,20 @@ const invoiceExpired = async (req, res, next) => {
 const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("user");
+
+	const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
+	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
+	const btcPayInvoice = await client.get_invoice(invoiceId)
+
+	invoice.payments = [];
+	btcPayInvoice.cryptoInfo.forEach(coin => {
+		if (Number(coin.cryptoPaid) > 0) {
+			invoice.payments.push({
+				currency: coin.cryptoCode,
+				paid: coin.cryptoPaid
+			})
+		}
+	})
 
 	invoice.state = type;
 	await invoice.save();
@@ -166,9 +198,24 @@ const invoiceSettled = async (req, res, next) => {
 
 	emailLib.sendPurchaseConfirmation(userObject.email);
 
+	const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
+	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
+	const btcPayInvoice = await client.get_invoice(invoiceId)
+
+	invoice.payments = [];
+	btcPayInvoice.cryptoInfo.forEach(coin => {
+		if (Number(coin.cryptoPaid) > 0) {
+			invoice.payments.push({
+				currency: coin.cryptoCode,
+				paid: coin.cryptoPaid
+			})
+		}
+	})
+
 	invoice.state = type;
 
 	Promise.all([aliasObject.save(), invoice.save(), userObject.save()]);
+
 }
 
 exports.webhooks = async (req, res, next) => {

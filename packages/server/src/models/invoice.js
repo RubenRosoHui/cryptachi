@@ -10,7 +10,12 @@ const InvoiceSchema = mongoose.Schema({
 		duration: Number,
 		name: String,
 		price: Number//TODO: amount currency unit
-	}
+	},
+	payments: [{
+		currency: String, //cryptoInfo[].cryptoCode
+		paid: String, //cryptoInfo[].cryptoPaid
+	}],
+	partiallyPaid: { type: Boolean, default: false },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Invoice', InvoiceSchema);
