@@ -32,11 +32,13 @@ exports.getInvoices = async (req, res, next) => {
 		const mappedInvoices = []
 		invoices.map(invoice => {
 			mappedInvoices.push({
+				id: invoice.invoiceId,
 				plan: invoice.plan,
-				state: invoice.state,
+				status: invoice.state,
 				invoiceId: invoice.invoiceId,
-				alias: `${invoice.alias.alias}.${invoice.alias.domain}`,
-				date: invoice.createdAt,
+				name: invoice.alias.alias,
+				domain: invoice.alias.domain,
+				createdAt: invoice.createdAt,
 				payments: invoice.payments,
 				partiallyPaid: invoice.partiallyPaid
 			})
