@@ -32,15 +32,16 @@ exports.getInvoices = async (req, res, next) => {
 		const mappedInvoices = []
 		invoices.map(invoice => {
 			mappedInvoices.push({
+				id: invoice.invoiceId,
 				plan: invoice.plan,
-				state: invoice.state,
-				invoiceId: invoice.invoiceId,
-				alias: `${invoice.alias.alias}.${invoice.alias.domain}`,
-				date: invoice.createdAt
+				status: invoice.state,
+        name: invoice.alias.alias,
+        domain: invoice.alias.domain,
+				createdAt: invoice.createdAt
 			})
 		})
 
-		const filteredInvoices = mappedInvoices.filter(invoice => invoice.state == 'InvoiceSettled' || invoice.state == 'InvoiceProcessing');
+		const filteredInvoices = mappedInvoices.filter(invoice => invoice.status == 'InvoiceSettled' || invoice.status == 'InvoiceProcessing');
 
 		res.status(200).json({
 			message: 'user invoices retrieved successfully',
