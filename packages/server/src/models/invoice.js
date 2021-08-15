@@ -9,7 +9,7 @@ const InvoiceSchema = mongoose.Schema({
 	plan: {
 		duration: Number,
 		name: String,
-		price: Number//TODO: amount currency unit
+		price: Number
 	},
 	payments: [{
 		currency: String, //cryptoInfo[].cryptoCode

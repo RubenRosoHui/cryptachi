@@ -32,7 +32,7 @@ exports.getInvoices = async (req, res, next) => {
 		const mappedInvoices = []
 		invoices.map(invoice => {
 			mappedInvoices.push({
-				id: invoice.invoiceId,
+				id: invoice._id,
 				plan: invoice.plan,
 				status: invoice.state,
 				invoiceId: invoice.invoiceId,

@@ -69,20 +69,37 @@ exports.createInvoice = async (req, res, next) => {
 		const chosenPlan = paidPlans[plan];
 
 		//does alias currently have an active invoice?
-		//redirect to that invoice
 		if (aliasObject.invoice) {
-			return res.status(200).json({
-				message: 'Invoice Already exists, redirecting',
-				url: aliasObject.invoice.url,
-			})
+
+			//is the invoice plan different?
+			if (aliasObject.invoice.plan.name != plan) {
+				//delete the currently active invoice
+				aliasObject.invoice = null;
+			}
+			//redirect to that invoice
+			else {
+				return res.status(200).json({
+					message: 'Invoice Already exists, redirecting',
+					url: aliasObject.invoice.url,
+				})
+			}
 		}
 
 		//default price
 		const normalPrice = (chosenPlan.price - (chosenPlan.price * (chosenPlan.percentDiscount / 100)));
 		//price after special discount if any
 		const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)));
-		//TODO: try sending more data like email, alias, etc and see if it shows up in BTCPAY server
-		const btcPayInvoice = await client.create_invoice({ price: price, currency: 'USD', redirectUrl: `${process.env.WEB_URL}/`, expirationTime: Date.now() + 90000 });
+
+		const btcPayInvoice = await client.create_invoice({
+			price: price,
+			currency: 'USD',
+			redirectUrl: `${process.env.WEB_URL}/checkout-success`,
+			//expirationTime: Date.now() + 90000,
+			buyerEmail: email,
+			itemCode: plan,
+			itemDesc: `$${price} USD ${chosenPlan.length / 365} year plan`
+		});
+
 		console.log(btcPayInvoice)
 		const invoice = new Invoice({
 			url: btcPayInvoice.url,
@@ -125,8 +142,14 @@ const invoiceExpired = async (req, res, next) => {
 
 	const aliasObject = await Alias.findById(invoice.alias);
 
-	aliasObject.invoice = null;
-
+	//if invoice does not match properly, occurs when user decides to change the plan they wanted
+	if (aliasObject.invoice.equals(invoice._id)) {
+		aliasObject.invoice = null;
+		await aliasObject.save();
+	}
+	else {
+		console.log(invoiceId, invoice._id, 'INVALID')
+	}
 	const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
 	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
 	const btcPayInvoice = await client.get_invoice(invoiceId)
@@ -147,7 +170,6 @@ const invoiceExpired = async (req, res, next) => {
 
 	invoice.state = type;
 	await invoice.save();
-	await aliasObject.save();
 }
 
 const invoiceProcessing = async (req, res, next) => {

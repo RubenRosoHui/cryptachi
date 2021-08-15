@@ -127,8 +127,8 @@ exports.alias = function({ checkValueIn='any', checkDomainValueIn='body', requir
 
   aliasValidator
     .exists(existsOpts).withMessage('Alias field required.')
+		.trim()
     .isAlphanumeric().withMessage('Alias can only contain numbers or letters.')
-    .trim()
     .toLowerCase()
     .bail()
     .custom(async (value, {req}) => {
