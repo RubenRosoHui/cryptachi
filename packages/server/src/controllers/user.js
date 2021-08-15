@@ -35,13 +35,16 @@ exports.getInvoices = async (req, res, next) => {
 				id: invoice.invoiceId,
 				plan: invoice.plan,
 				status: invoice.state,
-        name: invoice.alias.alias,
-        domain: invoice.alias.domain,
-				createdAt: invoice.createdAt
+				invoiceId: invoice.invoiceId,
+				name: invoice.alias.alias,
+				domain: invoice.alias.domain,
+				createdAt: invoice.createdAt,
+				payments: invoice.payments,
+				partiallyPaid: invoice.partiallyPaid
 			})
 		})
 
-		const filteredInvoices = mappedInvoices.filter(invoice => invoice.status == 'InvoiceSettled' || invoice.status == 'InvoiceProcessing');
+		const filteredInvoices = mappedInvoices.filter(invoice => invoice.status == 'InvoiceSettled' || invoice.status == 'InvoiceProcessing' || invoice.status == 'InvoiceExpired' && invoice.partiallyPaid);
 
 		res.status(200).json({
 			message: 'user invoices retrieved successfully',
