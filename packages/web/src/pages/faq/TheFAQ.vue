@@ -29,6 +29,7 @@
 			<li>
 				<h2>What are the limitations of a Free Alias?</h2>
 				<p>Free aliases have the same security and reliability features as a paid alias. However, free aliases are limited to having only 1 XMR record and must be renewed every 30 days.</p>
+				<br />
 				<p>You may upgrade a free alias at any time by clicking the upgrade button next to the alias in the <router-link to="/account/aliases">aliases section</router-link> of your user account page. Note that the upgrade button only appears if the alias has one record.</p>
 			</li>
 			<li>
