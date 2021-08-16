@@ -36,7 +36,7 @@ exports.checkValidationResults = (req, _, next) => {
 	}
 };
 
-exports.email = function({ checkValueIn='any', checkTaken=false, checkExisting=true } = { checkValueIn: 'any', checkTaken:false, checkExisting:true }) {
+exports.email = function({ checkValueIn='any', checkTaken=false, checkExisting=true, optional=false } = { checkValueIn: 'any', checkTaken:false, checkExisting:true, optional:false }) {
   const defaultMessage = value => `Invalid email: ${value}`;
   let emailValidator;
 
@@ -54,6 +54,8 @@ exports.email = function({ checkValueIn='any', checkTaken=false, checkExisting=t
       emailValidator = check('email', defaultMessage);
       break;
   }
+
+  if (optional) emailValidator.optional();
 
   emailValidator
 		.exists(existsOpts).withMessage('Email is required')
