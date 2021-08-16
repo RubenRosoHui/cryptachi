@@ -21,6 +21,7 @@
 				<select id="currency" name="currency" v-model="recordForm.fields.currency.value">
 					<option v-for="currency in recordForm.availableCurrencies" :key="currency" :value="currency">{{ currency.toUpperCase() }}</option>
 				</select>
+				<p class="yellow bold margin-top-2" v-if="!recordForm.isAliasPaid">Free aliases are limited to one XMR record.</p>
 			</div>
 			<div class="form-control text-align-right form-buttons">
 				<button v-if="recordForm.mode === 'edit'" type="submit" class="base-button" id="edit-button" @click="editRecord">EDIT</button>
@@ -100,6 +101,7 @@
 			recordForm: {
 				mode: 'edit', // NOTE: Valid values are: 'edit', 'add'
 				isVisible: false,
+				isAliasPaid: false,
 				availableCurrencies: [],
 				fields: {
 					aliasName: '',
@@ -136,7 +138,7 @@
 
 				this.recordForm.isVisible = true;
 			},
-			showAddRecordForm({ aliasName, domain, currencies }) {
+			showAddRecordForm({ aliasName, domain, currencies, paid }) {
 				if (currencies.length >= this.supportedCurrencies.length) {
 					const confirmDialog = this.$refs.confirmDialog;
 					confirmDialog.type = 'ok';
@@ -145,12 +147,18 @@
 					confirmDialog.show = true;
 				} else {
 					this.recordForm.mode = 'add';
+					this.recordForm.isAliasPaid = paid;
 					this.recordForm.fields.aliasName = aliasName;
 					this.recordForm.fields.domain = domain;
 					this.recordForm.fields.recipientName.value = '';
 					this.recordForm.fields.recipientAddress.value = '';
 					this.recordForm.fields.description.value = '';
-					this.recordForm.availableCurrencies = this.supportedCurrencies.filter(sc => !currencies.includes(sc)).sort();
+
+					if (paid)
+						this.recordForm.availableCurrencies = this.supportedCurrencies.filter(sc => !currencies.includes(sc)).sort();
+					else
+						this.recordForm.availableCurrencies = ['xmr']; // Free aliases can only have XMR records.
+
 					this.recordForm.fields.currency.value = this.recordForm.availableCurrencies[0];
 					this.recordForm.isVisible = true;
 				}

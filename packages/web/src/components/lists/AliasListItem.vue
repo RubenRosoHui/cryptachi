@@ -98,7 +98,8 @@
 				this.$emit('addRecord', {
 					aliasName: this.alias.name,
 					domain: this.alias.domain,
-					currencies: this.alias.records.map(record => record.currency)
+					currencies: this.alias.records.map(record => record.currency),
+					paid: this.alias.paid
 				});
 				this.isRecordsVisible = true;
 			},
