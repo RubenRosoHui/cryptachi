@@ -8,7 +8,8 @@
 				<ul class="features">
 					<li>DNSSEC Secured</li>
 					<li>DDoS Protection</li>
-					<li class="unfeature">One record limit</li>
+					<li class="unfeature">Limited to 1 record</li>
+					<li class="unfeature">Only XMR records</li>
 					<li class="unfeature">Expires every 30 days</li>
 				</ul>
 			</li>
