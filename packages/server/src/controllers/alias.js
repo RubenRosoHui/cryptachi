@@ -20,7 +20,6 @@ exports.queryAliases = async (req, res, next) => {
 		let invoiceAliases = invoiceRecords.map(r => r.alias);
 
 		if (email) {
-			console.log(email)
 			const user = await User.findOne({ email: email })
 
 			//get all the users active invoices (populate alias)
@@ -33,8 +32,6 @@ exports.queryAliases = async (req, res, next) => {
 
 			//filter through all the invoiceRecords, any with our alias are excluded
 			invoiceAliases = invoiceAliases.filter(alias => !usersActiveAliases.includes(alias))
-
-			console.log('result:', invoiceAliases)
 
 			//if the invoice on the aliasObject is also referenced in the users invoice list
 		}
