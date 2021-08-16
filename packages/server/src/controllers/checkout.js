@@ -70,14 +70,16 @@ exports.createInvoice = async (req, res, next) => {
 
 		//does alias currently have an active invoice?
 		if (aliasObject.invoice) {
+			let redirect = true;
 
-			//is the invoice plan different?
 			if (aliasObject.invoice.plan.name != plan) {
-				//delete the currently active invoice
-				aliasObject.invoice = null;
+				redirect = false;
+				if (aliasObject.invoice.state != 'InvoiceCreated') {
+					redirect = true;
+				}
 			}
-			//redirect to that invoice
-			else {
+
+			if (redirect) {
 				return res.status(200).json({
 					message: 'Invoice Already exists, redirecting',
 					url: aliasObject.invoice.url,
