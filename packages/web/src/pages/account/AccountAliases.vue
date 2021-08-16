@@ -37,11 +37,12 @@
 				<search-alias-field
 					@aliasChange="alias => aliasForm.fields.aliasName = alias"
 					@domainChange="domain => aliasForm.fields.domain = domain"
+					@validate="onSearchAliasFieldValidate"
 				/>
 			</div>
 			<div class="form-control text-align-right form-buttons">
-				<button type="submit" class="base-button purchase-alias">Purchase Alias</button>
-				<button type="submit" class="base-button margin-left-4">Add Free Alias</button>
+				<button type="submit" class="base-button purchase-alias" :disabled="!aliasForm.isValid">Purchase Alias</button>
+				<button type="submit" class="base-button margin-left-4" :disabled="!aliasForm.isValid">Add Free Alias</button>
 			</div>
 		</form>
 	</base-dialog>
@@ -111,6 +112,8 @@
 			},
 			aliasForm: {
 				isVisible: false,
+				isValid: false,
+				errorMessage: '',
 				fields: {
 					aliasName: '',
 					domain: '',
@@ -380,6 +383,10 @@
 					name: alias.alias,
 					expiration: new Date(alias.expiration)
 				}));
+			},
+			onSearchAliasFieldValidate({ isValid, errorMessage }) {
+				this.aliasForm.isValid = isValid;
+				this.aliasForm.errorMessage = errorMessage;
 			}
 		}
 	}
@@ -425,6 +432,9 @@
 
 	button.purchase-alias {
 		background-color: var(--yellow);
+	}
+	button.purchase-alias[disabled] {
+		background-color: var(--black);
 	}
 
 	#empty-aliases {
