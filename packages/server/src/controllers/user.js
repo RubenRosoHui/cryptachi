@@ -36,7 +36,7 @@ exports.getInvoices = async (req, res, next) => {
 				plan: invoice.plan,
 				status: invoice.state,
 				invoiceId: invoice.invoiceId,
-				name: invoice.alias.alias,
+				alias: invoice.alias.alias,
 				domain: invoice.alias.domain,
 				createdAt: invoice.createdAt,
 				payments: invoice.payments,
