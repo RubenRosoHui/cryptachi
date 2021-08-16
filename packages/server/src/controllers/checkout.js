@@ -97,7 +97,7 @@ exports.createInvoice = async (req, res, next) => {
 			//expirationTime: Date.now() + 90000,
 			buyerEmail: email,
 			itemCode: plan,
-			itemDesc: `$${price} USD ${chosenPlan.length / 365} year plan`
+			itemDesc: `$${price} USD ${chosenPlan.length / 365} year plan for ${alias}.${domain}`
 		});
 
 		console.log(btcPayInvoice)
