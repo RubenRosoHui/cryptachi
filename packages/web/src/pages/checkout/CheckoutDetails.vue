@@ -35,34 +35,6 @@
 					</label>
 				</div>
 			</div>
-			<!--
-			<div class="form-control-container">
-				<h3>Payment</h3>
-				<div class="form-control radio-buttons1 payment">
-					<div>
-						<label for="payment-monero">
-							<img src="../../assets/logos/png/monero-64.png" />
-							<input id="payment-monero" type="radio" value="xmr" name="payment" v-model="payment" />
-							<div>Monero</div>
-						</label>
-					</div>
-					<div>
-						<label for="payment-bitcoin">
-							<img src="../../assets/logos/png/bitcoin-64.png" />
-							<input id="payment-bitcoin" type="radio" value="btc" name="payment" v-model="payment" />
-							<div>Bitcoin</div>
-						</label>
-					</div>
-					<div>
-						<label for="payment-ethereum">
-							<img src="../../assets/logos/png/ethereum-64.png" />
-							<input id="payment-ethereum" type="radio" value="eth" name="payment" v-model="payment" />
-							<div>Ethereum</div>
-						</label>
-					</div>
-				</div>
-			</div>
-			-->
 			<div class="form-control-container">
 				<button type="submit" class="base-button" @click="onPaymentBtnClick">Make Payment</button>
 			</div>
@@ -80,8 +52,11 @@
 			domain: { type: String, required: true }
 		},
 		data: () => ({
-			plan: 'oneYear'
+			plan: ''
 		}),
+		mounted() {
+			this.plan = 'oneYear';
+		},
 		methods: {
 			async onPaymentBtnClick() {
 				const user = this.$store.getters.user;
