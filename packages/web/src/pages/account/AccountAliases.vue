@@ -348,13 +348,9 @@
 			async renewAlias({ alias, domain }) {
 				// TODO: This must be captcha protected.
 				try {
-					const response = await fetch(`/api/user/aliases/${alias}/renew`, {
+					const response = await fetch(`/api/user/aliases/${alias}/renew?domain=${domain}`, {
 						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							Authorization: this.$store.getters['jwt']
-						},
-						body: JSON.stringify({ domain })
+						headers: { Authorization: this.$store.getters['jwt'] }
 					});
 
 					const jsonResponse = await handleResponse(response);
