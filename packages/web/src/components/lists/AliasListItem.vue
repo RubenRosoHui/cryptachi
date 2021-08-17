@@ -173,12 +173,13 @@
 		display: flex;
 		list-style: none;
 		background-color: var(--black);
+		column-gap: var(--spacing-4);
 	}
 	.menu-control {
 		display: flex;
 		align-items: center;
 		cursor: pointer;
-		margin-right: var(--spacing-4);
+		column-gap: var(--spacing-4);
 	}
 	.menu-control img {
 		width: var(--icon-md);
