@@ -220,7 +220,7 @@ const invoiceSettled = async (req, res, next) => {
 		userObject.aliases.push(aliasObject._id);
 	}
 
-	emailLib.sendPurchaseConfirmation(userObject.email);
+	emailLib.sendPurchaseConfirmation(userObject.email,invoice,aliasObject);
 
 	const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
 	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
