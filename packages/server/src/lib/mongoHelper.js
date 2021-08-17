@@ -16,9 +16,14 @@ exports.deleteAlias = async function (aliasObject) {
 	aliasObject.records = [];
 	aliasObject.expiration = null;
 	aliasObject.paid = false;
-	user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
 
-	return Promise.all([aliasObject.save(), user.save()]);
+	if (user) {
+		user.aliases = user.aliases.filter(e => e.alias != aliasObject.alias);
+		return Promise.all([aliasObject.save(), user.save()]);
+	}
+	else {
+		return Promise.all([aliasObject.save()]);
+	}
 }
 exports.deleteRecord = async function (aliasObject, currency) {
 	let record = aliasObject.records.find(record => record.currency == currency)
