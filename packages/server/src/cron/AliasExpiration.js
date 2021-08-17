@@ -17,7 +17,7 @@ exports.checkExpiringAliases = async (req, res, next) => {
 		async (err, aliases) => {
 			aliases.map(async (alias) => {
 				let user = await User.findById(alias.user);
-				emailLib.sendAliasExpiryWarning(user.email, alias.expiration)
+				if (user) emailLib.sendAliasExpiryWarning(user.email, alias.expiration)
 			})
 
 		})
