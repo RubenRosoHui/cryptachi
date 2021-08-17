@@ -36,7 +36,7 @@ exports.checkValidationResults = (req, _, next) => {
 	}
 };
 
-exports.email = function ({ checkValueIn = 'any', checkTaken = false, checkExisting = true, optional = false } = { checkValueIn: 'any', checkTaken: false, checkExisting: true, optional: false }) {
+exports.email = function ({ checkValueIn = 'any', checkTaken = false, checkExisting = true, optional = false, checkFalsy = false } = { checkValueIn: 'any', checkTaken: false, checkExisting: true, optional: false, checkFalsy: false }) {
 	const defaultMessage = value => `Invalid email: ${value}`;
 	let emailValidator;
 
@@ -55,7 +55,7 @@ exports.email = function ({ checkValueIn = 'any', checkTaken = false, checkExist
 			break;
 	}
 
-	if (optional) emailValidator.optional();
+	if (optional) emailValidator.optional({ checkFalsy });
 
 	emailValidator
 		.exists(existsOpts).withMessage('Email is required')
@@ -277,12 +277,12 @@ exports.currency = function ({ allowExisting = false, mustExist = false } = { al
 		'xmr', //monero
 		'btc', //bitcoin
 		'eth', //etheruem
-		'ada', //cardano
-		'xrp', //XRP
-		'doge', //dogecoin
-		'ltc', //litecoin
-		'bch', //bitcoin cash
-		'trx', //tron
+		//'ada', //cardano
+		//'xrp', //XRP
+		//'doge', //dogecoin
+		//'ltc', //litecoin
+		//'bch', //bitcoin cash
+		//'trx', //tron
 	];
 
 	const currencyValidator = body('currency', value => `Invalid currency: ${value}`);
