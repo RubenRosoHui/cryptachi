@@ -17,7 +17,7 @@
 				<li class="menu-control">
 					<button v-if="!alias.paid && calculateDaysRemaining(alias.expiration) < 7" class="text-button green" @click="onRenewClicked">RENEW</button>
 					<button v-else-if="(!alias.paid && alias.records.length > 0) || (alias.paid && calculateDaysRemaining(alias.expiration) < 60)" class="text-button" @click="onUpgradeClicked">UPGRADE</button>
-					<img v-else src="../../assets/icons/svg/fi-rr-plus.svg" title="Add Record" @click="addRecord" />
+					<img v-if="(!alias.paid && alias.records.length === 0) || alias.paid" src="../../assets/icons/svg/fi-rr-plus.svg" title="Add Record" @click="addRecord" />
 				</li>
 				<li @click="toggleRecordsVisibility" class="menu-control" v-if="alias.records.length > 0">
 					<img src="../../assets/icons/svg/fi-rr-angle-up.svg" v-if="isRecordsVisible" title="Hide Records" />
