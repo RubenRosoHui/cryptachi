@@ -1,0 +1,195 @@
+:root {
+	--green-light: #c2fdc9;
+	--green: #50fa7b;
+	--green-dark: #009400;
+	--red-light: #f99d9e;
+	--red: #ff5555;
+	--red-dark: #c8191f;
+	--cyan-light: #b9f1fe;
+	--cyan: #8be9fd;
+	--cyan-dark: #19707b;
+	--yellow-light: #f8fbcc;
+	--yellow: #f1fa8c;
+	--yellow-dark: #9a8c35;
+	--purple-light: #d8bffb;
+	--purple: #bd93f9;
+	--purple-dark: #5806c8;
+	--pink-light: #feb1dd;
+	--pink: #ff79c6;
+	--pink-dark: #8d0063;
+	--blue-light: #c5cce1;
+	--blue: #5f72a8;
+	--blue-dark: #232e62;
+	--black-light: #7e808f;
+	--black: #4a4c59;
+	--black-dark: #282a36;
+	--black-darkest: #21232d;
+	--white: #f8f8f2;
+	--text-light: var(--white);
+	--text: #e4e4de;
+	--text-dark: #aeaea8;
+	--text-darker: #666661;
+
+	--green-filter: invert(61%) sepia(41%) saturate(650%) hue-rotate(82deg) brightness(124%) contrast(96%);
+	--green-light-filter: invert(90%) sepia(14%) saturate(770%) hue-rotate(67deg) brightness(107%) contrast(98%);
+	--red-filter: invert(53%) sepia(85%) saturate(3936%) hue-rotate(330deg) brightness(105%) contrast(99%);
+	--yellow-filter: invert(84%) sepia(38%) saturate(411%) hue-rotate(17deg) brightness(103%) contrast(105%);
+	--cyan-filter: invert(77%) sepia(32%) saturate(839%) hue-rotate(169deg) brightness(110%) contrast(98%);
+	--white-filter: invert(100%) sepia(2%) saturate(682%) hue-rotate(2deg) brightness(93%) contrast(92%);
+	--black-filter: invert(12%) sepia(7%) saturate(1691%) hue-rotate(193deg) brightness(92%) contrast(93%);
+}
+
+html {
+  background-color: var(--black-darkest) !important;
+}
+
+.modal.page {
+  background-color: var(--black-darkest);
+}
+
+.top-header {
+  background-color: var(--black-dark);
+}
+
+.top-header .timer-row__progress-bar {
+  background: var(--cyan-light);
+}
+
+.top-header .timer-row {
+	color: var(--black);
+  background: var(--cyan);
+}
+
+.top-header .timer-row.expiring-soon {
+	background: var(--red);
+}
+
+.top-header .timer-row__spinner svg {
+	filter: var(--black-filter);
+}
+
+.single-item-order__left__description {
+	color: var(--yellow);
+}
+
+.payment-tabs__slider {
+  background: var(--cyan);
+}
+
+nav.copyBox {
+	background: var(--blue-dark);
+	border: 1px solid var(--black);
+}
+nav.copyBox div.copyAmountText {
+	color: var(--yellow);
+}
+
+.copySectionBox.bottomBorder {
+	border-bottom: 1px solid var(--black-light);
+}
+
+.checkoutTextbox {
+		background: var(--black-dark);
+		border: 1px solid var(--black-light);
+		color: var(--text);
+}
+
+.copySectionBox label {
+	color: var(--green-light);
+	font-weight: bold;
+}
+
+.separatorGem {
+	background: var(--green);
+	border-right: 1px solid var(--green-light);
+	border-bottom: 1px solid var(--green-light);
+}
+
+.action-button {
+  color: var(--black-darkest) !important;
+  background-color: var(--cyan);
+}
+
+.action-button:active, .action-button:hover {
+  background-color: var(--cyan-light);
+}
+
+.invoice {
+  background-color: var(--black-dark);
+}
+
+.expired__body {
+  color: var(--white);
+}
+
+.currency-selection {
+  background-color: var(--black-dark);
+  border-bottom: 1px solid var(--black-light);
+  color: var(--text);
+  padding-top: 15px;
+  padding-bottom: 15px;
+  height: auto;
+}
+
+.line-items {
+  background-color: var(--black-darkest);
+  color: var(--black-light) !important;
+  border-top: 1px solid var(--black-light) !important;
+}
+
+.buyerTotalLine {
+  border-top: 1px solid var(--black);
+  background-color: var(--black-dark);
+  color: var(--text);
+}
+
+.payment-tabs {
+  background-color: var(--black-dark);
+  color: var(--text);
+  border-top: 1px solid var(--black-light);
+  border-bottom: 1px solid var(--black-light);
+}
+
+.payment-tabs__tab .active {
+	background-color: initial;
+  color: var(--cyan);
+}
+
+.payment-tabs__tab.active {
+	background-color: initial;
+  color: var(--cyan);
+	border-bottom: var(--cyan) 3px solid;
+}
+
+a {
+  color: var(--cyan) !important;
+}
+
+canvas {
+  border: 5px solid var(--white);
+}
+
+.manual__step-two__instructions {
+	color: var(--text);
+}
+
+#prettydropdown-DefaultLang ul {
+  color: var(--black-light) !important;
+  background-color: var(--black-darkest) !important;
+}
+
+.manual__step-one__header {
+    color: var(--text);
+}
+.manual__step-one__instructions {
+    color: var(--text);
+}
+
+.payment__currencies:hover {
+    background: rgba(248, 248, 248,0.1);
+}
+
+.recommended-fee{
+		color: var(--yellow);
+    margin-top: 10px;
+}
