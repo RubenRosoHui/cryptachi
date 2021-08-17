@@ -98,7 +98,7 @@ exports.confirmPassword = () => body('confirmPassword')
 		return true;
 	});
 
-exports.alias = function ({ checkValueIn = 'any', checkDomainValueIn = 'body', requireDomainField = true, allowTaken = false, allowExisting = false, optional = false, mustExist = false, checkOwnership = false } = { checkValueIn: 'any', checkDomainValueIn: 'body', requireDomainField: true, allowExists: false, allowTaken: false, optional: false, mustExist: false, checkOwnership: false }) {
+exports.alias = function ({ checkValueIn = 'any', checkDomainValueIn = 'body', requireDomainField = true, allowTaken = false, allowExisting = false, optional = false, mustExist = false, checkOwnership = false, checkInvoice = false } = { checkValueIn: 'any', checkDomainValueIn: 'body', requireDomainField: true, allowExists: false, allowTaken: false, optional: false, mustExist: false, checkOwnership: false, checkInvoice: false }) {
 	const defaultMessage = value => `Invalid alias: ${value}`;
 	let aliasValidator;
 
@@ -145,6 +145,24 @@ exports.alias = function ({ checkValueIn = 'any', checkDomainValueIn = 'body', r
 			// Check if alias is taken
 			const aliasTaken = Boolean(aliasFound && aliasFound.user);
 			if (!allowTaken && aliasTaken) throw 'Alias is taken.';
+
+			//check if alias has invoice belonging to user
+			if (checkInvoice) {
+
+				if (aliasFound && aliasFound.invoice) {
+					if (!req.user) {
+						console.error('Unable to check invoice since req.user was not found.');
+						throw { type: 'ServerError', msg: 'Something went wrong. If you are the admin, check the server logs.' };
+					}
+
+					const user = await User.findById(req.user.id)
+					//check if users list of invoices contains the active invoice alias
+					if (!user.invoices.includes(aliasFound.invoice)) {
+						console.log('INVOICE DOES NOT MATCH USER');
+						throw 'You do not own this alias';
+					}
+				}
+			}
 
 			return true;
 		})
@@ -280,8 +298,8 @@ exports.currency = function ({ allowExisting = false, mustExist = false } = { al
 				alias: req.params.alias,
 				domain: req.body.domain
 			});
-			
-			if(!alias.paid && value != 'xmr') throw `You can only own a monero record on a free alias`
+
+			if (!alias.paid && value != 'xmr') throw `You can only own a monero record on a free alias`
 
 			const currencyExists = alias.records.some(record => record.currency === value);
 
