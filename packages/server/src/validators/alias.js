@@ -5,7 +5,8 @@ exports.queryAliases = [
   validate.aliasList(),
 	validate.email({
 		checkValueIn: 'query',
-		optional: true
+		optional: true,
+		checkFalsy: true
 	}),
   validate.checkValidationResults
 ];

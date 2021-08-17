@@ -17,7 +17,7 @@ exports.checkExpiringAliases = async (req, res, next) => {
 		async (err, aliases) => {
 			aliases.map(async (alias) => {
 				let user = await User.findById(alias.user);
-				emailLib.sendAliasExpiryWarning(user.email, alias.expiration)
+				if (user) emailLib.sendAliasExpiryWarning(user.email, alias.expiration)
 			})
 
 		})
@@ -28,25 +28,23 @@ exports.checkExpiredAliases = async (req, res, next) => {
 
 	let expiry = new Date();
 
-	//find all expired, send email and delete
-	let expiredAliases = await Alias.find({ expiration: { $lte: expiry/*Date.now()*/ } }, async (err, aliases) => {
+	let expiredAliases = await Alias.find({ expiration: { $lte: expiry } });
 
-		aliases.map(async (alias) => {
-			let user = await User.findById(alias.user);
+	for (const alias of expiredAliases) {
 
-			//REVIEW: bug test this invoice code
-			if (alias.invoice) {
-				console.log('Alias expiration cancelled due to active invoice')
-				return;
-			}
+		let user = await User.findById(alias.user);
 
-			if (user) emailLib.sendAliasExpiry(user.email);
-			console.log(`${alias.alias} is expired`);
+		if (alias.invoice) {
+			console.log('Alias expiration cancelled due to active invoice')
+			return;
+		}
 
-			console.log(expiry)
-			console.log(alias.expiration)
-			await mongoLib.deleteAlias(alias);
-		})
+		if (user) emailLib.sendAliasExpiry(user.email);
+		console.log(`${alias.alias} is expired`);
 
-	});
+		console.log(expiry)
+		console.log(alias.expiration)
+
+		await mongoLib.deleteAlias(alias);
+	}
 }
