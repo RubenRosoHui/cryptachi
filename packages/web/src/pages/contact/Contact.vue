@@ -32,7 +32,13 @@
 				<p v-if="form.fields.message.errorMessage" class="error">{{ form.fields.message.errorMessage }}</p>
 			</div>
 			<div class="form-control text-align-right" id="form-buttons">
-				<button type="submit" class="base-button" id="submit-button" :disabled="form.disableSubmitButton">Send Message</button>
+				<recaptcha-button
+					ref="captchaBtn"
+					:disabled="form.disableSubmitButton"
+					@verify="onCaptchaVerify"
+					@expire="onCaptchaExpire"
+					@fail="onCaptchaFail"
+				>Send Message</recaptcha-button>
 			</div>
 			<form-message
 				v-if="form.message.isShown"
@@ -45,12 +51,15 @@
 
 <script>
 	import validator from 'validator';
+
+	import captchaMixin from '../../mixins/captcha.js';
 	import { handleResponse } from '../../lib/exception.js';
 
 	let showMessageTimeoutID;
 
 	export default {
 		name: 'ContactPage',
+		mixins: [captchaMixin],
 		data: () => ({
 			form: {
 				fields: {
@@ -145,6 +154,28 @@
 				this.form.fields.phone.value = '';
 				this.form.fields.message.value = '';
 			},
+			onCaptchaVerify(response) {
+				this.captchaResponse = response;
+				this.$refs.captchaBtn.reset();
+				this.submitForm();
+			},
+			onCaptchaFail() {
+				this.form.disableSubmitButton = true;
+
+				this.captchaReset();
+
+				this.form.message.value = 'Recaptcha verification failed. Please try again.';
+				this.form.message.type = 'error';
+				this.form.message.isShown = true;
+
+				if (showMessageTimeoutID) clearTimeout(showMessageTimeoutID);
+
+				showMessageTimeoutID = setTimeout(() => {
+					this.form.message.isShown = false;
+				}, 10000);
+
+				this.form.disableSubmitButton = false;
+			},
 			async submitForm() {
 				this.validateForm();
 				if (!this.form.isValid) return;
@@ -152,8 +183,10 @@
 				this.form.disableSubmitButton = true;
 				const formMessage = this.form.message;
 
+				const query = `?ct=${this.captchaResponse}`;
+
 				try {
-					const response = await fetch('/api/contact', {
+					const response = await fetch(`/api/contact${query}`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
