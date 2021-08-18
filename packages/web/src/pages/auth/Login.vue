@@ -14,7 +14,13 @@
 				<p class="text-align-center margin-top-2">Forgot your password? Click <router-link to="/reset-password-link">here</router-link>.</p>
 			</div>
 			<div class="form-control text-align-right" id="form-buttons">
-				<button type="submit" class="base-button" id="login-button">LOGIN</button>
+				<recaptcha-button
+					ref="captchaBtn"
+					:disabled="form.enableSubmit"
+					@verify="onCaptchaVerify"
+					@expire="onCaptchaExpire"
+					@fail="onCaptchaFail"
+				>LOGIN</recaptcha-button>
 			</div>
 		</form>
 		<form-message v-show="form.message" :message="form.message" type="error" />
@@ -23,9 +29,11 @@
 
 <script>
 	import validator from 'validator';
+	import captchaMixin from '../../mixins/captcha.js';
 
 	export default {
 		name: 'LoginPage',
+		mixins: [captchaMixin],
 		data: () => ({
 			form: {
 				fields: {
@@ -33,10 +41,22 @@
 					password: { value: '', errorMessage: '', isValid: false }
 				},
 				isValid: false,
-				message: ''
+				message: '',
+				enableSubmit: true
 			}
 		}),
 		methods: {
+			async onCaptchaVerify(response) {
+				this.form.enableSubmit = false;
+				this.captchaResponse = response;
+				await this.login();
+				this.captchaReset();
+				this.form.enableSubmit = true;
+			},
+			onCaptchaFail() {
+				this.form.message = 'Captcha verification failed. Please try again.';
+				this.captchaReset();
+			},
 			validateEmail() {
 				const email = this.form.fields.email;
 
@@ -75,7 +95,8 @@
 				try {
 					await this.$store.dispatch('login', {
 						email: this.form.fields.email.value,
-						password: this.form.fields.password.value
+						password: this.form.fields.password.value,
+						captchaResponse: this.captchaResponse
 					});
 
 					this.$router.push('/account');

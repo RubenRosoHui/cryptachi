@@ -9,33 +9,51 @@
 				<p v-if="otp.errorMessage" class="error text-align-left">{{ otp.errorMessage }}</p>
 			</div>
 			<div class="form-control text-align-right">
-				<button class="base-button">Submit</button>
+				<recaptcha-button
+					ref="captchaBtn"
+					:disabled="!enableSubmit"
+					@verify="onCaptchaVerify"
+					@expire="onCaptchaExpire"
+					@fail="onCaptchaFail"
+				>Submit</recaptcha-button>
 			</div>
 		</form>
 	</div>
 </template>
 
 <script>
+	import captchaMixin from '../../mixins/captcha.js';
+
 	export default {
 		name: 'TwoFactor',
+		mixins: [captchaMixin],
 		props: {
 			email: { type: String, required: true },
 			password: { type: String, required: true }
 		},
-		created() {
-			console.log('Email: ', this.email);
-			console.log('Password: ', this.password);
-		},
 		data: () => ({
-			otp: { value: '', errorMessage: '' }
+			otp: { value: '', errorMessage: '' },
+			enableSubmit: false
 		}),
 		methods: {
+			async onCaptchaVerify(response) {
+				this.enableSubmit = false;
+				this.captchaResponse = response;
+				await this.login();
+				this.captchaReset();
+				this.enableSubmit = true;
+			},
+			onCaptchaFail() {
+				this.otp.errorMessage = 'Captcha verification failed. Please try again.';
+				this.captchaReset();
+			},
 			async login() {
 				try {
 					await this.$store.dispatch('login', {
 						email: this.email,
 						password: this.password,
-						authCode: this.otp.value.replaceAll(' ', '')
+						authCode: this.otp.value.replaceAll(' ', ''),
+						captchaResponse: this.captchaResponse
 					});
 
 					this.$router.push('/account');
