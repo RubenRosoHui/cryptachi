@@ -36,33 +36,65 @@
 				</div>
 			</div>
 			<div class="form-control-container">
-				<button type="submit" class="base-button" @click="onPaymentBtnClick">Make Payment</button>
+				<recaptcha-button
+					ref="captchaBtn"
+					:disabled="isSubmitBtnEnabled"
+					@verify="onCaptchaVerify"
+					@expire="onCaptchaExpire"
+					@fail="onCaptchaFail"
+				>Make Payment</recaptcha-button>
 			</div>
 		</form>
+		<div class="text-align-right">
+			<p class="error" v-if="errorMessage">ERROR: {{ errorMessage }}</p>
+		</div>
 	</div>
 </template>
 
 <script>
 	import { handleResponse } from '../../lib/exception.js';
+	import captchaMixin from '../../mixins/captcha.js';
+
+	let errorMessageTimeoutID;
 
 	export default {
 		name: 'CheckoutDetails',
+		mixins: [captchaMixin],
 		props: {
 			alias: { type: String, required: true },
 			domain: { type: String, required: true }
 		},
 		data: () => ({
-			plan: ''
+			plan: 'oneYear',
+			errorMessage: '',
+			isSubmitBtnEnabled: true
 		}),
-		mounted() {
-			this.plan = 'oneYear';
-		},
 		methods: {
-			async onPaymentBtnClick() {
+			async onCaptchaVerify(response) {
+				this.isSubmitBtnEnabled = false;
+				this.captchaResponse = response;
+				this.captchaReset();
+				await this.makePayment();
+				this.isSubmitBtnEnabled = true;
+			},
+			onCaptchaFail() {
+				this.setErrorMessage('Recaptcha verification failed. Please try again.');
+				this.captchaReset();
+			},
+			setErrorMessage(message, timeoutDelay=10000) {
+				if (errorMessageTimeoutID) clearTimeout(errorMessageTimeoutID);
+
+				this.errorMessage = message;
+
+				setTimeout(() => {
+					this.errorMessage = '';
+				}, timeoutDelay);
+			},
+			async makePayment() {
 				const user = this.$store.getters.user;
 
 				try {
-					const response = await fetch('/api/checkout/create-invoice', {
+					const response = await fetch(`/api/checkout/create-invoice?ct=${this.captchaResponse}`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
@@ -78,6 +110,7 @@
 					window.location.href = jsonResponse.url;
 				} catch(err) {
 					console.error(err);
+					this.setErrorMessage(err.message);
 				}
 
 			}
