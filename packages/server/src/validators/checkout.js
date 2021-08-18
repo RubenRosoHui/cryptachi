@@ -65,22 +65,22 @@ exports.webhooks = [
 
 		//list of states that cannot preceed the state specified on the request
 		// "invoiceProcessing cannot come after Settled,Invalid,etc"
-		const invalidConditions = {
-			InvoiceProcessing: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired','InvoiceProcessing'],
-			InvoiceExpired: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired'],
-			InvoiceInvalid: ['InvoiceSettled','InvoiceInvalid'],
-			InvoiceSettled: ['InvoiceSettled','InvoiceInvalid']
-		}
+		// const invalidConditions = {
+		// 	InvoiceProcessing: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired','InvoiceProcessing'],
+		// 	InvoiceExpired: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired'],
+		// 	InvoiceInvalid: ['InvoiceSettled','InvoiceInvalid'],
+		// 	InvoiceSettled: ['InvoiceSettled','InvoiceInvalid']
+		// }
 
 		const invoice = await Invoice.findOne({ invoiceId: invoiceId });
 		if (!invoice) {
 			console.log('This invoice was created improperly')
 			throw errorLib.badRequestError('This invoice was created improperly')
 		}
-		if (invalidConditions[req.body.type] && invalidConditions[req.body.type].includes(invoice.state)) {//invalidStates.includes(invoice.state)) {
-			console.log('Invalid state sent to webhook')
-			throw errorLib.badRequestError('The invoice has already received this information')
-		}
+		// if (invalidConditions[req.body.type] && invalidConditions[req.body.type].includes(invoice.state)) {//invalidStates.includes(invoice.state)) {
+		// 	console.log('Invalid state sent to webhook')
+		// 	throw errorLib.badRequestError('The invoice has already received this information')
+		// }
 
 		return true;
 	}),
