@@ -98,7 +98,9 @@
 
 				const domain = this.domain;
 				const alias = this.alias.value;
-				const email = this.$store.getters.user.email || null;
+
+				const user = this.$store.getters.user;
+				const email = user ? this.$store.getters.user.email : '';
 
 				const query = `names=${alias}&domain=${domain}&email=${email}`;
 
