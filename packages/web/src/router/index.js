@@ -15,6 +15,7 @@ import AccountAliases from '../pages/account/AccountAliases.vue';
 import AccountSecurity from '../pages/account/AccountSecurity.vue';
 import AccountOrders from '../pages/account/AccountOrders.vue';
 import CheckoutDetails from '../pages/checkout/CheckoutDetails.vue';
+import CheckoutSuccess from '../pages/checkout/CheckoutSuccess.vue';
 import ConfirmEmail from '../pages/auth/ConfirmEmail';
 import EmailUnconfirmed from '../pages/error/EmailUnconfirmed';
 import NotFound from '../pages/error/NotFound.vue';
@@ -84,6 +85,14 @@ const router = createRouter({
       path: '/checkout-details',
       component: CheckoutDetails,
       name: 'CheckoutDetails',
+      beforeEnter: (to, _, next) => {
+        to.query.alias && to.query.domain ? next() : next('/');
+      },
+      props: route => ({ alias: route.query.alias, domain: route.query.domain })
+    },
+    {
+      path: '/checkout-success',
+      component: CheckoutSuccess,
       beforeEnter: (to, _, next) => {
         to.query.alias && to.query.domain ? next() : next('/');
       },
