@@ -19,7 +19,7 @@
 				<td>{{ formatDate(purchase.createdAt) }}</td>
 				<td>{{ purchase.id }}</td>
 				<td>
-					<div :class="statusStyles(purchase.status)" class="bold">{{ purchase.status }}</div>
+					<span :class="statusStyles(purchase.status)" class="bold">{{ purchase.status }}</span>
 					<router-link
 						to="/contact"
 						v-if="purchase.status === 'Expired' && purchase.partiallyPaid"
@@ -31,7 +31,10 @@
 				<td><span class="yellow">{{ purchase.alias }}</span>.{{ purchase.domain }}</td>
 				<td>{{ `${purchase.plan.duration} ${purchase.plan.unit}` }}</td>
 				<td>
-					<p v-for="payment in purchase.payments" :key="payment._id">{{ `${payment.paid} ${payment.currency.toUpperCase()}` }}</p>
+					<div class="payment-list__container">
+						<span v-for="payment in purchase.payments" :key="payment._id">{{ `${payment.paid} ${payment.currency.toUpperCase()}` }}<br /></span>
+						<span>1.00000 XMR</span>
+					</div>
 				</td>
 			</tr>
 		</tbody>
@@ -129,6 +132,9 @@
 			left: -100%;
 		}
 
+		.payment-list__container {
+			display: inline-block;
+		}
 
 		tbody td {
 			/* Behave like a row */
