@@ -33,7 +33,6 @@
 				<td>
 					<div class="payment-list__container">
 						<span v-for="payment in purchase.payments" :key="payment._id">{{ `${payment.paid} ${payment.currency.toUpperCase()}` }}<br /></span>
-						<span>1.00000 XMR</span>
 					</div>
 				</td>
 			</tr>
