@@ -37,7 +37,7 @@ exports.needsVerifiedAccount = async (req, res, next) => {
 }
 
 exports.needsCaptcha = async (req, res, next) => {
-	const recaptchaResponse = req.query.captcharesponse;
+	const recaptchaResponse = req.query.ct;
 
 	if (!recaptchaResponse) return next(errorLib.authenticationError('Valid captcha token required.'));
 
@@ -53,5 +53,5 @@ exports.needsCaptcha = async (req, res, next) => {
 		return next(errorLib.errorWrapper(err));
 	};
 
-	verificationResult.success ? next() : next(authenticationError('Requires verified captcha.'));
+	verificationResult.success ? next() : next(errorLib.authenticationError('Requires verified captcha.'));
 };
