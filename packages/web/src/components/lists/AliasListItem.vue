@@ -45,9 +45,14 @@
 			<tbody>
 				<tr v-for="(record, i) in sortRecords(alias.records)" :key="i">
 					<td class="currency">
+						<!-- REVIEW: Do this better. Use an object -->
 						<img v-if="record.currency === 'btc'" src="../../assets/logos/png/bitcoin-200.png" />
 						<img v-else-if="record.currency === 'xmr'" src="../../assets/logos/png/monero-200.png" />
 						<img v-else-if="record.currency === 'eth'" src="../../assets/logos/png/ethereum-200.png" />
+						<img v-else-if="record.currency === 'doge'" src="../../assets/logos/svg/dogecoin-doge-logo.svg" />
+						<img v-else-if="record.currency === 'ada'" src="../../assets/logos/svg/Cardano-RGB_Logo-Icon-White.svg" />
+						<img v-else-if="record.currency === 'bch'" src="../../assets/logos/svg/bitcoin-cash-bch-logo.svg" />
+						<img v-else-if="record.currency === 'ltc'" src="../../assets/logos/svg/litecoin-ltc-logo.svg" />
 						{{ record.currency.toUpperCase() }}
 					</td>
 					<td class="recipient-name" :title="record.recipientName">{{ record.recipientName }}</td>
