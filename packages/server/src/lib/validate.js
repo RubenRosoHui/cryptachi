@@ -6,6 +6,8 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js')
 
+const supported = require('../../../common/lib/supported.js')
+
 const existsOpts = { checkFalsy: true };
 
 const customValidationResult = validationResult.withDefaults({
@@ -190,8 +192,7 @@ exports.domain = function ({ checkValueIn = 'any', checkAliasValueIn = 'body', r
 	if (process.env.NODE_ENV === 'development') {
 		validDomains = ['cryptachi.com', 'cryptachitest.com'];
 	} else {
-		// TODO: Populate with purchased domains from DNSimple.
-		validDomains = [];
+		validDomains = supported.domains;
 	}
 
 	const defaultMessage = value => `Invalid domain: ${value}`;
@@ -273,17 +274,7 @@ exports.resetPasswordToken = () => body('token')
 	});
 
 exports.currency = function ({ allowExisting = false, mustExist = false } = { allowExisting: false, mustExist: false }) {
-	const validCurrencies = [
-		'xmr', //monero
-		'btc', //bitcoin
-		'eth', //etheruem
-		//'ada', //cardano
-		//'xrp', //XRP
-		//'doge', //dogecoin
-		//'ltc', //litecoin
-		//'bch', //bitcoin cash
-		//'trx', //tron
-	];
+	validCurrencies = supported.currencies;
 
 	const currencyValidator = body('currency', value => `Invalid currency: ${value}`);
 
