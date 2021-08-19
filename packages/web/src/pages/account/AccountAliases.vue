@@ -126,6 +126,7 @@
 		methods: {
 			showEditRecordForm(payload) {
 				const { record, aliasName, domain } = payload;
+
 				const formFields = this.recordForm.fields;
 
 				this.recordForm.mode = 'edit';
@@ -345,10 +346,9 @@
 					}
 				}
 			},
-			async renewAlias({ alias, domain }) {
-				// TODO: This must be captcha protected.
+			async renewAlias({ alias, domain, captchaResponse }) {
 				try {
-					const response = await fetch(`/api/user/aliases/${alias}/renew?domain=${domain}`, {
+					const response = await fetch(`/api/user/aliases/${alias}/renew?domain=${domain}&ct=${captchaResponse}`, {
 						method: 'POST',
 						headers: { Authorization: this.$store.getters['jwt'] }
 					});

@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const { needsVerifiedAccount } = require('../middlewares/auth.js')
+const { needsVerifiedAccount, needsCaptcha } = require('../middlewares/auth.js')
 const controller = require('../controllers/user.js')
 const validators = require('../validators/user.js');
 
-router.post('/aliases/:alias/renew', needsVerifiedAccount, validators.renewAlias, controller.renewAlias); // TODO: Protect with captcha
+router.post('/aliases/:alias/renew', needsVerifiedAccount, needsCaptcha, validators.renewAlias, controller.renewAlias);
 
 router.get('/aliases', needsVerifiedAccount, controller.getAliases);
 
@@ -32,6 +32,5 @@ router.get('/invoices', needsVerifiedAccount, controller.getInvoices);
 router.get('/resend-email-confirmation', controller.resendEmailConfirmation);
 
 router.get('/', controller.getUser);
-
 
 module.exports = router;

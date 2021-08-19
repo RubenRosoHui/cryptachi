@@ -1,5 +1,5 @@
 <template>
-	<button class="base-button" v-show="show" type="submit" id="g-recaptcha">
+	<button :class="buttonClass" v-show="show" type="submit" id="g-recaptcha">
 		<slot></slot>
 	</button>
 </template>
@@ -17,6 +17,11 @@
 				type: String,
 				required: false,
 				default: 'button'
+			},
+			buttonClass: {
+				type: String,
+				required: false,
+				default: 'base-button'
 			}
 		},
 		emits: {
@@ -72,7 +77,7 @@
 <style>
 	.grecaptcha-badge {
 		position: fixed;
-		top: 100%;
+		top: 105%;
 		right: 0;
 	}
 </style>

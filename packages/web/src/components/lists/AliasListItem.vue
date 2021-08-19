@@ -15,7 +15,14 @@
 					<img src="../../assets/icons/svg/fi-rr-trash.svg" title="Delete Alias" @click="deleteAlias" />
 				</li>
 				<li class="menu-control">
-					<button v-if="!alias.paid && calculateDaysRemaining(alias.expiration) < 7" class="text-button green" @click="onRenewClicked">RENEW</button>
+					<recaptcha-button
+						ref="captchaBtn"
+						v-if="!alias.paid && calculateDaysRemaining(alias.expiration) < 7"
+						buttonClass="text-button"
+						@verify="onCaptchaVerify"
+						@expire="onCaptchaExpire"
+						@fail="onCaptchaFail"
+					>RENEW</recaptcha-button>
 					<button v-else-if="(!alias.paid && alias.records.length > 0) || (alias.paid && calculateDaysRemaining(alias.expiration) < 60)" class="text-button" @click="onUpgradeClicked">UPGRADE</button>
 					<img v-if="(!alias.paid && alias.records.length === 0) || alias.paid" src="../../assets/icons/svg/fi-rr-plus.svg" title="Add Record" @click="addRecord" />
 				</li>
@@ -57,8 +64,11 @@
 </template>
 
 <script>
+	import captchaMixin from '../../mixins/captcha.js';
+
 	export default {
 		name: 'AliasListItem',
+		mixins: [captchaMixin],
 		props: ['alias'],
 		emits: [
 			'editRecord',
@@ -72,6 +82,11 @@
 			isRecordsVisible: false
 		}),
 		methods: {
+			onCaptchaVerify(response) {
+				this.captchaResponse = response;
+				this.captchaReset();
+				this.onRenew();
+			},
 			toggleRecordsVisibility() {
 				this.isRecordsVisible = !this.isRecordsVisible;
 			},
@@ -130,10 +145,11 @@
 					domain: this.alias.domain
 				});
 			},
-			onRenewClicked() {
+			onRenew() {
 				this.$emit('renewAlias', {
 					alias: this.alias.name,
-					domain: this.alias.domain
+					domain: this.alias.domain,
+					captchaResponse: this.captchaResponse
 				})
 			}
 		}
@@ -165,6 +181,10 @@
 		color: var(--white);
 	}
 
+	li.menu-control div {
+		display: none;
+	}
+
 	.text-button.green {
 		color: var(--green);
 	}
@@ -176,10 +196,9 @@
 		column-gap: var(--spacing-4);
 	}
 	.menu-control {
-		display: flex;
-		align-items: center;
+		/* HACK: grid display fixes the g-recaptcha div from being rendered and ruin the padding.*/
+		display: grid;
 		cursor: pointer;
-		column-gap: var(--spacing-4);
 	}
 	.menu-control img {
 		width: var(--icon-md);
