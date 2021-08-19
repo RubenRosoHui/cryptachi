@@ -128,7 +128,7 @@ exports.sendProcessingConfirmation = function (to) {
 		`
 	);
 }
-//TODO: ADD THE INVOICE INFORMATION HERE (perhaps a table?)
+
 exports.sendPurchaseConfirmation = function (to, invoice, alias) {
 
 	//Date	Order ID	Status	Alias	Plan	Payment
@@ -141,20 +141,21 @@ exports.sendPurchaseConfirmation = function (to, invoice, alias) {
 				<p>Thank you, your purchase is now available</p>
 				<table>
 					<tr>
-						<th>Date</th>
-						<th>Order ID</th>
-						<th>Alias</th>
-						<th>Plan</th>
-						<th>Payment</th>
+						<th>Date:</th><td>${invoice.createdAt.toDateString()}</td>
 					</tr>
 					<tr>
-						<th>${invoice.createdAt.toDateString()}</th>
-						<th>${invoice.invoiceId}</th>
-						<th>${alias.alias}.${alias.domain}</th>
-						<th>${invoice.plan.name}</th>
-						<th>${invoice.payments.map(x => {return `${x.paid} ${x.currency}`})}</th>
-					</tr >
-				</table >
+						<th>Order ID:</th><td>${invoice.invoiceId}</td>
+					</tr>
+					<tr>
+						<th>Alias:</th><td>${alias.alias}.${alias.domain}</td>
+					</tr>
+					<tr>
+						<th>Plan:</th><td>${invoice.plan.name}</td>
+					</tr>
+					<tr>
+						<th>Payment:</th><td>${invoice.payments.map(x => {return `${x.paid} ${x.currency}`})}</td>
+					</tr>
+				</table>
 			</html >
 		`
 	);
