@@ -9,9 +9,9 @@ exports.currencies = [
 	'xmr', //monero
 	'btc', //bitcoin
 	'eth', //etheruem
-	//'ada', //cardano
+	'ada', //cardano
 	'doge', //dogecoin
-	//'ltc', //litecoin
-	//'bch', //bitcoin cash
+	'ltc', //litecoin
+	'bch', //bitcoin cash
 	//'trx', //tron
 ];
