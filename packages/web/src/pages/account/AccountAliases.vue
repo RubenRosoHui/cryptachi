@@ -85,6 +85,7 @@
 
 	import AliasListItem from '../../components/lists/AliasListItem.vue';
 	import SearchAliasField from '../../components/fields/SearchAliasField.vue';
+	import { supported } from '@cryptachi/common';
 
 	export default {
 		name: 'AccountAliases',
@@ -96,7 +97,7 @@
 		},
 		data: () => ({
 			isLoading: false,
-			supportedCurrencies: ['xmr', 'btc', 'eth'],
+			supportedCurrencies: supported.currencies,
 			aliases: [],
 			recordForm: {
 				mode: 'edit', // NOTE: Valid values are: 'edit', 'add'
