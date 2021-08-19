@@ -7,6 +7,7 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js');
 const emailLib = require('../lib/email.js');
+const { Console } = require('console');
 
 const paidPlans = {
 	oneYear: {
@@ -113,7 +114,8 @@ exports.createInvoice = async (req, res, next) => {
 		aliasObject.invoice = invoice._id;
 		userObject.invoices.push(invoice._id);
 
-		Promise.all([invoice.save(), userObject.save(), aliasObject.save()]);
+		await aliasObject.save();
+		await Promise.all([invoice.save(), userObject.save()]);
 
 		res.status(200).json({
 			message: 'Invoice created successfully',
@@ -121,6 +123,7 @@ exports.createInvoice = async (req, res, next) => {
 		})
 	}
 	catch (err) {
+		console.log("THIS IS AN ERROR")
 		next(err);
 	}
 }
@@ -131,11 +134,18 @@ const invoiceInvalid = async (req, res, next) => {
 
 	const aliasObject = await Alias.findById(invoice.alias);
 
-	aliasObject.invoice = null;
+	//aliasObject.invoice = null;
+	if (aliasObject.invoice && aliasObject.invoice.equals(invoice._id)) {
+		aliasObject.invoice = null;
+		await aliasObject.save();
+		console.log(invoiceId, invoice._id, 'VALID')
+	}
+	else {
+		console.log(invoiceId, invoice._id, 'INVALID')
+	}
 
 	invoice.state = type;
 	await invoice.save();
-	await aliasObject.save();
 }
 
 const invoiceExpired = async (req, res, next) => {
@@ -145,9 +155,10 @@ const invoiceExpired = async (req, res, next) => {
 	const aliasObject = await Alias.findById(invoice.alias);
 
 	//if invoice does not match properly, occurs when user decides to change the plan they wanted
-	if (aliasObject.invoice.equals(invoice._id)) {
+	if (aliasObject.invoice && aliasObject.invoice.equals(invoice._id)) {
 		aliasObject.invoice = null;
 		await aliasObject.save();
+		console.log(invoiceId, invoice._id, 'VALID')
 	}
 	else {
 		console.log(invoiceId, invoice._id, 'INVALID')
@@ -220,7 +231,7 @@ const invoiceSettled = async (req, res, next) => {
 		userObject.aliases.push(aliasObject._id);
 	}
 
-	emailLib.sendPurchaseConfirmation(userObject.email,invoice,aliasObject);
+	emailLib.sendPurchaseConfirmation(userObject.email, invoice, aliasObject);
 
 	const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
 	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
@@ -243,9 +254,13 @@ const invoiceSettled = async (req, res, next) => {
 }
 
 exports.webhooks = async (req, res, next) => {
-	const { type } = req.body;
+	const { invoiceId, type } = req.body;
 
 	try {
+		//return success so that BTCpay knows the server is still running
+		const invoice = await Invoice.findOne({ invoiceId: invoiceId });
+		if (!invoice) return res.status(200).json({ message: 'Invalid state sent to webhook' }) && console.log('Invalid state sent to webhook');	
+
 		console.log(type, req.body);
 		switch (type) {
 			case 'InvoiceCreated':
@@ -271,7 +286,7 @@ exports.webhooks = async (req, res, next) => {
 				console.log('no selection')
 				break;
 		}
-		res.status(200).json({ message: 'success' });
+		return res.status(200).json({ message: 'success' });
 	}
 	catch (err) {
 		next(err);

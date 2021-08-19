@@ -61,6 +61,9 @@ exports.webhooks = [
 		}
 		return true;
 	}),
+	validate.checkValidationResults,
+
+	/*
 	body('invoiceId').custom(async (invoiceId, { req }) => {
 
 		//list of states that cannot preceed the state specified on the request
@@ -72,6 +75,7 @@ exports.webhooks = [
 		// 	InvoiceSettled: ['InvoiceSettled','InvoiceInvalid']
 		// }
 
+		//Make these not throw an error, need to return a success
 		const invoice = await Invoice.findOne({ invoiceId: invoiceId });
 		if (!invoice) {
 			console.log('This invoice was created improperly')
@@ -83,6 +87,6 @@ exports.webhooks = [
 		// }
 
 		return true;
-	}),
-	validate.checkValidationResults
+	}),*/
+
 ]
