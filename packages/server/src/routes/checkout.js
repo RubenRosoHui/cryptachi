@@ -9,6 +9,6 @@ router.post('/create-invoice', needsCaptcha, validator.createInvoice, controller
 
 router.post('/webhooks', validator.webhooks, controller.webhooks);
 
-router.get('/check-invoice', controller.checkInvoice)
+router.get('/get-invoice',validator.getInvoice, controller.getInvoice)
 
 module.exports = router;
