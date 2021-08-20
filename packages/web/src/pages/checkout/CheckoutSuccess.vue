@@ -11,11 +11,23 @@
 </template>
 
 <script>
+	import { handleResponse } from '../../lib/exception.js';
+
 	export default {
 		name: 'CheckoutSuccess',
 		props: {
 			alias: { type: String, required: true },
 			domain: { type: String, required: true }
+		},
+		data: () => ({
+			invoice: null
+		}),
+		methods: {
+			async getInvoice() {
+				const response = await fetch('/api/checkout/get-invoice');
+				const jsonResponse = handleResponse(response);
+				this.invoiceState = jsonResponse.invoice;
+			}
 		}
 	}
 </script>
