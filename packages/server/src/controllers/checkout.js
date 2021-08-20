@@ -46,24 +46,19 @@ const paidPlans = {
 	}
 }
 
-exports.checkInvoice = async (req, res, next) => {
-	const { alias, domain, invoiceId } = req.query;
+exports.getInvoice = async (req, res, next) => {
+	const { invoiceId } = req.query;
 
 	try {
-		const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate('alias')
+		const invoice = await Invoice.findOne({ invoiceId: invoiceId })
 
-		if (invoice) {
-			if ((invoice.state == 'InvoiceProcessing' || invoice.state == 'InvoiceSettled') && invoice.alias.alias == alias && invoice.alias.domain == domain) {
-				return res.status(200).json({
-					message: 'invoice status retrieved successfully',
-					exists: true
-				});
-			}
-		}
 		return res.status(200).json({
 			message: 'invoice status retrieved successfully',
-			exists: false
-		});
+			invoice: {
+				state: invoice.state,
+
+			}
+		})
 	}
 	catch (err) {
 		next(err);
