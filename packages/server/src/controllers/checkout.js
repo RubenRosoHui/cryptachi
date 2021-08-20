@@ -52,18 +52,18 @@ exports.checkInvoice = async (req, res, next) => {
 	try {
 		const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate('alias')
 
-		if(invoice){
-			if((invoice.state == 'InvoiceProcessing' || invoice.state == 'InvoiceSettled') && invoice.alias.alias == alias && invoice.alias.domain == domain){
-				return res.status(200).json({ 
+		if (invoice) {
+			if ((invoice.state == 'InvoiceProcessing' || invoice.state == 'InvoiceSettled') && invoice.alias.alias == alias && invoice.alias.domain == domain) {
+				return res.status(200).json({
 					message: 'invoice status retrieved successfully',
 					exists: true
-			});
+				});
 			}
 		}
-		return res.status(200).json({ 
+		return res.status(200).json({
 			message: 'invoice status retrieved successfully',
 			exists: false
-	});
+		});
 	}
 	catch (err) {
 		next(err);
@@ -212,9 +212,18 @@ const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("user");
 
+	const aliasObject = await Alias.findById(invoice.alias);
+
 	const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
 	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
 	const btcPayInvoice = await client.get_invoice(invoiceId)
+
+	//update the active invoice on the alias if the current one is incorrect
+	if (!aliasObject.invoice.equals(invoice._id)) {
+		aliasObject.invoice = invoice._id
+		console.log('running')
+		await aliasObject.save();
+	}
 
 	invoice.payments = [];
 	btcPayInvoice.cryptoInfo.forEach(coin => {
@@ -282,7 +291,7 @@ exports.webhooks = async (req, res, next) => {
 	try {
 		//return success so that BTCpay knows the server is still running
 		const invoice = await Invoice.findOne({ invoiceId: invoiceId });
-		if (!invoice) return res.status(200).json({ message: 'Invalid state sent to webhook' }) && console.log('Invalid state sent to webhook');
+		if (!invoice) return res.status(200).json({ message: `Invalid state ${invoiceId} sent to webhook` }) && console.log(`Invalid state ${invoiceId} sent to webhook`);
 
 		console.log(type, req.body);
 		switch (type) {
