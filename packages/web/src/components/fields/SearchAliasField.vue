@@ -99,7 +99,10 @@
 				const domain = this.domain;
 				const alias = this.alias.value;
 
-				const query = `names=${alias}&domain=${domain}`;
+				const user = this.$store.getters.user;
+				const email = user ? this.$store.getters.user.email : '';
+
+				const query = `names=${alias}&domain=${domain}&email=${email}`;
 
 				const response = await fetch(`/api/aliases?${query}`, { method: 'GET' });
 

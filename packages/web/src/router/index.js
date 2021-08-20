@@ -5,6 +5,7 @@ import store from '../store/index.js';
 import Home from '../pages/home/Home.vue';
 import Register from '../pages/auth/Register.vue';
 import Login from '../pages/auth/Login.vue';
+import TwoFactor from '../pages/auth/TwoFactor.vue';
 import ResetPassword from '../pages/auth/ResetPassword.vue';
 import ResetPasswordLink from '../pages/auth/ResetPasswordLink.vue';
 import Contact from '../pages/contact/Contact.vue';
@@ -13,10 +14,10 @@ import Account from '../pages/account/Account.vue';
 import AccountAliases from '../pages/account/AccountAliases.vue';
 import AccountSecurity from '../pages/account/AccountSecurity.vue';
 import AccountOrders from '../pages/account/AccountOrders.vue';
-import Checkout from '../pages/checkout/Checkout.vue';
 import CheckoutDetails from '../pages/checkout/CheckoutDetails.vue';
-import CheckoutPayment from '../pages/checkout/CheckoutPayment.vue';
+import CheckoutSuccess from '../pages/checkout/CheckoutSuccess.vue';
 import ConfirmEmail from '../pages/auth/ConfirmEmail';
+import EmailUnconfirmed from '../pages/error/EmailUnconfirmed';
 import NotFound from '../pages/error/NotFound.vue';
 
 const router = createRouter({
@@ -35,8 +36,23 @@ const router = createRouter({
   },
   routes: [
     { path: '/', component: Home },
-    { path: '/register', component: Register },
+    {
+      path: '/register',
+      component: Register,
+      beforeEnter(_, _2, next) {
+        store.getters.isAuthenticated ? next('/account') : next();
+      },
+    },
     { path: '/login', component: Login },
+    {
+      path: '/two-factor',
+      name: 'TwoFactor',
+      component: TwoFactor,
+      beforeEnter(to, _, next) {
+        to.params.email && to.params.password ? next() : next('/login');
+      },
+      props: route => ({ email: route.params.email, password: route.params.password })
+    },
     {
       path: '/reset-password',
       component: ResetPassword,
@@ -60,6 +76,10 @@ const router = createRouter({
       path: '/account',
       component: Account,
       redirect: '/account/aliases',
+      async beforeEnter(_, _2, next) {
+        await store.dispatch('fetchUserMeta');
+        store.getters.user.isEmailConfirmed ? next() : next('/email-unconfirmed');
+      },
       meta: { needsAuth: true },
       children: [
         { path: 'aliases', component: AccountAliases },
@@ -68,23 +88,24 @@ const router = createRouter({
       ]
     },
     {
-      path: '/checkout',
-      component: Checkout,
-      redirect: '/checkout/details',
-      meta: { needsUserInfo: true },
-      children: [
-        {
-          path: 'details',
-          component: CheckoutDetails,
-          name: 'CheckoutDetails',
-          beforeEnter: (to, _, next) => {
-            to.query.alias && to.query.domain ? next() : next('/');
-          },
-          props: route => ({ alias: route.query.alias, domain: route.query.domain })
-        },
-        { path: 'payment', component: CheckoutPayment }
-      ]
+      path: '/checkout-details',
+      component: CheckoutDetails,
+      name: 'CheckoutDetails',
+      beforeEnter: (to, _, next) => {
+        to.query.alias && to.query.domain ? next() : next('/');
+      },
+      props: route => ({ alias: route.query.alias, domain: route.query.domain })
     },
+    {
+      path: '/checkout-message',
+      component: CheckoutSuccess,
+      beforeEnter: (to, _, next) => {
+        console.log(to);
+        to.query.alias && to.query.domain && to.query.invoiceId ? next() : next('/');
+      },
+      props: route => ({ alias: route.query.alias, domain: route.query.domain, invoiceID: route.query.invoiceId })
+    },
+    { path: '/email-unconfirmed', component: EmailUnconfirmed },
 		{ path: '/:catchAll(.*)', component: NotFound }
   ]
 });

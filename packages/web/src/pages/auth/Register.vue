@@ -187,7 +187,10 @@
 							domain
 						});
 
-						this.$router.push(`/checkout/details?alias=${alias}&domain=${domain}`);
+						this.$router.push({
+							path: '/checkout-details',
+							query: { alias, domain }
+						});
 					}
 					else {
 						// User wants to sign up for free.

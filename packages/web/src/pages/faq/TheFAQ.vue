@@ -22,16 +22,26 @@
 			</li>
 			<li>
 				<h2>What are records?</h2>
-				<p>A record is attached to an alias and stores the type of currency, recipient name, and recipient address. An alias may have multiple records where each record is for a specific currency but may only have one record per currency. <span class="yellow bold">Note</span> that free aliases are limited to 1 record and expire every 30 days.</p>
+				<p>A record is attached to an alias and stores the type of currency, recipient name, and recipient address. An alias may have multiple records where each record is for a specific currency but may only have one record per currency. <span class="yellow bold">Note</span> that free aliases are limited to 1 XMR record and expire every 30 days.</p>
 				<br />
 				<p>You may edit these records at any time. Any changes to a record may take up to 24 hours to take effect.</p>
+			</li>
+			<li>
+				<h2>What are the limitations of a Free Alias?</h2>
+				<p>Free aliases have the same security and reliability features as a paid alias. However, free aliases are limited to having only 1 XMR record and must be renewed every 30 days.</p>
+				<br />
+				<p>You may upgrade a free alias at any time by clicking the upgrade button next to the alias in the <router-link to="/account/aliases">aliases section</router-link> of your user account page. Note that the upgrade button only appears if the alias has one record.</p>
 			</li>
 			<li>
 				<h2>Which cryptocurrencies are supported?</h2>
 				<p>We currently support the following currencies with plans of adding many more:</p>
 				<ul class="base-list">
 					<li>Bitcoin</li>
+					<li>Bitcoin Cash</li>
+					<li>Cardano</li>
+					<li>Dogecoin</li>
 					<li>Ethereum</li>
+					<li>Litecoin</li>
 					<li>Monero</li>
 				</ul>
 			</li>

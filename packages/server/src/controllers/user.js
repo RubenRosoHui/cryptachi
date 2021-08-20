@@ -13,7 +13,10 @@ exports.getAliases = async (req, res, next) => {
 	try {
 		const aliases = await User.findById(req.user.id).populate("aliases").select('-_id aliases');
 
-		res.status(200).json(aliases);
+		res.status(200).json({
+			message: 'user aliases retrieved successfully',
+			aliases: aliases.aliases
+		});
 	}
 	catch (err) {
 		next(errorLib.errorWrapper(err));
@@ -29,17 +32,24 @@ exports.getInvoices = async (req, res, next) => {
 		const mappedInvoices = []
 		invoices.map(invoice => {
 			mappedInvoices.push({
+				id: invoice._id,
 				plan: invoice.plan,
-				state: invoice.state,
+				status: invoice.state,
 				invoiceId: invoice.invoiceId,
-				alias: `${invoice.alias.alias}.${invoice.alias.domain}`,
-				date: invoice.createdAt
+				alias: invoice.alias.alias,
+				domain: invoice.alias.domain,
+				createdAt: invoice.createdAt,
+				payments: invoice.payments,
+				partiallyPaid: invoice.partiallyPaid
 			})
 		})
 
-		const filteredInvoices = mappedInvoices.filter(invoice => invoice.state == 'InvoiceSettled' || invoice.state == 'InvoiceProcessing');
+		const filteredInvoices = mappedInvoices.filter(invoice => invoice.status == 'InvoiceSettled' || invoice.status == 'InvoiceProcessing' || invoice.status == 'InvoiceExpired' && invoice.partiallyPaid);
 
-		res.status(200).json(filteredInvoices);
+		res.status(200).json({
+			message: 'user invoices retrieved successfully',
+			invoices: filteredInvoices
+		});
 	}
 	catch (err) {
 		next(errorLib.errorWrapper(err));
@@ -52,7 +62,7 @@ exports.renewAlias = async (req, res, next) => {
 	try {
 		const aliasObject = await Alias.findOne({ alias, domain, user: req.user.id });
 
-		if(aliasObject.paid) throw errorLib.conflictError('You cannot renew a paid alias')
+		if (aliasObject.paid) throw errorLib.conflictError('You cannot renew a paid alias')
 
 		const sevenDays = 604800000; // In milliseconds
 		const now = new Date();
@@ -109,7 +119,7 @@ exports.deleteAlias = async (req, res, next) => {
 	try {
 		const aliasObject = await Alias.findOne({ alias: alias, domain: domain, user: req.user.id });
 
-		if(aliasObject.paid) throw errorLib.conflictError('You cannot delete a paid alias')
+		if (aliasObject.paid) throw errorLib.conflictError('You cannot delete a paid alias')
 
 		await MongoLib.deleteAlias(aliasObject);
 
@@ -170,7 +180,7 @@ exports.editRecord = async (req, res, next) => {
 		record.recipientName = recipientName;
 		record.description = description;
 
-		await dnsimpleLib.editRecord(record.dnsimpleID, currency, domain, recipientAddress, recipientName);
+		await dnsimpleLib.editRecord(record.dnsimpleID, currency, domain, recipientAddress, recipientName, description);
 
 		await theAlias.save();
 
@@ -187,15 +197,24 @@ exports.retrieveTwoFactorAuthSecret = async (req, res, next) => {
 		const user = await User.findById(req.user.id);
 
 		//if two factor is already enabled
-		if (user.requireTwoFactor) throw errorLib.unauthorizedAccessError('You cannot view the secret for 2FA');
+		if (user.requireTwoFactor)
+			throw errorLib.unauthorizedAccessError("Cannot generate another secret because 2FA is enabled for this account.");
 
-		const secret = authenticator.generateSecret();
+		let secret;
+		if (user.twoFactorSecret) {
+			secret = user.twoFactorSecret;
+		}
+		else {
+			secret = authenticator.generateSecret();
+			user.twoFactorSecret = secret;
+
+			// REVIEW: The 2FA secret should probably be hashed like the password field.
+			await user.save();
+		}
+
 		const otpauthurl = authenticator.keyuri(user.email, 'Cryptachi', secret);
 
-		user.twoFactorSecret = secret;
-		await user.save();
-
-		res.status(200).json({ message: `Key generated successfully`, secret, otpauthurl })
+		res.status(200).json({ message: 'Key generated successfully', secret, otpauthurl })
 	} catch (err) {
 		next(errorLib.errorWrapper(err));
 	}
@@ -267,4 +286,34 @@ exports.enableTwoFactorAuth = async (req, res, next) => {
 		next(errorLib.errorWrapper(err));
 	}
 
+}
+
+exports.getUser = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.user.id);
+
+		res.status(200).json({
+			message: 'User info gathered successfully.',
+			user: {
+				isEmailConfirmed: user.isEmailConfirmed,
+				requireTwoFactor: user.requireTwoFactor
+			}
+		});
+	} catch (err) {
+		next(errorLib.errorWrapper(err));
+	}
+}
+
+exports.resendEmailConfirmation = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (user.isEmailConfirmed) throw errorLib.badRequestError('Email is already confirmed.');
+
+    await emailLib.sendAccountVerification(user.email, user.isEmailConfirmedToken);
+
+    res.status(200).json({ message: `Email confirmation has been successfully sent to ${user.email}` });
+  } catch(err) {
+    next(errorLib.errorWrapper(err));
+  }
 }

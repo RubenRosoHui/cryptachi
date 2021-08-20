@@ -155,3 +155,6 @@
 .bg-green-dark {
 	background-color: var(--green-dark);
 }
+.bg-yellow {
+	background-color: var(--yellow);
+}

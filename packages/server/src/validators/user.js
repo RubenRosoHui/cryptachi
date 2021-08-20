@@ -20,7 +20,8 @@ exports.addFreeAlias = [
   validate.alias({
     checkValueIn: 'param',
     checkDomainValueIn: 'query',
-    allowExisting: true
+    allowExisting: true,
+		checkInvoice: true
   }),
   validate.domain({
     checkValueIn: 'query',

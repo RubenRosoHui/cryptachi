@@ -71,7 +71,7 @@ exports.login = async (req, res, next) => {
 			if (authCode) {
 				const verified = authenticator.check(authCode,user.twoFactorSecret);
 				if (!verified) {
-					throw errorLib.badRequestError('You did not enter the correct Auth code');
+					throw errorLib.authenticationError('Invalid 2FA auth code.');
 				}
 			}
 			else {

@@ -10,6 +10,7 @@ import BaseDialog from './components/ui/BaseDialog.vue';
 import BaseConfirm from './components/ui/BaseConfirm.vue';
 import FormMessage from './components/ui/FormMessage';
 import LoadingSpinner from './components/ui/LoadingSpinner.vue';
+import RecaptchaButton from './components/buttons/RecaptchaButton.vue';
 
 const app = createApp(App);
 
@@ -18,6 +19,7 @@ app.component('BaseDialog', BaseDialog);
 app.component('BaseConfirm', BaseConfirm);
 app.component('FormMessage', FormMessage);
 app.component('LoadingSpinner', LoadingSpinner);
+app.component('RecaptchaButton', RecaptchaButton);
 
 app.use(store);
 app.use(router);

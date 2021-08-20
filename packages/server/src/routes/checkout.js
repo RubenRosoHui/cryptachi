@@ -3,9 +3,12 @@ const router = require('express').Router();
 const bodyParser = require('body-parser');
 const controller = require('../controllers/checkout.js');
 const validator = require('../validators/checkout.js');
+const { needsCaptcha } = require('../middlewares/auth.js');
 
-router.post('/create-invoice',validator.createInvoice, controller.createInvoice)
+router.post('/create-invoice', needsCaptcha, validator.createInvoice, controller.createInvoice);
 
-router.post('/webhooks', validator.webhooks, controller.webhooks)
+router.post('/webhooks', validator.webhooks, controller.webhooks);
+
+router.get('/get-invoice',validator.getInvoice, controller.getInvoice)
 
 module.exports = router;

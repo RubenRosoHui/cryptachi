@@ -67,9 +67,7 @@
 						})
 					});
 
-					await handleResponse(response);
-
-					const jsonResponse = await response.json();
+					const jsonResponse = await handleResponse(response);
 
 					this.form.errorMessage = '';
 					this.form.successMessage = `${jsonResponse.message}. You will be redirected to the login page in 10 seconds...`;

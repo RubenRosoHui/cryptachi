@@ -5,8 +5,12 @@
 			<img src="../../assets/logos/png/bitcoin-200.png" />
 			<img src="../../assets/logos/png/monero-200.png" />
 			<img src="../../assets/logos/png/ethereum-200.png" />
+			<img src="../../assets/logos/svg/bitcoin-cash-bch-logo.svg" />
+			<img src="../../assets/logos/svg/Cardano-RGB_Logo-Icon-White.svg" />
+			<img src="../../assets/logos/svg/dogecoin-doge-logo.svg" />
+			<img src="../../assets/logos/svg/litecoin-ltc-logo.svg" />
 		</div>
-		<p class="title-4">And much more...</p>
+		<p class="title-4">And much more coming soon...</p>
 	</div>
 </template>
 
@@ -30,6 +34,7 @@
 		padding: var(--spacing-8) 0;
 		max-width: 800px;
 		margin: 0 auto;
+		gap: var(--spacing-24);
 	}
 	.crypto-list-container img {
 		max-width: 100px;

@@ -15,9 +15,16 @@
 					<img src="../../assets/icons/svg/fi-rr-trash.svg" title="Delete Alias" @click="deleteAlias" />
 				</li>
 				<li class="menu-control">
-					<button v-if="calculateDaysRemaining(alias.expiration) < 7" class="text-button green" @click="onRenewClicked">RENEW</button>
-					<button v-else-if="!alias.paid && alias.records.length > 0" class="text-button" @click="onUpgradeClicked">UPGRADE</button>
-					<img v-else src="../../assets/icons/svg/fi-rr-plus.svg" title="Add Record" @click="addRecord" />
+					<recaptcha-button
+						ref="captchaBtn"
+						v-if="!alias.paid && calculateDaysRemaining(alias.expiration) < 7"
+						buttonClass="text-button"
+						@verify="onCaptchaVerify"
+						@expire="onCaptchaExpire"
+						@fail="onCaptchaFail"
+					>RENEW</recaptcha-button>
+					<button v-else-if="(!alias.paid && alias.records.length > 0) || (alias.paid && calculateDaysRemaining(alias.expiration) < 60)" class="text-button" @click="onUpgradeClicked">UPGRADE</button>
+					<img v-if="(!alias.paid && alias.records.length === 0) || alias.paid" src="../../assets/icons/svg/fi-rr-plus.svg" title="Add Record" @click="addRecord" />
 				</li>
 				<li @click="toggleRecordsVisibility" class="menu-control" v-if="alias.records.length > 0">
 					<img src="../../assets/icons/svg/fi-rr-angle-up.svg" v-if="isRecordsVisible" title="Hide Records" />
@@ -38,9 +45,14 @@
 			<tbody>
 				<tr v-for="(record, i) in sortRecords(alias.records)" :key="i">
 					<td class="currency">
+						<!-- REVIEW: Do this better. Use an object -->
 						<img v-if="record.currency === 'btc'" src="../../assets/logos/png/bitcoin-200.png" />
 						<img v-else-if="record.currency === 'xmr'" src="../../assets/logos/png/monero-200.png" />
 						<img v-else-if="record.currency === 'eth'" src="../../assets/logos/png/ethereum-200.png" />
+						<img v-else-if="record.currency === 'doge'" src="../../assets/logos/svg/dogecoin-doge-logo.svg" />
+						<img v-else-if="record.currency === 'ada'" src="../../assets/logos/svg/Cardano-RGB_Logo-Icon-White.svg" />
+						<img v-else-if="record.currency === 'bch'" src="../../assets/logos/svg/bitcoin-cash-bch-logo.svg" />
+						<img v-else-if="record.currency === 'ltc'" src="../../assets/logos/svg/litecoin-ltc-logo.svg" />
 						{{ record.currency.toUpperCase() }}
 					</td>
 					<td class="recipient-name" :title="record.recipientName">{{ record.recipientName }}</td>
@@ -57,8 +69,11 @@
 </template>
 
 <script>
+	import captchaMixin from '../../mixins/captcha.js';
+
 	export default {
 		name: 'AliasListItem',
+		mixins: [captchaMixin],
 		props: ['alias'],
 		emits: [
 			'editRecord',
@@ -72,6 +87,11 @@
 			isRecordsVisible: false
 		}),
 		methods: {
+			onCaptchaVerify(response) {
+				this.captchaResponse = response;
+				this.captchaReset();
+				this.onRenew();
+			},
 			toggleRecordsVisibility() {
 				this.isRecordsVisible = !this.isRecordsVisible;
 			},
@@ -98,7 +118,8 @@
 				this.$emit('addRecord', {
 					aliasName: this.alias.name,
 					domain: this.alias.domain,
-					currencies: this.alias.records.map(record => record.currency)
+					currencies: this.alias.records.map(record => record.currency),
+					paid: this.alias.paid
 				});
 				this.isRecordsVisible = true;
 			},
@@ -129,10 +150,11 @@
 					domain: this.alias.domain
 				});
 			},
-			onRenewClicked() {
+			onRenew() {
 				this.$emit('renewAlias', {
 					alias: this.alias.name,
-					domain: this.alias.domain
+					domain: this.alias.domain,
+					captchaResponse: this.captchaResponse
 				})
 			}
 		}
@@ -164,6 +186,10 @@
 		color: var(--white);
 	}
 
+	li.menu-control div {
+		display: none;
+	}
+
 	.text-button.green {
 		color: var(--green);
 	}
@@ -172,12 +198,12 @@
 		display: flex;
 		list-style: none;
 		background-color: var(--black);
+		column-gap: var(--spacing-4);
 	}
 	.menu-control {
-		display: flex;
-		align-items: center;
+		/* HACK: grid display fixes the g-recaptcha div from being rendered and ruin the padding.*/
+		display: grid;
 		cursor: pointer;
-		margin-right: var(--spacing-4);
 	}
 	.menu-control img {
 		width: var(--icon-md);

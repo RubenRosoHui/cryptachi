@@ -1,31 +1,36 @@
 const express = require('express');
 const router = express.Router();
 
+const { needsVerifiedAccount, needsCaptcha } = require('../middlewares/auth.js')
 const controller = require('../controllers/user.js')
 const validators = require('../validators/user.js');
 
-router.post('/aliases/:alias/renew', validators.renewAlias, controller.renewAlias); // TODO: Protect with captcha
+router.post('/aliases/:alias/renew', needsVerifiedAccount, needsCaptcha, validators.renewAlias, controller.renewAlias);
 
-router.get('/aliases', controller.getAliases);
+router.get('/aliases', needsVerifiedAccount, controller.getAliases);
 
-router.post('/aliases/:alias', validators.addFreeAlias, controller.addFreeAlias);
+router.post('/aliases/:alias', needsVerifiedAccount, validators.addFreeAlias, controller.addFreeAlias);
 
-router.delete('/aliases/:alias', validators.deleteAlias, controller.deleteAlias);
+router.delete('/aliases/:alias', needsVerifiedAccount, validators.deleteAlias, controller.deleteAlias);
 
-router.post('/aliases/:alias/records', validators.addRecord , controller.addRecord);
+router.post('/aliases/:alias/records', needsVerifiedAccount, validators.addRecord , controller.addRecord);
 
-router.patch('/aliases/:alias/records', validators.editRecord , controller.editRecord);
+router.patch('/aliases/:alias/records', needsVerifiedAccount, validators.editRecord , controller.editRecord);
 
-router.delete('/aliases/:alias/records', validators.deleteRecord , controller.deleteRecord);
+router.delete('/aliases/:alias/records', needsVerifiedAccount, validators.deleteRecord , controller.deleteRecord);
 
-router.post('/change-password', validators.changePassword, controller.changePassword)
+router.post('/change-password', needsVerifiedAccount, validators.changePassword, controller.changePassword)
 
-router.get('/2fa', controller.retrieveTwoFactorAuthSecret);
+router.get('/2fa', needsVerifiedAccount, controller.retrieveTwoFactorAuthSecret);
 
-router.post('/2fa', controller.enableTwoFactorAuth);
+router.patch('/2fa/enable', needsVerifiedAccount, controller.enableTwoFactorAuth);
 
-router.delete('/2fa', controller.disableTwoFactorAuth);
+router.patch('/2fa/disable', needsVerifiedAccount, controller.disableTwoFactorAuth);
 
-router.get('/invoices', controller.getInvoices);
+router.get('/invoices', needsVerifiedAccount, controller.getInvoices);
+
+router.get('/resend-email-confirmation', controller.resendEmailConfirmation);
+
+router.get('/', controller.getUser);
 
 module.exports = router;

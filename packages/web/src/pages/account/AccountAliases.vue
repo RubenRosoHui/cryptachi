@@ -21,6 +21,7 @@
 				<select id="currency" name="currency" v-model="recordForm.fields.currency.value">
 					<option v-for="currency in recordForm.availableCurrencies" :key="currency" :value="currency">{{ currency.toUpperCase() }}</option>
 				</select>
+				<p class="yellow bold margin-top-2" v-if="!recordForm.isAliasPaid">Free aliases are limited to one XMR record.</p>
 			</div>
 			<div class="form-control text-align-right form-buttons">
 				<button v-if="recordForm.mode === 'edit'" type="submit" class="base-button" id="edit-button" @click="editRecord">EDIT</button>
@@ -37,17 +38,12 @@
 				<search-alias-field
 					@aliasChange="alias => aliasForm.fields.aliasName = alias"
 					@domainChange="domain => aliasForm.fields.domain = domain"
+					@validate="onSearchAliasFieldValidate"
 				/>
 			</div>
-			<div class="form-control alias-select-type">
-				<label for="alias-type">Type</label>
-				<select id="alias-type" name="type" v-model="aliasForm.fields.type">
-					<option value="upgraded">Upgraded</option>
-					<option value="free">Free</option>
-				</select>
-			</div>
 			<div class="form-control text-align-right form-buttons">
-				<button type="submit" class="base-button">Add</button>
+				<button type="submit" class="base-button purchase-alias" :disabled="!aliasForm.isValid">Purchase Alias</button>
+				<button type="submit" class="base-button margin-left-4" :disabled="!aliasForm.isValid">Add Free Alias</button>
 			</div>
 		</form>
 	</base-dialog>
@@ -89,6 +85,7 @@
 
 	import AliasListItem from '../../components/lists/AliasListItem.vue';
 	import SearchAliasField from '../../components/fields/SearchAliasField.vue';
+	import { supported } from '@cryptachi/common';
 
 	export default {
 		name: 'AccountAliases',
@@ -100,11 +97,12 @@
 		},
 		data: () => ({
 			isLoading: false,
-			supportedCurrencies: ['xmr', 'btc', 'eth'],
+			supportedCurrencies: supported.currencies,
 			aliases: [],
 			recordForm: {
 				mode: 'edit', // NOTE: Valid values are: 'edit', 'add'
 				isVisible: false,
+				isAliasPaid: false,
 				availableCurrencies: [],
 				fields: {
 					aliasName: '',
@@ -117,6 +115,8 @@
 			},
 			aliasForm: {
 				isVisible: false,
+				isValid: false,
+				errorMessage: '',
 				fields: {
 					aliasName: '',
 					domain: '',
@@ -127,6 +127,7 @@
 		methods: {
 			showEditRecordForm(payload) {
 				const { record, aliasName, domain } = payload;
+
 				const formFields = this.recordForm.fields;
 
 				this.recordForm.mode = 'edit';
@@ -139,7 +140,7 @@
 
 				this.recordForm.isVisible = true;
 			},
-			showAddRecordForm({ aliasName, domain, currencies }) {
+			showAddRecordForm({ aliasName, domain, currencies, paid }) {
 				if (currencies.length >= this.supportedCurrencies.length) {
 					const confirmDialog = this.$refs.confirmDialog;
 					confirmDialog.type = 'ok';
@@ -148,12 +149,18 @@
 					confirmDialog.show = true;
 				} else {
 					this.recordForm.mode = 'add';
+					this.recordForm.isAliasPaid = paid;
 					this.recordForm.fields.aliasName = aliasName;
 					this.recordForm.fields.domain = domain;
 					this.recordForm.fields.recipientName.value = '';
 					this.recordForm.fields.recipientAddress.value = '';
 					this.recordForm.fields.description.value = '';
-					this.recordForm.availableCurrencies = this.supportedCurrencies.filter(sc => !currencies.includes(sc)).sort();
+
+					if (paid)
+						this.recordForm.availableCurrencies = this.supportedCurrencies.filter(sc => !currencies.includes(sc)).sort();
+					else
+						this.recordForm.availableCurrencies = ['xmr']; // Free aliases can only have XMR records.
+
 					this.recordForm.fields.currency.value = this.recordForm.availableCurrencies[0];
 					this.recordForm.isVisible = true;
 				}
@@ -283,10 +290,7 @@
 							headers: { Authorization: this.$store.getters['jwt'] }
 						});
 
-						await handleResponse(response);
-						const jsonResponse = await response.json();
-
-						console.log(jsonResponse.message);
+						const jsonResponse = await handleResponse(response);
 
 						this.aliases = this.aliases.filter(alias => `${alias.name}.${alias.domain}` !== `${aliasName}.${domain}`);
 					};
@@ -302,16 +306,16 @@
 
 				confirmDialog.show = true;
 			},
-			async addAlias() {
+			async addAlias($event) {
 				this.aliasForm.isVisible = false;
 
 				const name = this.aliasForm.fields.aliasName;
 				const domain = this.aliasForm.fields.domain;
-				const aliasType = this.aliasForm.fields.type;
+				const aliasType = $event.submitter.textContent;
 
-				if (aliasType === 'upgraded') {
+				if (aliasType === 'Purchase Alias') {
 					return this.$router.push({
-						path: '/checkout/details',
+						path: '/checkout-details',
 						query: { alias: name, domain }
 					})
 				}
@@ -323,9 +327,7 @@
 						headers: { Authorization: this.$store.getters['jwt'] }
 					});
 
-					await handleResponse(response);
-
-					const jsonResponse = await response.json();
+					const jsonResponse = await handleResponse(response);
 					const newAlias = jsonResponse.alias;
 
 					this.aliases.push({
@@ -345,21 +347,14 @@
 					}
 				}
 			},
-			async renewAlias({ alias, domain }) {
-				// TODO: This must be captcha protected.
+			async renewAlias({ alias, domain, captchaResponse }) {
 				try {
-					const response = await fetch(`/api/user/aliases/${alias}/renew`, {
+					const response = await fetch(`/api/user/aliases/${alias}/renew?domain=${domain}&ct=${captchaResponse}`, {
 						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							Authorization: this.$store.getters['jwt']
-						},
-						body: JSON.stringify({ domain })
+						headers: { Authorization: this.$store.getters['jwt'] }
 					});
 
-					await handleResponse(response);
-
-					const jsonResponse = await response.json();
+					const jsonResponse = await handleResponse(response);
 					const newExpiration = jsonResponse.alias.expiration;
 
 					const theAlias = this.aliases.find(a => a.alias === alias && a.domain === domain);
@@ -376,7 +371,7 @@
 			},
 			upgradeAlias({ alias, domain }) {
 				this.$router.push({
-					path: '/checkout/details',
+					path: '/checkout-details',
 					query: { alias, domain }
 				});
 			},
@@ -385,9 +380,7 @@
 					headers: { 'Authorization': this.$store.getters['jwt'] }
 				});
 
-				await handleResponse(response);
-
-				const jsonResponse = await response.json();
+				const jsonResponse = await handleResponse(response);
 
 				this.aliases = jsonResponse.aliases.map(alias => ({
 					...alias,
@@ -395,6 +388,10 @@
 					name: alias.alias,
 					expiration: new Date(alias.expiration)
 				}));
+			},
+			onSearchAliasFieldValidate({ isValid, errorMessage }) {
+				this.aliasForm.isValid = isValid;
+				this.aliasForm.errorMessage = errorMessage;
 			}
 		}
 	}
@@ -436,6 +433,13 @@
 	}
 	button.add-alias img {
 		width: var(--icon-md);
+	}
+
+	button.purchase-alias {
+		background-color: var(--yellow);
+	}
+	button.purchase-alias[disabled] {
+		background-color: var(--black);
 	}
 
 	#empty-aliases {

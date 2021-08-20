@@ -54,22 +54,27 @@ exports.sendAccountVerification = function (to, token) {
 	);
 }
 
-exports.sendAliasExpiryWarning = function (to, expirationDate) {
+exports.sendAliasExpiryWarning = function (to, expirationDate, alias, domain) {
+	const link = `${process.env.WEB_URL}/account/aliases`
 	return module.exports.sendEmail(
 		'mail@cryptachi.com',
 		to,
 		'Alias Expiring Soon! - Cryptachi.com',
-		`Your alias is gonna expire on ${expirationDate}
+		`<p>Your alias ${alias}.${domain} will expire on ${expirationDate}</p>
+		<p>You can renew now by going <a href="${link}">here</a></p>
 		`
 	)
 }
 
-exports.sendAliasExpiry = function (to) {
+exports.sendAliasExpiry = function (to, alias, domain) {
+	const link = `${process.env.WEB_URL}/account/aliases`
+
 	return module.exports.sendEmail(
 		'mail@cryptachi.com',
 		to,
 		'Alias Expired - Cryptachi.com',
-		`Your alias has expired!
+		`<p>Your alias ${alias}.${domain} has expired!</p>
+		<p>You can always create a new one <a href="${link}">here</a></p>
 		`
 	)
 }
@@ -97,7 +102,7 @@ exports.sendPasswordChangeNotification = function (to) {
 	//const supportLink = `${process.env.PREFIX}://${process.env.IP}:${process.env.WEBPORT}/contact`;
 	const supportLink = `${process.env.WEB_URL}/contact`;
 
-	module.exports.sendEmail(
+	return module.exports.sendEmail(
 		'mail@cryptachi.com',
 		to,
 		'Account Password Changed - Cryptachi.com',
@@ -110,41 +115,48 @@ exports.sendPasswordChangeNotification = function (to) {
 	);
 }
 
-exports.sendInvoicePaymentPage = function (to, url) {
-	module.exports.sendEmail(
-		'mail@cryptachi.com',
-		to,
-		'Purchase Confirmation - Cryptachi.com',
-		`
-			<html>
-				<p>e</p>
-			</html>
-		`
-	);
-}
 exports.sendProcessingConfirmation = function (to) {
 
-	module.exports.sendEmail(
+	return module.exports.sendEmail(
 		'mail@cryptachi.com',
 		to,
-		'Purchase Confirmation - Cryptachi.com',
+		'Purchase Processing - Cryptachi.com',
 		`
 			<html>
-				<p>We have received you payment, we will let you know once confirmed</p>
+				<p>Thank you for choosing Cryptachi! Your purchase is processing and will be ready shortly</p>
 			</html>
 		`
 	);
 }
-exports.sendPurchaseConfirmation = function (to) {
 
-	module.exports.sendEmail(
+exports.sendPurchaseConfirmation = function (to, invoice, alias) {
+
+	//Date	Order ID	Status	Alias	Plan	Payment
+	return module.exports.sendEmail(
 		'mail@cryptachi.com',
 		to,
 		'Purchase Confirmation - Cryptachi.com',
 		`
 			<html>
 				<p>Thank you, your purchase is now available</p>
-			</html>
+				<table>
+					<tr>
+						<th>Date:</th><td>${invoice.createdAt.toDateString()}</td>
+					</tr>
+					<tr>
+						<th>Order ID:</th><td>${invoice.invoiceId}</td>
+					</tr>
+					<tr>
+						<th>Alias:</th><td>${alias.alias}.${alias.domain}</td>
+					</tr>
+					<tr>
+						<th>Plan:</th><td>${invoice.plan.name}</td>
+					</tr>
+					<tr>
+						<th>Payment:</th><td>${invoice.payments.map(x => {return `${x.paid} ${x.currency}`})}</td>
+					</tr>
+				</table>
+			</html >
 		`
 	);
 }

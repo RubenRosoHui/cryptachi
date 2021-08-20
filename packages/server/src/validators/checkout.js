@@ -6,6 +6,19 @@ const Alias = require('../models/alias.js');
 const User = require('../models/user.js');
 const Invoice = require('../models/invoice.js');
 
+exports.getInvoice = [
+	query('invoiceId')
+	.custom(async (invoiceId,{req}) => {
+
+		const invoice = await Invoice.findOne({ invoiceId: invoiceId })
+
+		if(!invoice) throw 'Invoice does not exist'
+
+		return true;
+	}),
+	validate.checkValidationResults
+]
+
 exports.createInvoice = [
 	validate.alias({
 		checkValueIn: 'body',
@@ -61,28 +74,6 @@ exports.webhooks = [
 		}
 		return true;
 	}),
-	body('invoiceId').custom(async (invoiceId, { req }) => {
+	validate.checkValidationResults,
 
-		//list of states that cannot preceed the state specified on the request
-		// "invoiceProcessing cannot come after Settled,Invalid,etc"
-		const invalidConditions = {
-			InvoiceProcessing: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired','InvoiceProcessing'],
-			InvoiceExpired: ['InvoiceSettled','InvoiceInvalid','InvoiceExpired'],
-			InvoiceInvalid: ['InvoiceSettled','InvoiceInvalid'],
-			InvoiceSettled: ['InvoiceSettled','InvoiceInvalid']
-		}
-
-		const invoice = await Invoice.findOne({ invoiceId: invoiceId });
-		if (!invoice) {
-			console.log('This invoice was created improperly')
-			throw errorLib.badRequestError('This invoice was created improperly')
-		}
-		if (invalidConditions[req.body.type] && invalidConditions[req.body.type].includes(invoice.state)) {//invalidStates.includes(invoice.state)) {
-			console.log('Invalid state sent to webhook')
-			throw errorLib.badRequestError('The invoice has already received this information')
-		}
-
-		return true;
-	}),
-	validate.checkValidationResults
 ]

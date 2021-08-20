@@ -3,10 +3,11 @@ const router = express.Router();
 
 const controller = require('../controllers/auth.js');
 const validators = require('../validators/auth.js');
+const { needsCaptcha } = require('../middlewares/auth.js');
 
 router.post('/register', validators.register, controller.register);
 
-router.post('/login', validators.login, controller.login);
+router.post('/login', needsCaptcha, validators.login, controller.login);
 
 router.post('/confirm-email', validators.confirmEmail, controller.confirmEmail)
 

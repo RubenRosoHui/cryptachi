@@ -19,6 +19,7 @@
 	--spacing-40: 10rem;
 }
 
+.padding-1 { padding: var(--spacing-1); }
 .padding-2 { padding: var(--spacing-2); }
 .padding-4 { padding: var(--spacing-4); }
 .padding-8 { padding: var(--spacing-8); }
@@ -39,6 +40,11 @@
 .margin-top-4 { margin-top: var(--spacing-4); }
 .margin-top-8 { margin-top: var(--spacing-8); }
 .margin-top-16 { margin-top: var(--spacing-16); }
+
+.margin-left-2 { margin-left: var(--spacing-2); }
+.margin-left-4 { margin-left: var(--spacing-4); }
+.margin-left-8 { margin-left: var(--spacing-8); }
+.margin-left-16 { margin-left: var(--spacing-16); }
 
 .margin-bottom-2 { margin-bottom: var(--spacing-2); }
 .margin-bottom-4 { margin-bottom: var(--spacing-4); }

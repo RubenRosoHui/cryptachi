@@ -47,9 +47,7 @@
 				try {
 					const response = await fetch(`/api/auth/reset?email=${email.value}`);
 
-					await handleResponse(response);
-
-					const jsonResponse = await response.json();
+					const jsonResponse = await handleResponse(response);
 
 					this.form.successMessage = jsonResponse.message;
 					this.form.errorMessage = '';
