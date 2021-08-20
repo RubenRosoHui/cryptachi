@@ -91,12 +91,13 @@ const router = createRouter({
       props: route => ({ alias: route.query.alias, domain: route.query.domain })
     },
     {
-      path: '/checkout-success',
+      path: '/checkout-message',
       component: CheckoutSuccess,
       beforeEnter: (to, _, next) => {
-        to.query.alias && to.query.domain ? next() : next('/');
+        console.log(to);
+        to.query.alias && to.query.domain && to.query.invoiceId ? next() : next('/');
       },
-      props: route => ({ alias: route.query.alias, domain: route.query.domain })
+      props: route => ({ alias: route.query.alias, domain: route.query.domain, invoiceID: route.query.invoiceId })
     },
     { path: '/email-unconfirmed', component: EmailUnconfirmed },
 		{ path: '/:catchAll(.*)', component: NotFound }
