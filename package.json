@@ -2,5 +2,9 @@
     "private": true,
     "workspaces": [
         "packages/*"
-    ]
+    ],
+    "scripts": {
+        "build-staging": "./scripts/deploy.sh staging /var/www/testapp",
+        "build-production": "./scripts/deploy.sh production /var/www/cryptachi"
+    }
 }
