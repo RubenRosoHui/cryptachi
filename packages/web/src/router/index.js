@@ -36,7 +36,13 @@ const router = createRouter({
   },
   routes: [
     { path: '/', component: Home },
-    { path: '/register', component: Register },
+    {
+      path: '/register',
+      component: Register,
+      beforeEnter(_, _2, next) {
+        store.getters.isAuthenticated ? next('/account') : next();
+      },
+    },
     { path: '/login', component: Login },
     {
       path: '/two-factor',
