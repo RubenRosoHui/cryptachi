@@ -21,6 +21,7 @@
 
 <script>
 	import validator from 'validator';
+	import { supported }from '@cryptachi/common'
 
 	export default {
 		name: 'SearchAliasField',
@@ -38,11 +39,12 @@
 				isValid: false,
 				isAvailable: true
 			},
-			// TODO: Fill with purchased domain/s from DNSimple
 			availableDomains: []
 		}),
 		beforeMount() {
-			if (process.env.NODE_ENV === 'development') {
+			if (process.env.ACTUAL_ENV === 'production') {
+				this.availableDomains = supported.domains;
+			} else {
 				this.availableDomains = ['cryptachi.com', 'cryptachitest.com'];
 			}
 		},

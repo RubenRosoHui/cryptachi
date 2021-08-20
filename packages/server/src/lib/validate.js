@@ -189,10 +189,10 @@ exports.alias = function ({ checkValueIn = 'any', checkDomainValueIn = 'body', r
 
 exports.domain = function ({ checkValueIn = 'any', checkAliasValueIn = 'body', requireAliasField = true, optional = false } = { checkValueIn: 'any', checkAliasValueIn: 'body', requireAliasField: true, optional: false }) {
 	let validDomains;
-	if (process.env.NODE_ENV === 'development') {
-		validDomains = ['cryptachi.com', 'cryptachitest.com'];
-	} else {
+	if (process.env.ACTUAL_ENV === 'production') {
 		validDomains = supported.domains;
+	} else {
+		validDomains = ['cryptachi.com', 'cryptachitest.com'];
 	}
 
 	const defaultMessage = value => `Invalid domain: ${value}`;
