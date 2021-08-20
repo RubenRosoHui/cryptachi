@@ -22,7 +22,7 @@
 			</li>
 			<li>
 				<h2>What are records?</h2>
-				<p>A record is attached to an alias and stores the type of currency, recipient name, and recipient address. An alias may have multiple records where each record is for a specific currency but may only have one record per currency. <span class="yellow bold">Note</span> that free aliases are limited to 1 record and expire every 30 days.</p>
+				<p>A record is attached to an alias and stores the type of currency, recipient name, and recipient address. An alias may have multiple records where each record is for a specific currency but may only have one record per currency. <span class="yellow bold">Note</span> that free aliases are limited to 1 XMR record and expire every 30 days.</p>
 				<br />
 				<p>You may edit these records at any time. Any changes to a record may take up to 24 hours to take effect.</p>
 			</li>
@@ -37,7 +37,11 @@
 				<p>We currently support the following currencies with plans of adding many more:</p>
 				<ul class="base-list">
 					<li>Bitcoin</li>
+					<li>Bitcoin Cash</li>
+					<li>Cardano</li>
+					<li>Dogecoin</li>
 					<li>Ethereum</li>
+					<li>Litecoin</li>
 					<li>Monero</li>
 				</ul>
 			</li>
