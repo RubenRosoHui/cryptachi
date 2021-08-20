@@ -114,7 +114,7 @@ exports.createInvoice = async (req, res, next) => {
 		const btcPayInvoice = await client.create_invoice({
 			price: price,
 			currency: 'USD',
-			redirectUrl: `${process.env.WEB_URL}/checkout-success?alias=${alias}&domain=${domain}&invoiceId={InvoiceId}`,
+			redirectUrl: `${process.env.WEB_URL}/checkout-message?alias=${alias}&domain=${domain}&invoiceId={InvoiceId}`,
 			//expirationTime: Date.now() + 90000,
 			buyerEmail: email,
 			itemCode: plan,
