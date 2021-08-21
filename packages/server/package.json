@@ -6,7 +6,7 @@
   "main": "./src/index.js",
   "scripts": {
     "build-production": "webpack",
-    "build-staging": "TARGET_ENV=staging webpack",
+    "build-staging": "webpack --env TARGET_ENV=staging",
     "dev": "nodemon -r dotenv/config ./src/index.js dotenv_config_path=.env.development.local"
   },
   "keywords": [],

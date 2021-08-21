@@ -17,7 +17,7 @@ const config = {
 };
 
 module.exports = (env, argv) => {
-	const target = process.env.TARGET_ENV || 'production';
+	const target = env.TARGET_ENV || 'production';
 
 	console.log(`Building for: ${target}`);
 	if (target === 'staging') {
