@@ -43,7 +43,13 @@ const router = createRouter({
         store.getters.isAuthenticated ? next('/account') : next();
       },
     },
-    { path: '/login', component: Login },
+    {
+      path: '/login',
+      component: Login,
+      beforeEnter(_, _2, next) {
+        store.getters.isAuthenticated ? next('/account') : next();
+      }
+    },
     {
       path: '/two-factor',
       name: 'TwoFactor',
