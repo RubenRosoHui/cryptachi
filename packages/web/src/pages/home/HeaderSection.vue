@@ -80,10 +80,12 @@
 	}
 	.logo-left {
 		animation: slide-from-left 2s forwards;
+		animation-delay: -1s;
 		animation-timing-function: ease-out;
 	}
 	.logo-right {
 		animation: slide-from-right 2s forwards;
+		animation-delay: -1s;
 		animation-timing-function: ease-out;
 	}
 	@keyframes slide-from-left {
