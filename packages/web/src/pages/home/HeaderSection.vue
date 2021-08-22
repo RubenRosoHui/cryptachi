@@ -70,8 +70,9 @@
 	}
 	.img-container {
 		position: relative;
+		height: 370px;
 		width: 100%;
-		margin-top: var(--spacing-8);
+		margin: var(--spacing-8) auto 0 auto;
 	}
 	.logo {
 		width: 100%;
@@ -79,38 +80,48 @@
 		/*transform: rotate(20deg);*/
 	}
 	.logo-left {
+		position: absolute;
+		top: 0;
+		left: 0;
 		animation: slide-from-left 2s forwards;
 		animation-delay: -1.2s;
 		animation-timing-function: ease-out;
 	}
 	.logo-right {
+		position: absolute;
+		top: 0;
+		right: 0;
 		animation: slide-from-right 2s forwards;
 		animation-delay: -1.2s;
 		animation-timing-function: ease-out;
 	}
 	@keyframes slide-from-left {
 		0% {
-			transform: translateX(0) translateY(500px);
+			top: 18rem;
+			left: -18rem;
 			opacity: 0;
 		}
 		75% {
 			opacity: 0;
 		}
 		100% {
-			transform: translateX(200px);
+			top: 0;
+			left: 0;
 			opacity: 1;
 		}
 	}
 	@keyframes slide-from-right {
 		0% {
-			transform: translateX(0) translateY(-500px);
+			top: -18rem;
+			right: -18rem;
 			opacity: 0;
 		}
 		75% {
 			opacity: 0;
 		}
 		100% {
-			transform: translateX(-200px);
+			top: 0;
+			right: 0;
 			opacity: 1;
 		}
 	}
@@ -123,6 +134,13 @@
 	.signup-button {
 		width: 100%;
 		margin-top: var(--spacing-8);
+	}
+
+	@media (min-width: 400px) {
+		.img-container {
+			width: 400px;
+			height: 400px;
+		}
 	}
 
 	@media (min-width: 600px) {
