@@ -92,7 +92,7 @@
 			opacity: 0;
 		}
 		75% {
-			opacity: 0.01;
+			opacity: 0;
 		}
 		100% {
 			transform: translateX(200px);
@@ -105,7 +105,7 @@
 			opacity: 0;
 		}
 		75% {
-			opacity: 0.01;
+			opacity: 0;
 		}
 		100% {
 			transform: translateX(-200px);
