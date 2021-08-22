@@ -84,3 +84,13 @@
 		transform: rotate(-360deg);
 	}
 }
+
+.sway {
+	animation: sway 5s infinite;
+	animation-timing-function: ease-in-out;
+}
+@keyframes sway {
+	0%   { transform: rotate(5deg); }
+	50%  { transform: rotate(-5deg); }
+	100% { transform: rotate(5deg); }
+}
