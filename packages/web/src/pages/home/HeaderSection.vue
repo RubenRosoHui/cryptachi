@@ -1,7 +1,12 @@
 <template>
 	<header class="section-container">
 		<div class="img-container">
-			<img class="logo levitate" src="../../assets/logos/png/cryptachi-logo.png" />
+			<!--
+				TODO: Replace with this image after left and right logo animation is done and do a sway
+				<img class="logo" src="../../assets/logos/png/cryptachi-logo-v4.png" />
+			-->
+			<img class="logo logo-left" src="../../assets/logos/png/cryptachi-logo-left.png" />
+			<img class="logo logo-right" src="../../assets/logos/png/cryptachi-logo-right.png" />
 		</div>
 		<div class="text-container">
 			<h1>Tired of using long and hard-to-remember crypto addresses?</h1>
@@ -66,10 +71,46 @@
 	.img-container {
 		position: relative;
 		width: 100%;
+		margin-top: var(--spacing-8);
 	}
 	.logo {
 		width: 100%;
 		max-width: 400px;
+		/*transform: rotate(20deg);*/
+	}
+	.logo-left {
+		animation: slide-from-left 2s forwards;
+		animation-timing-function: ease-out;
+	}
+	.logo-right {
+		animation: slide-from-right 2s forwards;
+		animation-timing-function: ease-out;
+	}
+	@keyframes slide-from-left {
+		0% {
+			transform: translateX(0) translateY(500px);
+			opacity: 0;
+		}
+		75% {
+			opacity: 0.01;
+		}
+		100% {
+			transform: translateX(200px);
+			opacity: 1;
+		}
+	}
+	@keyframes slide-from-right {
+		0% {
+			transform: translateX(0) translateY(-500px);
+			opacity: 0;
+		}
+		75% {
+			opacity: 0.01;
+		}
+		100% {
+			transform: translateX(-200px);
+			opacity: 1;
+		}
 	}
 
 	form {
