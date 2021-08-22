@@ -5,9 +5,7 @@
 				{{ alias.name }}<span class="domain">.{{ alias.domain }}</span>
 			</h2>
 			<div class="tags">
-				<span class="tag" :class="{ warning: calculateDaysRemaining(alias.expiration) < 7 }">
-					Expires in: {{ calculateDaysRemaining(alias.expiration) }} days
-				</span>
+				<span class="tag" :class="{ warning: calculateDaysRemaining(alias.expiration) < 7 }">{{ displayExpiration }}</span>
 				<span class="tag free" v-if="!alias.paid">FREE</span>
 			</div>
 			<menu>
@@ -104,8 +102,12 @@
 			calculateDaysRemaining(date) {
 				const now = new Date();
 				const daysRemaining = Math.round((date - now) / 86400000);
-
 				return daysRemaining < 0 ? 0 : daysRemaining;
+			},
+			calculateYearsRemaining(date) {
+				const now = new Date();
+				const yearsRemaining = ((date - now) / 31557600000).toFixed(1);
+				return yearsRemaining < 0 ? 0 : yearsRemaining;
 			},
 			editRecord(record) {
 				this.$emit('editRecord', {
@@ -156,6 +158,16 @@
 					domain: this.alias.domain,
 					captchaResponse: this.captchaResponse
 				})
+			}
+		},
+		computed: {
+			displayExpiration() {
+				const expirationDate = this.alias.expiration;
+				const daysRemaining = this.calculateDaysRemaining(expirationDate);
+
+				if (daysRemaining <= 365) return `Expires in ${daysRemaining} days`;
+
+				return `Expires in ${this.calculateYearsRemaining(expirationDate)} years`;
 			}
 		}
 	}
