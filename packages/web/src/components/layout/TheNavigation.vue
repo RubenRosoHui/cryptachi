@@ -6,6 +6,9 @@
 		<router-link to="/" id="brand">
 			<h1 class="font-lg">Cryptachi</h1>
 		</router-link>
+		<p v-if="isAuthenticated" class="font-xs margin-right-8" id="login-display">
+			Logged in as: <span class="yellow bold">{{ user.email }}</span>
+		</p>
 		<nav class="font-family-mono font-sm bold">
 			<img id="dropdown-menu" title="Menu" src="../../assets/icons/svg/fi-rr-menu-burger.svg" @click="sideMenu('toggle')" />
 			<ul :class="dropdownStyles" @click="sideMenu('close')">
@@ -90,12 +93,14 @@
 				styles.open = this.isMenuDisplayed;
 				return styles;
 			},
-			...mapGetters(['isAuthenticated'])
+			...mapGetters(['isAuthenticated', 'user'])
 		}
 	};
 </script>
 
 <style scoped>
+	#login-display { display: none; }
+
 	.navigation-container {
 		display: flex;
 		position: relative;
@@ -190,5 +195,10 @@
 		nav ul li:last-child img {
 			margin-right: 0;
 		}
+
+	}
+
+	@media (min-width: 1000px) {
+		#login-display { display: initial; }
 	}
 </style>
