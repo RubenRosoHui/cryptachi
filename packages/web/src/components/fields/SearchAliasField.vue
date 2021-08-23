@@ -3,7 +3,7 @@
 		<div class="textbox" :class="textboxStyles">
 			<div class="form-control ti-container">
 				<label class="hidden" for="check-alias">Check Alias</label>
-				<input id="check-alias" :value="alias.value" type="text" name="alias" @input="onAliasInput" :disabled="disable"/>
+				<input id="check-alias" :value="alias.value" placeholder="YourAlias" type="text" name="alias" @input="onAliasInput" :disabled="disable"/>
 			</div>
 			<div class="form-control sel-container">
 				<label class="hidden" for="domains-dropdown">Select Domain</label>
