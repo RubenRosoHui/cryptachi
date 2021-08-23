@@ -86,7 +86,6 @@ const router = createRouter({
         try {
           await store.dispatch('fetchUserMeta');
         } catch(err) {
-          console.log(err);
           if (
             err.httpStatusCode === 401 ||
             (err.httpStatusCode === 500 && err.name === 'JsonWebTokenError')
