@@ -88,7 +88,13 @@
 
 					this.purchases = mappedPurchases;
 				} catch(err) {
-					console.log(err);
+					if (
+						err.httpStatusCode === 401 ||
+						(err.httpStatusCode === 500 && err.name === 'JsonWebTokenError')
+					) {
+						this.$store.dispatch('logout');
+						this.$router.replace('/login');
+					}
 				}
 			}
 		}

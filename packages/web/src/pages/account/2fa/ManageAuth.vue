@@ -26,6 +26,8 @@
 </template>
 
 <script>
+	import { handleResponse } from '../../../lib/exception.js';
+
 	export default {
 		name: 'ManageAuth',
 		emits: ['changeAuthComponent'],
@@ -35,7 +37,17 @@
 		}),
 		async beforeMount() {
 			this.isLoading = true;
-			await this.fetchUserInfo();
+			try {
+				await this.fetchUserInfo();
+			} catch(err) {
+				if (
+					err.httpStatusCode === 401 ||
+					(err.httpStatusCode === 500 && err.name === 'JsonWebTokenError')
+				) {
+					this.$store.dispatch('logout');
+					return this.$router.replace('/login');
+				}
+			}
 			this.isLoading = false;
 		},
 		methods: {
@@ -44,9 +56,7 @@
 					headers: { Authorization: this.$store.getters['jwt'] }
 				});
 
-				if (!response.ok) throw Error('Failed to fetch user info.');
-
-				const jsonResponse = await response.json();
+				const jsonResponse = await handleResponse(response);
 
 				this.twoFactorAuthenticationEnabled = jsonResponse.user.requireTwoFactor;
 			}
