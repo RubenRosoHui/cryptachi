@@ -83,7 +83,19 @@ const router = createRouter({
       component: Account,
       redirect: '/account/aliases',
       async beforeEnter(_, _2, next) {
-        await store.dispatch('fetchUserMeta');
+        try {
+          await store.dispatch('fetchUserMeta');
+        } catch(err) {
+          console.log(err);
+          if (
+            err.httpStatusCode === 401 ||
+            (err.httpStatusCode === 500 && err.name === 'JsonWebTokenError')
+          ) {
+            store.dispatch('logout');
+            return next('/login');
+          }
+        }
+
         store.getters.user.isEmailConfirmed ? next() : next('/email-unconfirmed');
       },
       meta: { needsAuth: true },
