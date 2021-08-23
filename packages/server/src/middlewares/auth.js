@@ -16,7 +16,7 @@ exports.needsWebToken = async (req, res, next) => {
 
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-		req.user = decoded;
+		req.user = decoded.user;
 
     // NOTE: This helps prevent many errors and redundancies where controllers/middlewares
 		// after this one assume that the decoded user exists. That is not always the case.

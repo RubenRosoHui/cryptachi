@@ -12,8 +12,20 @@
 
   export default {
     components: { TheNavigation, TheFooter },
-    async mounted() {
-      await this.$store.dispatch('loadAuthFromStorage');
+    mounted() {
+      this.$store.dispatch('loadAuthFromStorage');
+    },
+    computed: {
+      didAutoLogout() {
+        return this.$store.getters['didAutoLogout'];
+      }
+    },
+    watch: {
+      didAutoLogout(curVal, newVal) {
+        if (curVal && curVal !== newVal) {
+          this.$router.replace('/login');
+        }
+      }
     }
   };
 </script>>

@@ -61,9 +61,11 @@ exports.login = async (req, res, next) => {
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		const payload = {
-			id: user.id,
-			email: user.email,
-			roles: user.roles,
+      user: {
+				id: user.id,
+				email: user.email,
+				roles: user.roles
+      }
 		};
 
 		if (!isMatch) throw errorLib.authenticationError("Invalid credentials.");
@@ -88,8 +90,7 @@ exports.login = async (req, res, next) => {
 				.cookie('jwtSig', signature, {path: '/'})
 				.json({
 					message: "Logged in successfully.",
-					jsonWebToken: [header, payloadData].join('.'),
-					user: payload
+					jsonWebToken: [header, payloadData].join('.')
 				});
 		});
 	} catch (err) {
