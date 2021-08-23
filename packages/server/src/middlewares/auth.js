@@ -4,9 +4,15 @@ const errorLib = require('../lib/error.js');
 const fetch = require('node-fetch');
 
 exports.needsWebToken = async (req, res, next) => {
-	const token = req.header('Authorization');
+	const authToken = req.header('Authorization');
+  const signature = req.cookies.jwtSig;
 
-	if (!token) return next(errorLib.authenticationError("Authentication token is required."));
+	if (!authToken)
+    return next(errorLib.authenticationError("Authentication token is required."));
+  else if (!signature)
+    return next(errorLib.authenticationError("jwtSig cookie is required."));
+
+  const token = [authToken, signature].join('.');
 
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);

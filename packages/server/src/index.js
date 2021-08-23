@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 
 const User = require('./models/user.js');
@@ -48,6 +49,8 @@ app.use(bodyParser.json({
 		}
 }
 }));
+
+app.use(cookieParser());
 
 app.use('/api/aliases', aliasRoutes);
 app.use('/api/auth', authRoutes);

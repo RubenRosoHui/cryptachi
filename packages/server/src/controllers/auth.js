@@ -82,11 +82,15 @@ exports.login = async (req, res, next) => {
 		jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, authorization) => {
 			if (err) throw errorLib.serverError(err.message);
 
-			return res.status(200).json({
-				message: "Logged in successfully.",
-				jsonWebToken: authorization,
-				user: payload
-			});
+			const [ header, payloadData, signature ] = authorization.split('.');
+
+			return res.status(200)
+				.cookie('jwtSig', signature, {path: '/'})
+				.json({
+					message: "Logged in successfully.",
+					jsonWebToken: [header, payloadData].join('.'),
+					user: payload
+				});
 		});
 	} catch (err) {
 		next(errorLib.errorWrapper(err));
