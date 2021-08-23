@@ -30,12 +30,14 @@ export default createStore({
 
       const decoded = jwtDecode(jwt);
       const user = decoded.user;
-      const tokenExpiration = decoded.exp;
 
-      const expiresIn = Math.round(+tokenExpiration - new Date().getTime()/1000) * 1000; // In milliseconds
+      const expiresIn = Math.round(+decoded.exp - new Date().getTime()/1000) * 1000; // In milliseconds
       console.log(`JWT Expires in ${(expiresIn / 86400000).toFixed(1)} days.`)
 
-      if (expiresIn <= 0) return;
+      if (expiresIn <= 0) {
+        context.dispatch('logout');
+        return;
+      }
 
       timer = setTimeout(() => {
         context.dispatch('autoLogout');
