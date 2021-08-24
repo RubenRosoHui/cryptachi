@@ -77,7 +77,7 @@
 	.logo {
 		width: 100%;
 		max-width: 400px;
-		/*transform: rotate(20deg);*/
+		user-select: none;
 	}
 	.logo-left {
 		position: absolute;
