@@ -87,6 +87,7 @@ exports.login = async (req, res, next) => {
 				.cookie('jwtSig', signature, {
 					path: '/',
 					httpOnly: true,
+					sameSite: 'Strict',
 					maxAge: 604800000, // 7 days in milliseconds
 					secure: process.env.ACTUAL_ENV === 'production'
 				})
