@@ -61,11 +61,11 @@ exports.login = async (req, res, next) => {
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		const payload = {
-      user: {
+			user: {
 				id: user.id,
 				email: user.email,
 				roles: user.roles
-      }
+			}
 		};
 
 		if (!isMatch) throw errorLib.authenticationError("Invalid credentials.");
@@ -86,8 +86,13 @@ exports.login = async (req, res, next) => {
 
 			const [ header, payloadData, signature ] = authorization.split('.');
 
-			return res.status(200)
-				.cookie('jwtSig', signature, {path: '/'})
+			res.status(200)
+				.cookie('jwtSig', signature, {
+					path: '/',
+					httpOnly: true,
+					maxAge: 604800000, // 7 days in milliseconds
+					secure: process.env.ACTUAL_ENV === 'production'
+				})
 				.json({
 					message: "Logged in successfully.",
 					jsonWebToken: [header, payloadData].join('.')
