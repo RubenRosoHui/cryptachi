@@ -39,8 +39,9 @@
 		</tbody>
 	</table>
 	<div class="text-align-center" v-else>
-		<img src="../../assets/icons/svg/fi-rr-circle.svg" class="icon-150 red-filter margin-bottom-4" />
-		<p class="error">No invoices to display. Please make a purchase.</p>
+		<h1 class="red margin-bottom-4">No Orders</h1>
+		<img src="../../assets/icons/svg/fi-rr-circle.svg" class="icon-100 red-filter margin-bottom-4" />
+		<p class="error">There are 0 orders to display.</p>
 	</div>
 </template>
 
