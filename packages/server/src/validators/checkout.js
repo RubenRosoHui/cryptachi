@@ -69,7 +69,6 @@ exports.webhooks = [
 			.digest('hex');
 
 		if (signature != `sha256=${hmac}`) {
-			console.log('invalid webhook signature')
 			throw errorLib.authenticationError('You do not have permission to access this route');
 		}
 		return true;

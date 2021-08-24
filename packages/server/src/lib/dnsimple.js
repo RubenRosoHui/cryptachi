@@ -7,7 +7,6 @@ const contentString = function (currency, recipientAddress, recipientName, descr
 	let descriptionString = ''
 	if (description) descriptionString = ` tx_description=${description};`
 
-	console.log(`oa1:${currency} recipient_address=${recipientAddress};${nameString}${descriptionString}`)
 	return `oa1:${currency} recipient_address=${recipientAddress};${nameString}${descriptionString}`
 }
 

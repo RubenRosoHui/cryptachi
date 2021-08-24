@@ -35,9 +35,6 @@ exports.register = async (req, res, next) => {
 		// No need to await
 		EmailLib.sendAccountVerification(email, token);
 
-		// TODO: Remove console log when production ready.
-		console.log(`activation token ${token}`);
-
 		res.status(201).json({
 			message: "User registered successfully.",
 			user: {
