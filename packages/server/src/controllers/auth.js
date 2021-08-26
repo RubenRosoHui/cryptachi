@@ -1,5 +1,4 @@
 const User = require('../models/user.js');
-const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js')
 const EmailLib = require('../lib/email.js')
 const MongoLib = require('../lib/mongoHelper.js')
