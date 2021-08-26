@@ -40,7 +40,6 @@ exports.addRecord = async function (aliasObject, currency, recipientAddress, rec
 
 	//DNSimple API code
 	const id = await dnsimpleLib.addRecord(aliasObject.alias, aliasObject.domain, currency, recipientAddress, recipientName, description);
-	console.log(id); // 20 or 30
 	//Add record
 	aliasObject.records.push({ dnsimpleID: id, currency, recipientAddress, recipientName, description });
 	await aliasObject.save();

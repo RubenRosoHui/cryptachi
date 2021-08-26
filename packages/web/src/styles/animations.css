@@ -57,3 +57,40 @@
 		transform: translateY(0)
 	}
 }
+
+.spinner {
+	animation: spin 3s infinite;
+	animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.spinner-linear {
+	animation: spin-backwards 3s infinite;
+	animation-timing-function: linear;
+}
+@keyframes spin-backwards {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(-360deg);
+	}
+}
+
+.sway {
+	animation: sway 5s infinite;
+	animation-timing-function: ease-in-out;
+}
+@keyframes sway {
+	0%   { transform: rotate(5deg); }
+	50%  { transform: rotate(-5deg); }
+	100% { transform: rotate(5deg); }
+}

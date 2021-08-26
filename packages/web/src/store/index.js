@@ -1,11 +1,15 @@
 import { createStore } from 'vuex';
 
 import { handleResponse } from '../lib/exception.js';
+import jwtDecode from 'jwt-decode';
+
+let timer;
 
 export default createStore({
   state: {
     jwt: null,
-    user: null
+    user: null,
+    didAutoLogout: false
   },
   mutations: {
     jwt(state, payload) {
@@ -13,12 +17,31 @@ export default createStore({
     },
     user(state, payload) {
       state.user = payload;
+    },
+    didAutoLogout(state, payload) {
+      state.didAutoLogout = payload;
     }
   },
   actions: {
     loadAuthFromStorage(context) {
       const jwt = JSON.parse(localStorage.getItem('jwt'));
-      const user = JSON.parse(localStorage.getItem('user'));
+
+      if (!jwt) return;
+
+      const decoded = jwtDecode(jwt);
+      const user = decoded.user;
+
+      const expiresIn = Math.round(+decoded.exp - new Date().getTime()/1000) * 1000; // In milliseconds
+      console.log(`JWT Expires in ${(expiresIn / 86400000).toFixed(1)} days.`)
+
+      if (expiresIn <= 0) {
+        context.dispatch('logout');
+        return;
+      }
+
+      timer = setTimeout(() => {
+        context.dispatch('autoLogout');
+      }, expiresIn);
 
       context.commit('jwt', jwt);
       context.commit('user', user);
@@ -52,17 +75,35 @@ export default createStore({
 
       const jsonResponse = await handleResponse(response);
 
-      context.commit('jwt', jsonResponse.jsonWebToken);
-      context.commit('user', jsonResponse.user);
+      const jwt = jsonResponse.jsonWebToken;
+      const decoded = jwtDecode(jwt);
 
-      localStorage.setItem('jwt', JSON.stringify(jsonResponse.jsonWebToken));
-      localStorage.setItem('user', JSON.stringify(jsonResponse.user));
+      const user = decoded.user;
+      const expiresIn = Math.round(+decoded.exp - new Date().getTime()/1000) * 1000; // In milliseconds
+      console.log(`JWT Expires in ${(expiresIn / 86400000).toFixed(1)} days.`)
+
+      context.commit('jwt', jwt);
+      context.commit('user', user);
+      context.commit('didAutoLogout', false);
+
+      localStorage.setItem('jwt', JSON.stringify(jwt));
+      localStorage.setItem('user', JSON.stringify(user));
+
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        context.dispatch('autoLogout');
+      }, expiresIn);
     },
     logout(context) {
       context.commit('jwt', null);
       context.commit('user', null);
+      clearTimeout(timer);
       localStorage.removeItem('jwt');
       localStorage.removeItem('user');
+    },
+    autoLogout(context) {
+      context.dispatch('logout');
+      context.commit('didAutoLogout', true);
     },
     async fetchUserMeta(context) {
       // Fetches the user meta data from the server.
@@ -84,13 +125,16 @@ export default createStore({
       return !!state.jwt;
     },
     isAdmin(state, getters) {
-      return getters.isAuthenticated() && state.user.role.includes('admin');
+      return getters.isAuthenticated && state.user.roles.includes('admin');
     },
     jwt(state) {
       return state.jwt;
     },
     user(state) {
       return state.user;
+    },
+    didAutoLogout(state) {
+      return state.didAutoLogout;
     }
   }
 })

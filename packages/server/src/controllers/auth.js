@@ -1,5 +1,4 @@
 const User = require('../models/user.js');
-const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js')
 const EmailLib = require('../lib/email.js')
 const MongoLib = require('../lib/mongoHelper.js')
@@ -35,9 +34,6 @@ exports.register = async (req, res, next) => {
 		// No need to await
 		EmailLib.sendAccountVerification(email, token);
 
-		// TODO: Remove console log when production ready.
-		console.log(`activation token ${token}`);
-
 		res.status(201).json({
 			message: "User registered successfully.",
 			user: {
@@ -61,9 +57,11 @@ exports.login = async (req, res, next) => {
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		const payload = {
-			id: user.id,
-			email: user.email,
-			roles: user.roles,
+			user: {
+				id: user.id,
+				email: user.email,
+				roles: user.roles
+			}
 		};
 
 		if (!isMatch) throw errorLib.authenticationError("Invalid credentials.");
@@ -82,11 +80,20 @@ exports.login = async (req, res, next) => {
 		jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, authorization) => {
 			if (err) throw errorLib.serverError(err.message);
 
-			return res.status(200).json({
-				message: "Logged in successfully.",
-				jsonWebToken: authorization,
-				user: payload
-			});
+			const [ header, payloadData, signature ] = authorization.split('.');
+
+			res.status(200)
+				.cookie('jwtSig', signature, {
+					path: '/',
+					httpOnly: true,
+					sameSite: 'Strict',
+					maxAge: 604800000, // 7 days in milliseconds
+					secure: process.env.ACTUAL_ENV === 'production'
+				})
+				.json({
+					message: "Logged in successfully.",
+					jsonWebToken: [header, payloadData].join('.')
+				});
 		});
 	} catch (err) {
 		next(errorLib.errorWrapper(err));

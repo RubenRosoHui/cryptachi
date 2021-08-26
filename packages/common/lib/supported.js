@@ -1,8 +1,5 @@
-
-
 exports.domains = [
 	'sendcoins2.me'
-
 ]
 
 exports.currencies = [

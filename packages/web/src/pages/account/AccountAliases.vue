@@ -376,23 +376,33 @@
 				});
 			},
 			async loadAliases() {
-				const response = await fetch('/api/user/aliases', {
-					headers: { 'Authorization': this.$store.getters['jwt'] }
-				});
+				try {
+					const response = await fetch('/api/user/aliases', {
+						headers: { 'Authorization': this.$store.getters['jwt'] }
+					});
 
-				const jsonResponse = await handleResponse(response);
+					const jsonResponse = await handleResponse(response);
 
-				this.aliases = jsonResponse.aliases.map(alias => ({
-					...alias,
-					id: alias._id,
-					name: alias.alias,
-					expiration: new Date(alias.expiration)
-				}));
+					this.aliases = jsonResponse.aliases.map(alias => ({
+						...alias,
+						id: alias._id,
+						name: alias.alias,
+						expiration: new Date(alias.expiration)
+					}));
+				} catch(err) {
+					if (
+						err.httpStatusCode === 401 ||
+						(err.httpStatusCode === 500 && err.name === 'JsonWebTokenError')
+					) {
+						this.$store.dispatch('logout');
+						this.$router.replace('/login')
+					}
+				}
 			},
 			onSearchAliasFieldValidate({ isValid, errorMessage }) {
 				this.aliasForm.isValid = isValid;
 				this.aliasForm.errorMessage = errorMessage;
-			}
+			},
 		}
 	}
 </script>

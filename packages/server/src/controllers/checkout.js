@@ -121,7 +121,6 @@ exports.createInvoice = async (req, res, next) => {
 			itemDesc: `$${price} USD ${chosenPlan.length / 365} year plan for ${alias}.${domain}`
 		});
 
-		console.log(btcPayInvoice)
 		const invoice = new Invoice({
 			url: btcPayInvoice.url,
 			invoiceId: btcPayInvoice.id,
@@ -141,7 +140,6 @@ exports.createInvoice = async (req, res, next) => {
 		})
 	}
 	catch (err) {
-		console.log("THIS IS AN ERROR")
 		next(err);
 	}
 }
@@ -288,7 +286,6 @@ exports.webhooks = async (req, res, next) => {
 		const invoice = await Invoice.findOne({ invoiceId: invoiceId });
 		if (!invoice) return res.status(200).json({ message: `Invalid state ${invoiceId} sent to webhook` }) && console.log(`Invalid state ${invoiceId} sent to webhook`);
 
-		console.log(type, req.body);
 		switch (type) {
 			case 'InvoiceCreated':
 				break;

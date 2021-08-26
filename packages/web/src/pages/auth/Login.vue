@@ -16,7 +16,7 @@
 			<div class="form-control text-align-right" id="form-buttons">
 				<recaptcha-button
 					ref="captchaBtn"
-					:disabled="form.enableSubmit"
+					:disabled="!form.enableSubmit"
 					@verify="onCaptchaVerify"
 					@expire="onCaptchaExpire"
 					@fail="onCaptchaFail"

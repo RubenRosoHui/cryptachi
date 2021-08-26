@@ -34,6 +34,7 @@
 					<p v-if="authCode.errorMessage" class="error">{{ authCode.errorMessage }}</p>
 				</div>
 				<div class="form-control text-align-right" id="form-buttons">
+					<button type="button" class="base-button margin-right-4" @click="$emit('changeAuthComponent', 'ManageAuth')">Back</button>
 					<button type="submit" class="base-button">Verify</button>
 				</div>
 			</form>
