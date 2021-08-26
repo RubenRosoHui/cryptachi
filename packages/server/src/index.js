@@ -23,21 +23,16 @@ const app = express();
 // MongoDB Configuration
 const mongoUrl = `mongodb://${process.env.MONGODB_HOSTNAME}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DBNAME}`;
 
-var mongoOptions;
-if(process.env.MONGODB_USER){
-	mongoOptions = {
-		auth: {
-			user: process.env.MONGODB_USER,
-			password: process.env.MONGODB_PASS,
-		},
-		useNewUrlParser: true,
-		useUnifiedTopology: true
-	};
-}
-else {
-	mongoOptions = {
-		useNewUrlParser: true,
-		useUnifiedTopology: true
+const mongoOptions = {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true
+};
+
+if(process.env.MONGODB_USER) {
+	mongoOptions.auth = {
+		user: process.env.MONGODB_USER,
+		password: process.env.MONGODB_PASS,
 	};
 }
 
@@ -47,7 +42,7 @@ app.use(bodyParser.json({
 		if (req.url.includes('/webhooks')){
 			req.rawbody = buf;
 		}
-}
+	}
 }));
 
 app.use(cookieParser());
@@ -95,23 +90,23 @@ cron.schedule('* * * * *', cronLib.checkExpiredAliases)
 // MAIN
 // ------------------
 mongoose.connect(mongoUrl, mongoOptions).then(() => {
-  console.log('MongoDB connected successfully.');
-  return User.findOne({ roles: 'admin' });
+	console.log('MongoDB connected successfully.');
+	return User.findOne({ roles: 'admin' });
 }).then(adminFound => {
-  if (!adminFound) {
+	if (!adminFound) {
 		bcrypt.hash(process.env.ADMIN_PASSWORD, 12).then(hashedPassword => {
 			const user = new User({
 				email: process.env.ADMIN_EMAIL.toLowerCase(),
 				password: hashedPassword,
 				roles: ['admin'],
-        isEmailConfirmed: true,
-        isEmailConfirmedToken: undefined
+				isEmailConfirmed: true,
+				isEmailConfirmedToken: undefined
 			});
 			return user.save();
 		}).then(newUser => {
 			console.log(`Created initial admin user... Email: ${newUser.email}, Password: ${process.env.ADMIN_PASSWORD}`);
 		});
-  }
+	}
 
 	const port = process.env.PORT || 3000;
 	app.listen(port, () => console.log(`Server is running on port ${port}`));
