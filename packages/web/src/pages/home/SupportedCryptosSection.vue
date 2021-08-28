@@ -34,9 +34,11 @@
 		padding: var(--spacing-8) 0;
 		max-width: 800px;
 		margin: 0 auto;
-		gap: var(--spacing-24);
+		row-gap: var(--spacing-8);
+		column-gap: var(--spacing-24);
 	}
 	.crypto-list-container img {
-		max-width: 100px;
+		width: 100px;
+		height: 100px;
 	}
 </style>
