@@ -42,7 +42,7 @@
 			availableDomains: []
 		}),
 		beforeMount() {
-			if (process.env.ACTUAL_ENV === 'production') {
+			if (process.env.VUE_APP_ACTUAL_ENV === 'production') {
 				this.availableDomains = supported.domains;
 			} else {
 				this.availableDomains = ['cryptachi.com', 'cryptachitest.com'];
