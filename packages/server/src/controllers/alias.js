@@ -2,8 +2,8 @@ const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const Invoice = require('../models/invoice.js');
 
-const ErrorLib = require('../lib/error.js')
-const MongoLib = require('../lib/mongoHelper.js')
+const ErrorLib = require('../lib/error.js');
+const MongoLib = require('../lib/mongoHelper.js');
 
 //GET /?names=a,b,c&domain=cryptachi.com
 exports.queryAliases = async (req, res, next) => {
@@ -43,4 +43,29 @@ exports.queryAliases = async (req, res, next) => {
 	catch (err) {
 		next(err);
 	}
+}
+
+exports.queryAddresses = async (req, res, next) => {
+	//const { alias, domain } = req.hostname;
+	const alias = 'matthew'
+	const domain = 'cryptachi.com'
+	console.log(req.hostname)
+	console.log(req.subdomains)
+	console.log(req.domain)
+
+	const aliasObject = await Alias.findOne({alias,domain})
+
+	const records = aliasObject.records.map(record => {
+		return {
+			currency: record.currency,
+			recipientAddress: record.recipientAddress,
+			recipientName: record.recipientName,
+			description: record.description
+		}
+	});
+
+	return res.status(200).json({
+		message: 'alias addresses retrieved successfully',
+		addresses: records
+	});
 }
