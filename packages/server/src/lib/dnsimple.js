@@ -68,3 +68,29 @@ exports.editRecord = async function (id, currency, domain, recipientAddress, rec
 
 	return jsonResponse;
 }
+
+exports.addAlias = async function (alias,domain) {
+	if (['development', 'staging'].includes(process.env.ACTUAL_ENV) && process.env.DNSIMPLE_ZONE) domain = process.env.DNSIMPLE_ZONE;
+
+	//add zone record
+	let id;
+	const response = await fetch(`${process.env.DNSIMPLE_DOMAIN}/${process.env.DNSIMPLE_ACCOUNTID}/zones/${domain}/records`, {
+		headers: {
+			'Authorization': `Bearer ${process.env.DNSIMPLE_TOKEN}`,
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		method: 'POST',
+		body: JSON.stringify({
+			name: alias,
+			type: 'ALIAS',
+			content: domain
+		})
+	});
+
+	const responseData = await response.json();
+
+	id = responseData.data.id;
+
+	return id;
+}

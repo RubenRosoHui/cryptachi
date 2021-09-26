@@ -61,6 +61,7 @@ exports.addAlias = async function (user, alias, domain) {
 			domain: domain,
 			expiration: expiry
 		});
+		dnsimpleLib.addAlias(alias,domain);
 	}
 
 	user.aliases.push(newAlias._id);
