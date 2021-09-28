@@ -46,14 +46,9 @@ exports.queryAliases = async (req, res, next) => {
 }
 
 exports.queryAddresses = async (req, res, next) => {
-	//const { alias, domain } = req.hostname;
-	const alias = 'matthew'
-	const domain = 'cryptachi.com'
-	console.log(req.hostname)
-	console.log(req.subdomains)
-	console.log(req.domain)
+	const { alias, domain } = req.query;
 
-	const aliasObject = await Alias.findOne({alias,domain})
+	const aliasObject = await Alias.findOne({ alias, domain })
 
 	const records = aliasObject.records.map(record => {
 		return {
