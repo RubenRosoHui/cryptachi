@@ -100,7 +100,7 @@ exports.confirmPassword = () => body('confirmPassword')
 		return true;
 	});
 
-exports.alias = function ({ checkValueIn = 'any', checkDomainValueIn = 'body', requireDomainField = true, allowTaken = false, allowExisting = false, optional = false, mustExist = false, checkOwnership = false, checkInvoice = false } = { checkValueIn: 'any', checkDomainValueIn: 'body', requireDomainField: true, allowExists: false, allowTaken: false, optional: false, mustExist: false, checkOwnership: false, checkInvoice: false }) {
+exports.alias = function ({ checkValueIn = 'any', checkDomainValueIn = 'body', requireDomainField = true, allowTaken = false,mustBeTaken = false, allowExisting = false, optional = false, mustExist = false, checkOwnership = false, checkInvoice = false } = { checkValueIn: 'any', checkDomainValueIn: 'body', requireDomainField: true, allowExists: false, allowTaken: false, optional: false, mustExist: false, checkOwnership: false, checkInvoice: false }) {
 	const defaultMessage = value => `Invalid alias: ${value}`;
 	let aliasValidator;
 
@@ -147,6 +147,7 @@ exports.alias = function ({ checkValueIn = 'any', checkDomainValueIn = 'body', r
 			// Check if alias is taken
 			const aliasTaken = Boolean(aliasFound && aliasFound.user);
 			if (!allowTaken && aliasTaken) throw 'Alias is taken.';
+			if (mustBeTaken && !aliasTaken) throw 'Alias is not taken.';
 
 			//check if alias has invoice belonging to user
 			if (checkInvoice) {

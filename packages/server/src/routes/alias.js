@@ -8,6 +8,6 @@ const validators = require('../validators/alias.js');
 router.get('/', validators.queryAliases, controller.queryAliases);
 
 //Get aliases addresses
-router.get('/addresses', controller.queryAddresses)
+router.get('/addresses', validators.queryAddresses, controller.queryAddresses)
 
 module.exports = router;
