@@ -84,7 +84,7 @@ exports.addAlias = async function (alias,domain) {
 		body: JSON.stringify({
 			name: alias,
 			type: 'ALIAS',
-			content: domain
+			content: process.env.DNSIMPLE_ALIAS_REDIRECT
 		})
 	});
 
