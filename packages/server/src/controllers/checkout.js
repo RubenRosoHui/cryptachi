@@ -1,13 +1,21 @@
+/*
+Name: checkout.js
+Purpose: Controller to handle checkout routes
+
+*/
+//Libraries
 const fetch = require('node-fetch');
 const btcpay = require('btcpay');
 const crypto = require('crypto');
 
+//Custom Libraries
 const Invoice = require('../models/invoice.js');
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const errorLib = require('../lib/error.js');
 const emailLib = require('../lib/email.js');
 
+//Different plan options
 const paidPlans = {
 	oneYear: {
 		price: 6,
@@ -46,6 +54,7 @@ const paidPlans = {
 	}
 }
 
+//
 exports.getInvoice = async (req, res, next) => {
 	const { invoiceId } = req.query;
 
@@ -65,16 +74,23 @@ exports.getInvoice = async (req, res, next) => {
 	}
 }
 
+// Create an invoice and sends an invoice to the user
 exports.createInvoice = async (req, res, next) => {
-	// https://www.npmjs.com/package/btcpay
-	// On the server set up an access token and run the below script
-	// /node -e "const btcpay=require('btcpay'); new btcpay.BTCPayClient('https://testnet.demo.btcpayserver.org', btcpay.crypto.load_keypair(Buffer.from('PRIVATE KEY', 'hex'))).pair_client('CLIENT KEY').then(console.log).catch(console.error)"
+	
+	/*
+	Setup For BTCPayServer
+	https://www.npmjs.com/package/btcpay
+	On the server set up an access token and run the below script
+	/node -e "const btcpay=require('btcpay'); new btcpay.BTCPayClient('https://testnet.demo.btcpayserver.org', btcpay.crypto.load_keypair(Buffer.from('PRIVATE KEY', 'hex'))).pair_client('CLIENT KEY').then(console.log).catch(console.error)"
+	*/
+
 	const { alias, domain, email, plan } = req.body;
 
 	try {
 		const userObject = await User.findOne({ email: email });
 		let aliasObject = await Alias.findOne({ alias: alias, domain: domain }).populate("invoice");
 
+		//Creates an alias if none exist in the database
 		if (!aliasObject) {
 			aliasObject = new Alias({
 				alias: alias,
@@ -82,12 +98,13 @@ exports.createInvoice = async (req, res, next) => {
 			});
 		}
 
+		//Connects to BTCPayServer
 		const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
 		const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
 
 		const chosenPlan = paidPlans[plan];
 
-		//does alias currently have an active invoice?
+		//Checks if alias has an active invoice
 		if (aliasObject.invoice) {
 			let redirect = true;
 
@@ -108,19 +125,21 @@ exports.createInvoice = async (req, res, next) => {
 
 		//default price
 		const normalPrice = (chosenPlan.price - (chosenPlan.price * (chosenPlan.percentDiscount / 100)));
+		
 		//price after special discount if any
 		const price = (normalPrice - (normalPrice * (chosenPlan.specialDiscount / 100)));
-
+		
+		//Creates Invoice on BTCPayServer
 		const btcPayInvoice = await client.create_invoice({
 			price: price,
 			currency: 'USD',
 			redirectUrl: `${process.env.WEB_URL}/checkout-message?alias=${alias}&domain=${domain}&invoiceId={InvoiceId}`,
-			//expirationTime: Date.now() + 90000,
 			buyerEmail: email,
 			itemCode: plan,
 			itemDesc: `$${price} USD ${chosenPlan.length / 365} year plan for ${alias}.${domain}`
 		});
 
+		//Creates Invoice for Cryptachi
 		const invoice = new Invoice({
 			url: btcPayInvoice.url,
 			invoiceId: btcPayInvoice.id,
@@ -130,7 +149,6 @@ exports.createInvoice = async (req, res, next) => {
 		});
 		aliasObject.invoice = invoice._id;
 		userObject.invoices.push(invoice._id);
-
 		await aliasObject.save();
 		await Promise.all([invoice.save(), userObject.save()]);
 
@@ -144,45 +162,38 @@ exports.createInvoice = async (req, res, next) => {
 	}
 }
 
+// Webhook to cleanup existing invalid invoice 
 const invoiceInvalid = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId });
-
 	const aliasObject = await Alias.findById(invoice.alias);
 
-	//aliasObject.invoice = null;
 	if (aliasObject.invoice && aliasObject.invoice.equals(invoice._id)) {
 		aliasObject.invoice = null;
 		await aliasObject.save();
-		console.log(invoiceId, invoice._id, 'VALID')
-	}
-	else {
-		console.log(invoiceId, invoice._id, 'INVALID')
 	}
 
 	invoice.state = type;
 	await invoice.save();
 }
 
+// webhook to cleanup expired invoice
 const invoiceExpired = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("alias");
-
 	const aliasObject = await Alias.findById(invoice.alias);
 
-	//if invoice does not match properly, occurs when user decides to change the plan they wanted
+	//checks invoice, and occurs when user changes plans
 	if (aliasObject.invoice && aliasObject.invoice.equals(invoice._id)) {
 		aliasObject.invoice = null;
 		await aliasObject.save();
-		console.log(invoiceId, invoice._id, 'VALID')
 	}
-	else {
-		console.log(invoiceId, invoice._id, 'INVALID')
-	}
+
 	const keypair = btcpay.crypto.load_keypair(new Buffer.from(process.env.BTCPAY_KEY, 'hex'));
 	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
 	const btcPayInvoice = await client.get_invoice(invoiceId)
 
+	//checks if a payment was made
 	let partiallyPaid = false;
 	invoice.payments = [];
 	btcPayInvoice.cryptoInfo.forEach(coin => {
@@ -201,6 +212,7 @@ const invoiceExpired = async (req, res, next) => {
 	await invoice.save();
 }
 
+//Webhook called after user makes a purchase
 const invoiceProcessing = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId }).populate("user");
@@ -211,7 +223,7 @@ const invoiceProcessing = async (req, res, next) => {
 	const client = new btcpay.BTCPayClient(process.env.BTCPAY_URL, keypair, { merchant: 'Cryptachi' });
 	const btcPayInvoice = await client.get_invoice(invoiceId)
 
-	//update the active invoice on the alias if the current one is incorrect
+	//checks and updates invoice
 	if (!aliasObject.invoice.equals(invoice._id)) {
 		aliasObject.invoice = invoice._id
 		console.log('running')
@@ -234,6 +246,7 @@ const invoiceProcessing = async (req, res, next) => {
 	emailLib.sendProcessingConfirmation(invoice.user.email)
 }
 
+//Webhook called after purchase was confirmed
 const invoiceSettled = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 	const invoice = await Invoice.findOne({ invoiceId: invoiceId });
@@ -278,6 +291,8 @@ const invoiceSettled = async (req, res, next) => {
 
 }
 
+// Main Webhook
+// Listens to BTCPayServer for requests and calls other webhooks
 exports.webhooks = async (req, res, next) => {
 	const { invoiceId, type } = req.body;
 

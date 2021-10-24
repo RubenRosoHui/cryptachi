@@ -1,14 +1,20 @@
+/*
+Name: user.js
+Purpose:  Controller to handle user routes
+*/
+//Libraries
 const { authenticator } = require('otplib');
 const bcrypt = require('bcryptjs');
 
+//Custom Libraries
 const User = require('../models/user.js');
 const Alias = require('../models/alias.js');
 const Invoice = require('../models/invoice.js')
-
 const emailLib = require('../lib/email.js');
 const errorLib = require('../lib/error.js');
 const MongoLib = require('../lib/mongoHelper.js');
 
+//Gets user's current alias'
 exports.getAliases = async (req, res, next) => {
 	try {
 		const aliases = await User.findById(req.user.id).populate("aliases").select('-_id aliases');
@@ -23,6 +29,7 @@ exports.getAliases = async (req, res, next) => {
 	}
 }
 
+//Gets user's current invoices'
 exports.getInvoices = async (req, res, next) => {
 	try {
 		const userObject = await User.findById(req.user.id)
@@ -56,6 +63,7 @@ exports.getInvoices = async (req, res, next) => {
 	}
 }
 
+//Renew free alias for current user
 exports.renewAlias = async (req, res, next) => {
 	const { alias } = req.params;
 	const { domain } = req.query;
@@ -89,6 +97,7 @@ exports.renewAlias = async (req, res, next) => {
 	}
 }
 
+//Add free alias for current user
 exports.addFreeAlias = async (req, res, next) => {
 	const { alias } = req.params;
 	const { domain } = req.query;
@@ -112,6 +121,7 @@ exports.addFreeAlias = async (req, res, next) => {
 	}
 }
 
+//Delete current alias for current user
 exports.deleteAlias = async (req, res, next) => {
 	const { alias } = req.params;
 	const { domain } = req.query;
@@ -130,6 +140,7 @@ exports.deleteAlias = async (req, res, next) => {
 	}
 }
 
+//Add record for current user alias
 exports.addRecord = async (req, res, next) => {
 	const { currency, domain, recipientAddress, recipientName, description } = req.body;
 	const { alias } = req.params;
@@ -149,6 +160,7 @@ exports.addRecord = async (req, res, next) => {
 	}
 }
 
+//Delete record for current user alias
 exports.deleteRecord = async (req, res, next) => {
 	const { currency, domain } = req.body;
 	const { alias } = req.params;
@@ -165,6 +177,7 @@ exports.deleteRecord = async (req, res, next) => {
 	}
 }
 
+//Edit record for curent user alias
 exports.editRecord = async (req, res, next) => {
 	const dnsimpleLib = require('../lib/dnsimple.js');
 
@@ -184,7 +197,6 @@ exports.editRecord = async (req, res, next) => {
 
 		await theAlias.save();
 
-		// Return updated record.
 		res.status(200).json({ message: "Record updated successfully.", record })
 	} catch (err) {
 		next(errorLib.errorWrapper(err));
@@ -243,6 +255,7 @@ exports.disableTwoFactorAuth = async (req, res, next) => {
 	}
 }
 
+//Change Password for current User
 exports.changePassword = async (req, res, next) => {
 	const password = req.body.password;
 
@@ -288,6 +301,7 @@ exports.enableTwoFactorAuth = async (req, res, next) => {
 
 }
 
+//Gets user info
 exports.getUser = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
@@ -304,6 +318,7 @@ exports.getUser = async (req, res, next) => {
 	}
 }
 
+//Resends confirmation email to current user
 exports.resendEmailConfirmation = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);

@@ -1,8 +1,14 @@
-const Users = require('../models/user.js');
+/*
+Name: root.js
+Purpose: Controller to handle root routes
 
+*/
+//Custom Libraries
+const Users = require('../models/user.js');
 const emailLib = require('../lib/email.js');
 const errorLib = require('../lib/error.js');
 
+//Contact Cryptachi
 exports.contact = async (req, res, next) => {
   const { name, email, phone, message } = req.body;
 

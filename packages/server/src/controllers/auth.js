@@ -1,13 +1,21 @@
-const User = require('../models/user.js');
-const errorLib = require('../lib/error.js')
-const EmailLib = require('../lib/email.js')
-const MongoLib = require('../lib/mongoHelper.js')
+/*
+Name: auth.js
+Purpose: Controller to handle authentication routes
 
+*/
+//Libraries
 const crypto = require('crypto');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { authenticator } = require('otplib');
 
+//Custom Libraries
+const User = require('../models/user.js');
+const errorLib = require('../lib/error.js')
+const EmailLib = require('../lib/email.js')
+const MongoLib = require('../lib/mongoHelper.js')
+
+//registers a new user 
 exports.register = async (req, res, next) => {
 	const { email, password, alias, domain } = req.body;
 
@@ -26,12 +34,10 @@ exports.register = async (req, res, next) => {
 			await MongoLib.addAlias(user, alias, domain);
 		}
 
+		//Sends an email to the new user
 		const token = crypto.randomBytes(32).toString('hex');
 		user.isEmailConfirmedToken = token;
-
 		await user.save();
-
-		// No need to await
 		EmailLib.sendAccountVerification(email, token);
 
 		res.status(201).json({
@@ -44,16 +50,16 @@ exports.register = async (req, res, next) => {
 		});
 	}
 	catch (err) {
-		next(errorLib.errorWrapper(err)); //takes it to the next error middleware
+		next(errorLib.errorWrapper(err));
 	}
 }
 
+//Allows user to login and checks for proper credentials
 exports.login = async (req, res, next) => {
 	const { email, password, authCode } = req.body;
 
 	try {
 		const user = await User.findOne({ email });
-
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		const payload = {
@@ -100,6 +106,7 @@ exports.login = async (req, res, next) => {
 	}
 }
 
+//Confirmation for new user when email is opened
 exports.confirmEmail = async (req, res, next) => {
 	const { email, token } = req.query;
 
@@ -118,6 +125,7 @@ exports.confirmEmail = async (req, res, next) => {
 	}
 }
 
+//Reset Email for user to reset password
 exports.getResetLink = async (req, res, next) => {
 	const { email } = req.query;
 
@@ -125,7 +133,7 @@ exports.getResetLink = async (req, res, next) => {
 		const user = await User.findOne({ email: email });
 
 		let token;
-		//if a valid token currently exists
+		//if a valid token currently exists resend a token
 		if (user.resetToken && Date.now() < user.resetTokenExpiration) {
 			token = user.resetToken;
 			await EmailLib.sendPasswordReset(email, token);
@@ -136,16 +144,13 @@ exports.getResetLink = async (req, res, next) => {
 			user.resetTokenExpiration = Date.now() + 3600000; //in one hour
 			await Promise.all([user.save(), EmailLib.sendPasswordReset(email, token)])
 		}
-
-		console.log(`reset token ${token}`);
-
 		return res.status(200).json({ message: "Email sent" });
 	} catch (err) {
 		next(errorLib.errorWrapper(err));
 	}
 
 }
-
+//Reset Password for user from email
 exports.postResetPassword = async (req, res, next) => {
 	const { email, password, token } = req.body;
 
